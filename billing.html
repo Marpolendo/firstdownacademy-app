@@ -1,0 +1,207 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+<title>Billing — First Down Academy</title>
+<link rel="icon" type="image/x-icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{ --bg:#020f1e; --bg2:#051526; --card:#0a1f36; --card2:#0e2740;
+  --lime:#C1FF22; --border:rgba(193,255,34,.14); --line:rgba(255,255,255,.08);
+  --text:#e8eef4; --muted:#93a4b5; --muted2:#5f7386;
+  --fd:'Barlow Condensed',sans-serif; --fb:'Barlow',sans-serif; --fm:'JetBrains Mono',monospace; }
+*{margin:0;padding:0;box-sizing:border-box}
+body{ background:var(--bg); color:var(--text); font-family:var(--fb);
+  min-height:100vh; padding-bottom:110px; -webkit-font-smoothing:antialiased; }
+
+.top{ position:sticky; top:0; z-index:50; display:flex; align-items:center; justify-content:space-between;
+  padding:14px 18px; background:rgba(2,15,30,.9); backdrop-filter:blur(12px); border-bottom:1px solid var(--line); }
+.top a{ font-family:var(--fm); font-size:11px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--muted); text-decoration:none; }
+.top a:hover{ color:var(--lime); }
+.top .mark{ font-family:var(--fd); font-weight:900; font-style:italic; font-size:16px;
+  letter-spacing:.05em; text-transform:uppercase; color:#fff; }
+.top .mark span{ color:var(--lime); }
+
+.wrap{ max-width:640px; margin:0 auto; padding:28px 20px 0; }
+.eyebrow{ font-family:var(--fm); font-size:10px; letter-spacing:.2em; text-transform:uppercase;
+  color:var(--lime); margin-bottom:8px; }
+h1{ font-family:var(--fd); font-weight:900; font-size:clamp(36px,8vw,50px); line-height:.95;
+  text-transform:uppercase; margin-bottom:6px; }
+.lede{ color:var(--muted); font-size:14px; margin-bottom:26px; }
+
+.section-label{ font-family:var(--fd); font-weight:800; font-size:17px; letter-spacing:.05em;
+  text-transform:uppercase; color:#fff; margin:26px 2px 12px; }
+
+.card{ background:var(--bg2); border:1px solid var(--line); border-radius:14px;
+  padding:18px; margin-bottom:12px; }
+.plan{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:14px;
+  border-color:var(--border);
+  background:radial-gradient(120% 100% at 88% 0%, rgba(193,255,34,.08), transparent 55%), var(--bg2); }
+.plan-name{ font-family:var(--fd); font-weight:900; font-size:24px; text-transform:uppercase; color:#fff; line-height:1; }
+.plan-sub{ font-size:12.5px; color:var(--muted); margin-top:4px; }
+.pill{ font-family:var(--fm); font-size:9.5px; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--lime); background:rgba(193,255,34,.08); border:1px solid var(--border);
+  border-radius:999px; padding:6px 12px; white-space:nowrap; }
+.pill.gray{ color:var(--muted2); background:var(--card); border-color:var(--line); }
+
+.row{ display:grid; grid-template-columns:1fr auto; align-items:center; gap:12px;
+  background:var(--bg2); border:1px solid var(--line); border-radius:11px;
+  padding:14px 16px; margin-bottom:9px; }
+.row-title{ font-weight:600; font-size:14px; color:#fff; }
+.row-sub{ font-family:var(--fm); font-size:10px; letter-spacing:.1em; text-transform:uppercase;
+  color:var(--muted2); margin-top:3px; }
+.row-amt{ font-family:var(--fd); font-weight:800; font-size:18px; color:var(--lime); }
+
+.empty{ text-align:center; padding:26px 16px; color:var(--muted2); font-size:13.5px;
+  border:1px dashed var(--line); border-radius:12px; }
+.empty a{ color:var(--lime); }
+
+.btn{ display:block; text-align:center; font-family:var(--fd); font-weight:800; font-size:15px;
+  letter-spacing:.07em; text-transform:uppercase; border-radius:10px; padding:14px;
+  text-decoration:none; margin-top:8px; }
+.btn.lime{ background:var(--lime); color:#06100a; }
+.btn.ghost{ background:transparent; color:var(--muted); border:1px solid var(--line); }
+.btn.ghost:hover{ color:var(--lime); border-color:var(--lime); }
+
+.help{ font-size:12px; color:var(--muted2); text-align:center; padding:26px 16px 8px; line-height:1.7; }
+.help a{ color:var(--muted); }
+
+.loading{ text-align:center; padding:70px 0; color:var(--muted2); font-family:var(--fm);
+  font-size:11px; letter-spacing:.18em; text-transform:uppercase; }
+#billingBody{ display:none; }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <a href="dashboard.html">← Dashboard</a>
+  <div class="mark">Bill<span>ing</span></div>
+  <a href="premium.html">Go Premium</a>
+</header>
+
+<main class="wrap">
+  <div class="loading" id="billingLoading">Loading your account…</div>
+
+  <div id="billingBody">
+    <div class="eyebrow">Your Account</div>
+    <h1>Billing</h1>
+    <p class="lede" id="billingEmail"></p>
+
+    <div class="section-label">Your Plan</div>
+    <div class="card plan">
+      <div>
+        <div class="plan-name">Level 1 · Foundations</div>
+        <div class="plan-sub">8 modules · full Player Safety course · Gridiron IQ exam</div>
+      </div>
+      <span class="pill">Free Forever</span>
+    </div>
+    <div id="ownedList"></div>
+
+    <div class="section-label">Purchase History</div>
+    <div id="historyList"></div>
+
+    <div class="section-label">Manage</div>
+    <a class="btn lime" href="premium.html">Browse Premium Content →</a>
+    <a class="btn ghost" id="portalBtn" href="#" style="display:none" rel="noopener">Manage Payment &amp; Receipts (Stripe)</a>
+
+    <p class="help">
+      Payments are processed by Stripe. Purchases unlock on this account only.
+      Need help or a refund? Contact us via
+      <a href="https://firstdownacademy.com/legal.html">firstdownacademy.com</a>.
+    </p>
+  </div>
+</main>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="curriculum.js?v=6"></script>
+<script src="app.js?v=6"></script>
+<script>
+// ── Page stubs (required by app.js) ──
+function showPage(n){ var m={'home':'index.html','dashboard':'dashboard.html'}; if(m[n]) window.location.href=m[n]; }
+function buildModuleList(){} function buildDashModuleList(){} function updateNavForLoggedIn(){} function loadDashboard(){}
+
+// ══════════════════════════════════════════════════════════════
+// BILLING CONFIG — paste your Stripe Customer Portal link here
+// (Stripe Dashboard -> Settings -> Billing -> Customer portal).
+// Leave '' until Stripe is live; the button stays hidden.
+// ══════════════════════════════════════════════════════════════
+var STRIPE_PORTAL_URL = '';
+
+// Product id -> display name (must match premium.html PRODUCTS ids)
+var PRODUCT_NAMES = {
+  starter:      'Starter — Level 2',
+  elite:        'Elite — Level 3',
+  offense:      'Offensive Package',
+  defense:      'Defensive Package',
+  specialteams: 'Special Teams Package',
+  position:     'Position Training'
+};
+
+function fmtDate(d){
+  try { return new Date(d).toLocaleDateString(undefined, {year:'numeric', month:'short', day:'numeric'}); }
+  catch(e){ return ''; }
+}
+
+async function loadBilling(){
+  document.getElementById('billingEmail').textContent =
+    'Signed in as ' + ((currentUser && currentUser.email) || 'your account');
+
+  var owned = [], history = [];
+  try {
+    // Reads the entitlements table (created in the Stripe build phase).
+    // If the table doesn't exist yet, this throws and we fall through
+    // to the free-plan-only view — the page works before the backend does.
+    var res = await db.from('entitlements')
+      .select('product, status, amount, purchased_at')
+      .eq('user_id', currentUser.id)
+      .order('purchased_at', { ascending:false });
+    if (!res.error && res.data) {
+      history = res.data;
+      owned = res.data.filter(function(r){ return r.status === 'active'; });
+    }
+  } catch(e) { /* entitlements backend not live yet — free view */ }
+
+  var ownedEl = document.getElementById('ownedList');
+  if (owned.length) {
+    ownedEl.innerHTML = owned.map(function(r){
+      return '<div class="card plan"><div>' +
+        '<div class="plan-name">' + (PRODUCT_NAMES[r.product] || r.product) + '</div>' +
+        '<div class="plan-sub">Unlocked ' + fmtDate(r.purchased_at) + '</div></div>' +
+        '<span class="pill">Active</span></div>';
+    }).join('');
+  }
+
+  var histEl = document.getElementById('historyList');
+  if (history.length) {
+    histEl.innerHTML = history.map(function(r){
+      return '<div class="row"><div>' +
+        '<div class="row-title">' + (PRODUCT_NAMES[r.product] || r.product) + '</div>' +
+        '<div class="row-sub">' + fmtDate(r.purchased_at) + ' · ' + (r.status || '') + '</div></div>' +
+        '<div class="row-amt">' + (r.amount ? '$' + (r.amount/100).toFixed(2) : '') + '</div></div>';
+    }).join('');
+  } else {
+    histEl.innerHTML = '<div class="empty">No purchases yet. Everything you own so far is free — ' +
+      'when premium launches, your purchases and receipts will appear here. ' +
+      '<a href="premium.html">See what\'s coming →</a></div>';
+  }
+
+  if (STRIPE_PORTAL_URL) {
+    var pb = document.getElementById('portalBtn');
+    pb.href = STRIPE_PORTAL_URL;
+    pb.style.display = 'block';
+  }
+
+  document.getElementById('billingLoading').style.display = 'none';
+  document.getElementById('billingBody').style.display = 'block';
+}
+
+document.addEventListener('sessionReady', function(){
+  if (!currentUser) { window.location.href = 'auth.html?next=billing.html'; return; }
+  loadBilling();
+});
+</script>
+</body>
+</html>
