@@ -1,0 +1,515 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Player Safety — First Down Academy</title>
+<meta name="description" content="Free player safety module: hydration, sportsmanship, injury awareness, and recovery. For every athlete ages 8–18.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,700&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&family=Fraunces:ital,opsz,wght@1,9..144,300&display=swap" rel="stylesheet">
+<link rel="prefetch" href="index.html">
+<link rel="prefetch" href="giq-exam.html">
+<style>
+:root{
+  --bg:#020f1e; --bg2:#051526; --card:#0a1f36;
+  --lime:#C1FF22; --border:rgba(193,255,34,.14);
+  --muted:#93a4b5; --muted2:#5f7386;
+  --fd:"Barlow Condensed",sans-serif; --fb:"Barlow",sans-serif;
+  --fm:"JetBrains Mono",monospace; --fs:"Fraunces",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+body{background:var(--bg);color:#e8eef4;font-family:var(--fb);line-height:1.6;-webkit-font-smoothing:antialiased}
+a{color:inherit;text-decoration:none}
+button{font-family:inherit;cursor:pointer}
+
+/* NAV */
+.nav{position:sticky;top:0;z-index:50;height:64px;display:flex;align-items:center;justify-content:space-between;
+  padding:0 20px;background:rgba(2,15,30,.88);backdrop-filter:blur(10px);border-bottom:1px solid var(--border)}
+.nav-brand{display:flex;align-items:center;gap:10px}
+.nav-mark{width:32px;height:32px;background:var(--lime);color:#06100a;display:grid;place-items:center;
+  font-family:var(--fd);font-weight:900;font-size:15px;transform:skewX(-8deg)}
+.nav-name{font-family:var(--fd);font-weight:800;font-style:italic;font-size:16px;letter-spacing:.05em;text-transform:uppercase}
+.nav-back{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted);
+  border:1px solid var(--border);padding:8px 14px;border-radius:2px}
+.nav-back:hover{color:var(--lime);border-color:var(--lime)}
+.nav-right{display:flex;align-items:center;gap:18px}
+.nav-link{font-family:var(--fm);font-size:11px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted)}
+.nav-link:hover{color:var(--lime)}
+.nav-back{background:var(--lime);color:#06100a;border-color:var(--lime);font-weight:700}
+.nav-back:hover{color:#06100a;filter:brightness(1.08)}
+@media(max-width:760px){.nav-link{display:none}}
+
+/* HERO */
+.hero{max-width:900px;margin:0 auto;padding:56px 20px 36px;text-align:center}
+.hero-shield{margin:0 auto 18px;width:72px;height:72px}
+.eyebrow{font-family:var(--fm);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);margin-bottom:10px}
+.hero h1{font-family:var(--fd);font-weight:900;font-size:clamp(48px,10vw,84px);line-height:.9;
+  letter-spacing:-.02em;text-transform:uppercase}
+.hero h1 .serif{font-family:var(--fs);font-style:italic;font-weight:300;color:var(--lime);text-transform:none}
+.hero p{color:var(--muted);max-width:52ch;margin:16px auto 0;font-size:15px}
+
+/* PROGRESS */
+.progress{max-width:900px;margin:0 auto;padding:0 20px 28px}
+.progress-track{height:6px;background:var(--card);border-radius:999px;overflow:hidden}
+.progress-fill{height:100%;width:0%;background:var(--lime);border-radius:999px;transition:width .4s ease}
+.progress-label{font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;
+  color:var(--muted2);margin-top:8px;text-align:right}
+
+/* COMPLETE BANNER */
+.complete{display:none;max-width:900px;margin:0 auto 28px;padding:0 20px}
+.complete.show{display:block}
+.complete-inner{border:1px solid var(--lime);background:rgba(193,255,34,.07);border-radius:4px;
+  padding:22px 24px;display:flex;align-items:center;gap:16px}
+.complete-inner svg{flex:none}
+.complete-title{font-family:var(--fd);font-weight:900;font-size:24px;text-transform:uppercase;letter-spacing:.02em}
+.complete-sub{font-size:13.5px;color:var(--muted)}
+
+/* LESSON LIST */
+.lessons{max-width:900px;margin:0 auto;padding:0 20px 80px;display:grid;gap:16px}
+.lesson{background:var(--bg2);border:1px solid var(--border);border-radius:4px;overflow:hidden}
+.lesson-head{width:100%;display:grid;grid-template-columns:auto 1fr auto;gap:16px;align-items:center;
+  padding:20px;background:none;border:0;color:inherit;text-align:left}
+.lesson-num{font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--muted2);
+  border:1px solid var(--border);padding:6px 9px;border-radius:2px}
+.lesson-title{font-family:var(--fd);font-weight:800;font-size:24px;text-transform:uppercase;letter-spacing:.02em;line-height:1}
+.lesson-sub{font-size:12.5px;color:var(--muted);margin-top:3px}
+.lesson-state{font-family:var(--fm);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted2)}
+.lesson.done .lesson-state{color:var(--lime)}
+.lesson.done .lesson-num{border-color:var(--lime);color:var(--lime)}
+
+/* SLIDE AREA */
+.lesson-body{display:none;border-top:1px solid var(--border)}
+.lesson.open .lesson-body{display:block}
+.slide{display:none;padding:26px 22px}
+.slide.active{display:grid;grid-template-columns:1fr 200px;gap:24px;align-items:center}
+@media(max-width:700px){.slide.active{grid-template-columns:1fr}.slide-art{order:-1;justify-self:center}}
+.slide h3{font-family:var(--fd);font-weight:800;font-size:26px;text-transform:uppercase;margin-bottom:10px;color:#fff}
+.slide p{font-size:14.5px;color:#c3cfda;margin-bottom:10px}
+.slide ul{margin:0 0 10px 18px;font-size:14.5px;color:#c3cfda}
+.slide li{margin-bottom:6px}
+.slide .callout{border-left:3px solid var(--lime);background:rgba(193,255,34,.06);
+  padding:12px 14px;font-size:13.5px;border-radius:0 3px 3px 0}
+.slide-art{width:200px;height:200px}
+.slide-nav{display:flex;align-items:center;justify-content:space-between;padding:0 22px 22px}
+.slide-dots{font-family:var(--fm);font-size:11px;letter-spacing:.14em;color:var(--muted2)}
+.btn{font-family:var(--fd);font-weight:800;font-size:15px;letter-spacing:.06em;text-transform:uppercase;
+  padding:12px 24px;border-radius:2px;border:1px solid var(--border);background:none;color:#e8eef4}
+.btn:hover{border-color:var(--lime);color:var(--lime)}
+.btn-lime{background:var(--lime);color:#06100a;border-color:var(--lime)}
+.btn-lime:hover{color:#06100a;filter:brightness(1.08)}
+.btn[disabled]{opacity:.35;pointer-events:none}
+
+/* QUIZ */
+.quiz{padding:24px 22px;border-top:1px dashed var(--border)}
+.quiz-label{font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--lime);margin-bottom:14px}
+.q{margin-bottom:20px}
+.q-text{font-weight:600;font-size:15px;margin-bottom:10px}
+.q-opts{display:grid;gap:8px}
+.opt{text-align:left;background:var(--card);border:1px solid var(--border);border-radius:3px;
+  padding:11px 14px;font-size:14px;color:#dbe5ee}
+.opt:hover{border-color:rgba(193,255,34,.45)}
+.q.locked .opt{pointer-events:none;opacity:.55}
+.q.locked .opt.correct{opacity:1;border-color:var(--lime);background:rgba(193,255,34,.1);color:#fff}
+.q.locked .opt.wrong{opacity:1;border-color:#e05252;background:rgba(224,82,82,.08)}
+.q-explain{display:none;margin-top:10px;font-size:13px;color:var(--muted);
+  border-left:3px solid var(--lime);padding:8px 12px}
+.q.locked .q-explain{display:block}
+.quiz-done{display:none;margin-top:6px}
+.quiz-done.show{display:block}
+
+footer{border-top:1px solid var(--border);padding:28px 20px;text-align:center;
+  font-family:var(--fm);font-size:10.5px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2)}
+footer a{color:var(--muted)}
+footer a:hover{color:var(--lime)}
+.disclaimer{max-width:900px;margin:0 auto;padding:0 20px 40px;font-size:12px;color:var(--muted2);text-align:center}
+</style>
+</head>
+<body>
+
+<nav class="nav">
+  <a class="nav-brand" href="index.html">
+    <span class="nav-mark">FD</span>
+    <span class="nav-name">First Down Academy</span>
+  </a>
+  <div class="nav-right">
+    <a class="nav-link" href="index.html">Home</a>
+    <a class="nav-link" href="program.html">Curriculum</a>
+    <a class="nav-link" href="giq-exam.html">IQ Lab</a>
+    <a class="nav-link" href="coaches.html">Coaches</a>
+    <a class="nav-back" href="giq-exam.html">Test Your IQ →</a>
+  </div>
+</nav>
+
+<header class="hero">
+  <svg class="hero-shield" viewBox="0 0 64 64" fill="none" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+    <path d="M32 4 L56 13 V32 C56 47 45 56 32 60 C19 56 8 47 8 32 V13 Z" stroke="#C1FF22" stroke-width="2.5" fill="rgba(193,255,34,.06)"/>
+    <path d="M22 32 L29.5 39.5 L43 24" stroke="#C1FF22" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+  </svg>
+  <div class="eyebrow">Always Free · Ages 8–18 · No Level Required</div>
+  <h1>Player <span class="serif">Safety.</span></h1>
+  <p>Six short lessons — about 25 minutes total — covering what every athlete should know: hydration, sportsmanship, injury awareness, recovery, weather and field safety, and speaking up. Finish all six to earn your Safety Star.</p>
+</header>
+
+<div class="progress">
+  <div class="progress-track"><div class="progress-fill" id="progFill"></div></div>
+  <div class="progress-label" id="progLabel">0 of 6 lessons complete</div>
+</div>
+
+<div class="complete" id="completeBanner">
+  <div class="complete-inner">
+    <svg width="44" height="44" viewBox="0 0 64 64" fill="none" aria-hidden="true">
+      <path d="M32 4 L56 13 V32 C56 47 45 56 32 60 C19 56 8 47 8 32 V13 Z" fill="#C1FF22"/>
+      <path d="M22 32 L29.5 39.5 L43 24" stroke="#020f1e" stroke-width="4" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
+    </svg>
+    <div>
+      <div class="complete-title">Safety Star Earned</div>
+      <div class="complete-sub">You finished all six lessons. Share what you learned with a teammate — safety works best when the whole team knows it.</div>
+      <a class="btn btn-lime" style="margin-top:12px;display:inline-block" href="giq-exam.html">Next: Test Your Gridiron IQ →</a>
+    </div>
+  </div>
+</div>
+
+<main class="lessons" id="lessons"></main>
+
+<p class="disclaimer">This module teaches general safety awareness and is not medical advice. Always follow the guidance of your coach, parents, athletic trainer, or doctor.</p>
+
+<footer>
+  <a href="index.html">First Down Academy</a> · Player Safety Module · Free Forever
+</footer>
+
+<script>
+var SAFETY = [
+  {
+    id:"hydration", title:"Hydration & Heat", sub:"Water is equipment. Bring it every day. · ~4 min",
+    slides:[
+      { t:"Drink Before You're Thirsty",
+        html:"<p>By the time you feel thirsty, your body is already behind on water. Thirst is a late warning, not an early one.</p><ul><li>Drink water <strong>before</strong> practice starts.</li><li>Drink at <strong>every</strong> water break — even a few sips.</li><li>Keep drinking <strong>after</strong> practice ends.</li></ul>",
+        art:"drop" },
+      { t:"Hot Days Are Different",
+        html:"<p>Heat makes your body work harder on every rep. On hot or humid days, you lose water faster than you think — especially in pads and a helmet.</p><div class='callout'>Full gear can raise your body heat fast. If your coach adds extra water breaks on hot days, use every one of them.</div>",
+        art:"sun" },
+      { t:"Know the Warning Signs",
+        html:"<p>Heat illness is serious, and teammates look out for each other. Tell a coach right away if you or a teammate has:</p><ul><li>Dizziness or headache</li><li>Muscle cramps</li><li>Feeling sick to your stomach</li><li>Chills or confusion on a hot day</li></ul><div class='callout'>Speaking up isn't weakness — it's what smart players do. Get to shade, water, and an adult.</div>",
+        art:"alert" },
+      { t:"Build the Habit",
+        html:"<p>Great hydration isn't luck — it's a routine you run every single day.</p><ul><li>Pack your water bottle with your gear, every practice, every game.</li><li>Drink at every break without being told.</li><li>Quick body check: if your pee is light-colored, you're hydrated. Dark means drink more.</li></ul><p>Do it long enough and you won't even think about it — that's what pros do.</p>",
+        art:"bottle" }
+    ],
+    quiz:[
+      { q:"When should you drink water on a practice day?",
+        opts:["Only when you feel thirsty","Before, during, and after practice","Only after practice ends","Only if it's a hot day"], a:1,
+        ex:"Thirst shows up late. Drinking before, during, and after keeps you ahead of dehydration." },
+      { q:"On a hot day, a teammate says he's dizzy and has a headache. What do you do?",
+        opts:["Tell him to push through the drill","Give him candy for quick energy","Tell a coach right away and help him get water and shade","Wait and see how he looks next period"], a:2,
+        ex:"Dizziness and headache in the heat are warning signs. Get an adult involved immediately — that's a teammate's job." },
+      { q:"What's the best hydration habit for an athlete?",
+        opts:["Drink a lot once a day, before bed","Bring a water bottle to every practice and drink at every break","Wait until a coach reminds you","Only drink sports drinks — they work better than water"], a:1,
+        ex:"A bottle in your bag and sips at every break beats any other plan. Water is the main fuel — sports drinks are extra, not a replacement." }
+    ]
+  },
+  {
+    id:"sportsmanship", title:"Sportsmanship", sub:"Respect the game, the refs, and the player across from you. · ~4 min",
+    slides:[
+      { t:"Respect Is Part of the Game",
+        html:"<p>Football is physical, but it runs on respect. Refs, coaches, opponents, and teammates all deserve it — every snap, win or lose.</p><ul><li>Play hard <strong>between</strong> the whistles, never after.</li><li>Help an opponent up. It costs nothing.</li><li>Let your play do the talking.</li></ul>",
+        art:"hands" },
+      { t:"Handling Trash Talk",
+        html:"<p>Someone will try to get in your head. That's part of sports. The player who reacts usually gets the flag — and lets the other team win the mental game.</p><div class='callout'>Walk away, reset, next play. Losing your cool is how good players hurt their own team.</div>",
+        art:"shield" },
+      { t:"Winning and Losing Right",
+        html:"<p>How you act after the game says more about you than the score does.</p><ul><li><strong>After a win:</strong> celebrate with your team, respect the other one. No showing off at their expense.</li><li><strong>After a loss:</strong> shake hands, hold your head up, and learn from it. Never blame refs or teammates.</li></ul>",
+        art:"flag" },
+      { t:"Be the Teammate Everyone Wants",
+        html:"<p>Sportsmanship starts inside your own huddle.</p><ul><li>When a teammate makes a mistake, pick him up — <em>next play</em>.</li><li>Never blame, mock, or pile on. Everyone drops one sometimes.</li><li>Celebrate teammates' big plays like they're your own.</li></ul><div class='callout'>Teams that lift each other up play looser, faster, and better. Be the reason yours does.</div>",
+        art:"team" }
+    ],
+    quiz:[
+      { q:"An opponent trash-talks you after a play. What's the smart move?",
+        opts:["Talk back louder so he stops","Shove him when the ref isn't looking","Walk away and lock in on the next play","Tell your teammates to go after him"], a:2,
+        ex:"Reacting is how you draw a penalty and hurt your team. Resetting for the next play is the strongest response there is." },
+      { q:"Your team just lost a close game. Good sportsmanship looks like:",
+        opts:["Explaining to everyone why the refs cost you the game","Shaking hands and congratulating the other team","Skipping the handshake line to cool off","Slamming your helmet so they know you care"], a:1,
+        ex:"Shake hands, hold your head up, learn from it. Everyone loses games — how you handle it is what people remember." },
+      { q:"A teammate drops an easy catch and looks upset. What does a great teammate do?",
+        opts:["Remind him that he cost the team the drive","Say nothing and avoid him","Encourage him — 'shake it off, next play'","Ask the coach to put someone else in"], a:2,
+        ex:"Everyone makes mistakes. Picking a teammate up gets his head back in the game — piling on takes it out." }
+    ]
+  },
+  {
+    id:"injury", title:"Injury Awareness", sub:"Never hide pain. When in doubt, sit it out. · ~5 min",
+    slides:[
+      { t:"Never Hide an Injury",
+        html:"<p>Playing hurt doesn't make you tough — it makes small injuries into big ones. Coaches would always rather know.</p><ul><li>If something hurts, <strong>tell a coach or parent</strong>.</li><li>Pain that changes how you run, cut, or throw means <strong>stop</strong>.</li><li>You can't help your team from the injury list.</li></ul>",
+        art:"cross" },
+      { t:"Head Injuries Are Different",
+        html:"<p>A hit to the head is never something to shake off. If you feel dizzy, confused, sick, or have a headache after a hit — stop playing and tell an adult <strong>immediately</strong>.</p><div class='callout'>When in doubt, sit it out. Never return the same day after a possible concussion, and only come back when a medical professional says you're ready.</div>",
+        art:"helmet" },
+      { t:"Play Safe Every Snap",
+        html:"<p>Most injuries are avoidable with good habits:</p><ul><li><strong>Head up</strong> — see what you hit. Never lead with the top of your helmet.</li><li><strong>Gear that fits</strong> — a loose helmet or pads can't protect you.</li><li><strong>Warm up every time</strong> — cold muscles get hurt.</li></ul>",
+        art:"up" },
+      { t:"Run a Gear Check",
+        html:"<p>Your equipment only protects you if it fits and works. Before every practice and game:</p><ul><li><strong>Helmet:</strong> snug, no rocking side to side.</li><li><strong>Chin strap:</strong> buckled on every snap — no exceptions.</li><li><strong>Mouthguard:</strong> in your mouth, not in your hand.</li><li><strong>Pads:</strong> covering what they're built to cover.</li></ul><div class='callout'>Broken or loose gear? Tell a coach before you take a rep. Equipment problems are always fixable — injuries aren't always.</div>",
+        art:"check" }
+    ],
+    quiz:[
+      { q:"You take a hit and feel dizzy and a little confused. What do you do?",
+        opts:["Keep playing so you don't lose your spot","Stop playing and tell your coach or parent right away","Wait until halftime to mention it","Drink water and shake it off"], a:1,
+        ex:"Those are possible concussion signs. Stop immediately and tell an adult — only a medical professional can clear you to return." },
+      { q:"What's the best way to lower your injury risk on every play?",
+        opts:["Play as fast as possible no matter what","Keep your head up and use proper form","Loosen your pads so you can move freely","Skip warm-ups to save your energy"], a:1,
+        ex:"Head up, good form, gear that fits, and a real warm-up prevent more injuries than anything else you control." },
+      { q:"Your chin strap breaks right before practice. What do you do?",
+        opts:["Practice anyway — it's just one day","Tape it up and hope it holds","Tell your coach and get it fixed before taking a rep","Borrow a smaller helmet even though it rocks around"], a:2,
+        ex:"An unbuckled or broken strap means your helmet can't do its job. Gear problems get fixed before you play — every time." }
+    ]
+  },
+  {
+    id:"recovery", title:"Rest & Recovery", sub:"Sleep and food are training too. · ~4 min",
+    slides:[
+      { t:"Sleep Is a Superpower",
+        html:"<p>Your body gets stronger while you sleep — that's when muscles repair and your brain locks in what you practiced.</p><ul><li>Young athletes need <strong>8–10+ hours</strong> a night.</li><li>Bad sleep means slower reactions and more injuries.</li><li>Big game tomorrow? Sleep is the best prep there is.</li></ul>",
+        art:"moon" },
+      { t:"Fuel Like an Athlete",
+        html:"<p>Food is fuel. You can't practice hard on an empty tank.</p><ul><li>Eat a real meal a couple hours before practice.</li><li>Eat something with protein after — that's when your body rebuilds.</li><li>Water beats soda and energy drinks. Every time.</li></ul>",
+        art:"bolt" },
+      { t:"Listen to Your Body",
+        html:"<p>Feeling worn down, sore for days, or dreading practice you usually love? That's your body asking for rest.</p><div class='callout'>Rest days aren't lazy days — they're when the work you put in becomes strength. Tell a coach or parent if you feel run-down for more than a couple of days.</div>",
+        art:"battery" },
+      { t:"Make Recovery a Routine",
+        html:"<p>The best athletes treat recovery like a scheduled part of training.</p><ul><li>Take your rest days — muscles rebuild <strong>between</strong> workouts, not during them.</li><li>Light movement on off days (a walk, easy stretching) keeps you loose.</li><li>Screens off a little earlier at night = better sleep = better practice.</li></ul>",
+        art:"cal" }
+    ],
+    quiz:[
+      { q:"How much sleep helps young athletes recover and perform their best?",
+        opts:["4–5 hours is plenty during the season","About 6 hours","8–10 or more hours a night","Sleep doesn't really affect sports"], a:2,
+        ex:"Muscles repair and skills lock in during sleep. 8–10+ hours is the target for young athletes." },
+      { q:"You've felt sore and worn down for several days straight. What should you do?",
+        opts:["Hide it and train harder to toughen up","Tell your coach or parent and get some rest","Add a second workout to push through it","Use energy drinks to power past it"], a:1,
+        ex:"Days of feeling run-down is your body asking for recovery. Rest is part of training — say something and take it." },
+      { q:"Why do good coaches schedule rest days?",
+        opts:["To punish players who practiced poorly","Because rest is when your body rebuilds stronger","To save time on the practice field","Rest days are just tradition — they don't matter"], a:1,
+        ex:"Training breaks your muscles down; rest builds them back stronger. Skipping recovery means training harder for worse results." }
+    ]
+  },
+  {
+    id:"weather", title:"Weather & Field Safety", sub:"Lightning, cold, and the ground you play on. · ~4 min",
+    slides:[
+      { t:"When Thunder Roars, Go Indoors",
+        html:"<p>Lightning is one of the most dangerous things on a football field — and it can strike from a storm you can't even see yet.</p><ul><li>Hear thunder? <strong>Stop playing and get inside</strong> a building or a hard-top vehicle.</li><li>Never shelter under trees, goalposts, or bleachers.</li><li>Play doesn't restart until about <strong>30 minutes after the last thunder</strong> — your coach will give the all-clear.</li></ul>",
+        art:"storm" },
+      { t:"Cold Weather Counts Too",
+        html:"<p>Cold practices bring their own risks. Your body works differently when it's freezing.</p><ul><li>Dress in <strong>layers</strong> you can remove as you warm up.</li><li>Cover your head and hands between drills.</li><li>Keep moving — standing still is when cold gets you.</li></ul><div class='callout'>Can't feel your fingers or toes, or can't stop shivering? Tell a coach right away.</div>",
+        art:"snow" },
+      { t:"Check Your Field",
+        html:"<p>Plenty of injuries come from the ground, not the game. Smart players scan the field during warm-ups:</p><ul><li>Holes, dips, or torn turf</li><li>Sprinkler heads, rocks, glass, or trash</li><li>Slick or muddy spots</li></ul><p>Spot something? Point it out to a coach so it gets fixed or marked before someone rolls an ankle on it.</p>",
+        art:"eye" },
+      { t:"Stay With the Team",
+        html:"<p>Part of staying safe is simply staying together — especially at away games and tournaments.</p><ul><li>Stay in the team area unless a coach or parent knows where you are.</li><li>Know the meet-up spot in case you get separated.</li><li>Use a buddy when heading to water, bathrooms, or the parking lot.</li></ul>",
+        art:"team" }
+    ],
+    quiz:[
+      { q:"You hear thunder during practice — no lightning in sight. What's the right move?",
+        opts:["Keep practicing until you actually see lightning","Stop and get inside a building or hard-top vehicle right away","Shelter under the goalpost until it passes","Stand under the biggest tree near the field"], a:1,
+        ex:"If you can hear thunder, lightning is close enough to strike. Get to real shelter immediately — never trees or goalposts." },
+      { q:"When is it safe to go back on the field after a storm?",
+        opts:["As soon as the rain stops","A few minutes after the last rumble","When the coach gives the all-clear — about 30 minutes after the last thunder","Whenever the other team goes back out"], a:2,
+        ex:"The 30-minute rule exists because lightning can strike after a storm seems over. Wait for the adult all-clear." },
+      { q:"During warm-ups you spot a hole in the field. What do you do?",
+        opts:["Remember where it is so you can jump over it","Tell a coach so it can be fixed or marked","Keep it to yourself — it might trip the other team","Kick some dirt in it and keep going"], a:1,
+        ex:"Field hazards injure players on both teams. Telling a coach gets it fixed before someone's season ends on it." }
+    ]
+  },
+  {
+    id:"speakup", title:"Speak Up & Look Out", sub:"Your voice is safety equipment. Use it. · ~4 min",
+    slides:[
+      { t:"Your Voice Is Safety Equipment",
+        html:"<p>Every lesson in this module ends the same way: <strong>tell an adult</strong>. That's not a coincidence — speaking up is the most important safety skill in sports.</p><ul><li>Pain, dizziness, broken gear, a dangerous field — say something.</li><li>Coaches can only fix problems they know about.</li></ul><div class='callout'>When someone's health or safety is involved, telling an adult is never tattling. It's leadership.</div>",
+        art:"mega" },
+      { t:"Bullying & Hazing Are Never OK",
+        html:"<p>Real teams don't make players \"earn their spot\" through embarrassment, threats, or being picked on. That's hazing, and it has no place in football.</p><ul><li>No player ever has to do something embarrassing or unsafe to belong.</li><li>Happening to you or a teammate? Tell a coach or parent.</li><li>Great teammates shut it down; they never join in.</li></ul>",
+        art:"stop" },
+      { t:"Look Out for Each Other",
+        html:"<p>You see things coaches miss. Fifty eyes on the field beat two.</p><ul><li>Notice a teammate limping, wobbly, or quiet after a hit? <strong>Check on him.</strong></li><li>If something seems off, tell a coach — even if your teammate says he's fine.</li><li>The best teams protect their own, on and off the field.</li></ul>",
+        art:"hands" },
+      { t:"Know the Emergency Basics",
+        html:"<p>You're not expected to be a doctor — just to know what to do in the first ten seconds.</p><ul><li>Know where the first-aid kit and athletic trainer are at your field.</li><li>If a player is seriously hurt: <strong>don't move him</strong>, give him space, and get an adult <strong>immediately</strong>.</li><li>Stay calm — the calmest person on the field is the most useful one.</li></ul>",
+        art:"cross" }
+    ],
+    quiz:[
+      { q:"An older player says rookies have to do something embarrassing to \"join the team.\" What is that?",
+        opts:["A normal football tradition — go along with it","Hazing — it's never OK, and you should tell a coach or parent","Fine, as long as you only do the easy parts","Something to laugh off so you fit in"], a:1,
+        ex:"That's hazing, and no team is allowed to require it. Telling an adult protects you and every rookie after you." },
+      { q:"A teammate takes a hard hit and stays down on the field. What do you do?",
+        opts:["Grab his arm and pull him up quickly","Give him space, don't move him, and get a coach immediately","Pour water on him to wake him up","Tell him to walk it off before coach sees"], a:1,
+        ex:"Moving a seriously hurt player can make an injury worse. Space, calm, and an adult — that's the whole job." },
+      { q:"When is telling an adult the right call — not tattling?",
+        opts:["Never — athletes handle things themselves","Only if a coach directly asks you","Any time someone's health or safety is involved","Only after the season is over"], a:2,
+        ex:"Safety is the line. Games and jokes, handle it yourself; health, injuries, hazing, or danger — an adult needs to know, every time." }
+    ]
+  }
+];
+
+/* Inline SVG art per slide */
+var ART = {
+  drop:'<svg viewBox="0 0 200 200" fill="none"><path d="M100 30 C100 30 50 95 50 130 a50 50 0 0 0 100 0 C150 95 100 30 100 30 Z" stroke="#C1FF22" stroke-width="4" fill="rgba(193,255,34,.07)"/><path d="M75 135 a25 25 0 0 0 20 24" stroke="#C1FF22" stroke-width="4" stroke-linecap="round"/></svg>',
+  sun:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round"><circle cx="100" cy="100" r="34" fill="rgba(193,255,34,.07)"/><path d="M100 38v-18M100 180v-18M38 100H20M180 100h-18M56 56 44 44M156 156l-12-12M144 56l12-12M44 156l12-12"/></svg>',
+  alert:'<svg viewBox="0 0 200 200" fill="none"><path d="M100 30 L175 160 H25 Z" stroke="#C1FF22" stroke-width="4" stroke-linejoin="round" fill="rgba(193,255,34,.07)"/><path d="M100 75v45" stroke="#C1FF22" stroke-width="6" stroke-linecap="round"/><circle cx="100" cy="140" r="5" fill="#C1FF22"/></svg>',
+  bottle:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linejoin="round"><path d="M85 30 h30 v18 h-30 Z" fill="rgba(193,255,34,.07)"/><path d="M78 48 h44 l8 26 v96 a8 8 0 0 1 -8 8 H78 a8 8 0 0 1 -8 -8 V74 Z" fill="rgba(193,255,34,.07)"/><path d="M70 110 h60 M70 140 h60" opacity=".5"/></svg>',
+  hands:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M30 90 h45 l25 25 a10 10 0 0 1 -14 14 L70 113" fill="rgba(193,255,34,.07)"/><path d="M170 90 h-45 l-15 15"/><path d="M96 139 l14 14 a10 10 0 0 0 14 -14 M110 153 a10 10 0 0 0 14 -14"/></svg>',
+  shield:'<svg viewBox="0 0 200 200" fill="none"><path d="M100 20 L165 44 V100 C165 145 135 168 100 180 C65 168 35 145 35 100 V44 Z" stroke="#C1FF22" stroke-width="4" fill="rgba(193,255,34,.07)"/><path d="M72 100 L92 120 L130 78" stroke="#C1FF22" stroke-width="6" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+  flag:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4"><path d="M60 180 V30" stroke-linecap="round"/><path d="M60 34 h80 l-16 22 16 22 H60" fill="rgba(193,255,34,.07)" stroke-linejoin="round"/></svg>',
+  team:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round"><circle cx="70" cy="70" r="20" fill="rgba(193,255,34,.07)"/><circle cx="130" cy="70" r="20" fill="rgba(193,255,34,.07)"/><path d="M35 150 a35 35 0 0 1 70 0" /><path d="M95 150 a35 35 0 0 1 70 0" /></svg>',
+  cross:'<svg viewBox="0 0 200 200" fill="none"><rect x="40" y="40" width="120" height="120" rx="16" stroke="#C1FF22" stroke-width="4" fill="rgba(193,255,34,.07)"/><path d="M100 70v60M70 100h60" stroke="#C1FF22" stroke-width="8" stroke-linecap="round"/></svg>',
+  helmet:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M45 105 a55 55 0 0 1 110 0 v20 h-20 l-8 22 h-30 l-6 -22 H55 Z" fill="rgba(193,255,34,.07)"/><path d="M135 125 h28 v14 h-24"/><circle cx="122" cy="102" r="5" fill="#C1FF22" stroke="none"/></svg>',
+  up:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="5" stroke-linecap="round" stroke-linejoin="round"><path d="M100 165 V45" /><path d="M65 80 L100 45 L135 80"/><path d="M40 165 h120" opacity=".4"/></svg>',
+  check:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><circle cx="100" cy="100" r="70" fill="rgba(193,255,34,.07)"/><path d="M68 102 L92 126 L136 76" stroke-width="7"/></svg>',
+  moon:'<svg viewBox="0 0 200 200" fill="none"><path d="M135 30 a70 70 0 1 0 35 95 a58 58 0 0 1 -35 -95 Z" stroke="#C1FF22" stroke-width="4" fill="rgba(193,255,34,.07)"/><path d="M150 60 l4 10 10 4 -10 4 -4 10 -4 -10 -10 -4 10 -4 Z" fill="#C1FF22"/></svg>',
+  bolt:'<svg viewBox="0 0 200 200" fill="none"><path d="M112 22 L52 112 h40 l-8 66 64 -96 h-42 Z" stroke="#C1FF22" stroke-width="4" stroke-linejoin="round" fill="rgba(193,255,34,.07)"/></svg>',
+  battery:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4"><rect x="30" y="70" width="120" height="60" rx="8" fill="rgba(193,255,34,.07)"/><path d="M150 88 h16 v24 h-16"/><rect x="42" y="82" width="22" height="36" fill="#C1FF22" stroke="none"/><rect x="70" y="82" width="22" height="36" fill="#C1FF22" stroke="none" opacity=".5"/></svg>',
+  cal:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round"><rect x="35" y="50" width="130" height="115" rx="10" fill="rgba(193,255,34,.07)"/><path d="M35 82 h130 M70 36 v26 M130 36 v26"/><circle cx="75" cy="115" r="6" fill="#C1FF22" stroke="none"/><circle cx="105" cy="115" r="6" fill="#C1FF22" stroke="none" opacity=".5"/><circle cx="135" cy="115" r="6" fill="#C1FF22" stroke="none" opacity=".5"/></svg>',
+  storm:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linejoin="round"><path d="M60 100 a30 30 0 0 1 4 -60 a38 38 0 0 1 74 8 a26 26 0 0 1 2 52 Z" fill="rgba(193,255,34,.07)"/><path d="M104 108 L82 142 h22 l-10 34 32 -44 h-22 l12 -24 Z" fill="rgba(193,255,34,.15)"/></svg>',
+  snow:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round"><path d="M100 30 v140 M40 65 l120 70 M160 65 L40 135"/><path d="M100 30 l-12 14 M100 30 l12 14 M100 170 l-12 -14 M100 170 l12 -14 M40 65 l18 2 M40 65 l2 18 M160 135 l-18 -2 M160 135 l-2 -18 M160 65 l-2 18 M160 65 l-18 2 M40 135 l2 -18 M40 135 l18 -2"/></svg>',
+  eye:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4"><path d="M25 100 C55 60 145 60 175 100 C145 140 55 140 25 100 Z" fill="rgba(193,255,34,.07)"/><circle cx="100" cy="100" r="24"/><circle cx="100" cy="100" r="8" fill="#C1FF22" stroke="none"/></svg>',
+  mega:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4" stroke-linecap="round" stroke-linejoin="round"><path d="M40 85 v30 h25 l60 35 V50 L65 85 Z" fill="rgba(193,255,34,.07)"/><path d="M65 115 l10 40 h18 l-8 -38"/><path d="M140 80 a25 25 0 0 1 0 40" opacity=".6"/><path d="M152 65 a45 45 0 0 1 0 70" opacity=".35"/></svg>',
+  stop:'<svg viewBox="0 0 200 200" fill="none" stroke="#C1FF22" stroke-width="4"><circle cx="100" cy="100" r="70" fill="rgba(193,255,34,.07)"/><path d="M52 52 L148 148" stroke-width="6" stroke-linecap="round"/></svg>'
+};
+
+var STORE_KEY = "fda_safety_v1";
+function getState(){
+  try { return JSON.parse(localStorage.getItem(STORE_KEY)) || {}; }
+  catch(e){ return {}; }
+}
+function saveState(s){
+  try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch(e){}
+}
+
+var root = document.getElementById("lessons");
+
+SAFETY.forEach(function(lesson, li){
+  var el = document.createElement("article");
+  el.className = "lesson";
+  el.id = "lesson-" + lesson.id;
+
+  var slidesHtml = lesson.slides.map(function(s, si){
+    return '<div class="slide' + (si===0?' active':'') + '" data-slide="'+si+'">' +
+      '<div><h3>'+s.t+'</h3>'+s.html+'</div>' +
+      '<div class="slide-art" aria-hidden="true">'+ART[s.art]+'</div>' +
+    '</div>';
+  }).join("");
+
+  var quizHtml = lesson.quiz.map(function(q, qi){
+    var opts = q.opts.map(function(o, oi){
+      return '<button class="opt" data-q="'+qi+'" data-o="'+oi+'">'+o+'</button>';
+    }).join("");
+    return '<div class="q" data-a="'+q.a+'"><div class="q-text">'+(qi+1)+'. '+q.q+'</div>' +
+      '<div class="q-opts">'+opts+'</div>' +
+      '<div class="q-explain">'+q.ex+'</div></div>';
+  }).join("");
+
+  el.innerHTML =
+    '<button class="lesson-head" aria-expanded="false">' +
+      '<span class="lesson-num">0'+(li+1)+'</span>' +
+      '<span><span class="lesson-title">'+lesson.title+'</span>' +
+      '<div class="lesson-sub">'+lesson.sub+'</div></span>' +
+      '<span class="lesson-state">Start →</span>' +
+    '</button>' +
+    '<div class="lesson-body">' +
+      slidesHtml +
+      '<div class="slide-nav">' +
+        '<button class="btn btn-prev" disabled>← Back</button>' +
+        '<span class="slide-dots">1 / '+lesson.slides.length+'</span>' +
+        '<button class="btn btn-lime btn-next">Next →</button>' +
+      '</div>' +
+      '<div class="quiz" style="display:none">' +
+        '<div class="quiz-label">Quick Check · '+lesson.quiz.length+' Questions</div>' +
+        quizHtml +
+        '<div class="quiz-done"><button class="btn btn-lime btn-finish">Finish Lesson ✓</button></div>' +
+      '</div>' +
+    '</div>';
+
+  root.appendChild(el);
+
+  var cur = 0;
+  var slides = el.querySelectorAll(".slide");
+  var dots = el.querySelector(".slide-dots");
+  var prev = el.querySelector(".btn-prev");
+  var next = el.querySelector(".btn-next");
+  var quiz = el.querySelector(".quiz");
+  var head = el.querySelector(".lesson-head");
+  var answered = 0;
+
+  head.addEventListener("click", function(){
+    var isOpen = el.classList.contains("open");
+    document.querySelectorAll(".lesson.open").forEach(function(o){ o.classList.remove("open"); });
+    if(!isOpen){ el.classList.add("open"); el.scrollIntoView({behavior:"smooth", block:"start"}); }
+  });
+
+  function show(i){
+    cur = i;
+    slides.forEach(function(s, si){ s.classList.toggle("active", si===i); });
+    dots.textContent = (i+1) + " / " + slides.length;
+    prev.disabled = (i===0);
+    next.textContent = (i===slides.length-1) ? "Take Quick Check →" : "Next →";
+  }
+  prev.addEventListener("click", function(){ if(cur>0) show(cur-1); });
+  next.addEventListener("click", function(){
+    if(cur < slides.length-1){ show(cur+1); }
+    else {
+      quiz.style.display = "block";
+      next.disabled = true;
+      quiz.scrollIntoView({behavior:"smooth", block:"start"});
+    }
+  });
+
+  quiz.querySelectorAll(".opt").forEach(function(opt){
+    opt.addEventListener("click", function(){
+      var qEl = opt.closest(".q");
+      if(qEl.classList.contains("locked")) return;
+      var correct = parseInt(qEl.getAttribute("data-a"), 10);
+      var picked = parseInt(opt.getAttribute("data-o"), 10);
+      qEl.classList.add("locked");
+      qEl.querySelectorAll(".opt").forEach(function(o, oi){
+        if(oi === correct) o.classList.add("correct");
+        else if(oi === picked) o.classList.add("wrong");
+      });
+      answered++;
+      if(answered === lesson.quiz.length){
+        el.querySelector(".quiz-done").classList.add("show");
+      }
+    });
+  });
+
+  el.querySelector(".btn-finish").addEventListener("click", function(){
+    var st = getState();
+    st[lesson.id] = true;
+    saveState(st);
+    markDone(el);
+    el.classList.remove("open");
+    updateProgress();
+  });
+});
+
+function markDone(el){
+  el.classList.add("done");
+  el.querySelector(".lesson-state").textContent = "Complete ✓";
+}
+
+function updateProgress(){
+  var st = getState();
+  var done = SAFETY.filter(function(l){ return st[l.id]; }).length;
+  document.getElementById("progFill").style.width = (done / SAFETY.length * 100) + "%";
+  document.getElementById("progLabel").textContent = done + " of " + SAFETY.length + " lessons complete";
+  document.getElementById("completeBanner").classList.toggle("show", done === SAFETY.length);
+}
+
+/* Restore saved progress */
+(function(){
+  var st = getState();
+  SAFETY.forEach(function(l){
+    if(st[l.id]) markDone(document.getElementById("lesson-" + l.id));
+  });
+  updateProgress();
+})();
+</script>
+</body>
+</html>
