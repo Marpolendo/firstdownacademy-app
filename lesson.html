@@ -7,10 +7,85 @@
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 <link rel="icon" type="image/png" sizes="32x32" href="favicon-32.png">
 <link rel="stylesheet" href="style.css?v=2">
+<style>
+/* ══ LESSON DARK SKIN — matches the FDA app theme ══
+   Page-scoped overrides for the classes the lesson engine emits.
+   style.css stays untouched for any page still using light mode. */
+:root{ --L-bg:#020f1e; --L-bg2:#051526; --L-card:#0a1f36; --L-card2:#0e2740;
+  --L-lime:#C1FF22; --L-border:rgba(193,255,34,.14); --L-line:rgba(255,255,255,.08);
+  --L-text:#e8eef4; --L-muted:#93a4b5; --L-muted2:#5f7386; --L-red:#e05252; }
+body{ background:var(--L-bg); }
+
+/* Overview */
+.module-overview{ color:var(--L-text); }
+.overview-chip{ background:var(--L-card); border:1px solid var(--L-border); color:var(--L-lime); }
+.overview-desc{ color:var(--L-muted); }
+.overview-lessons{ background:transparent; }
+.overview-lesson-item{ background:var(--L-bg2); border:1px solid var(--L-line); box-shadow:none; }
+.overview-lesson-num{ background:var(--L-card); color:var(--L-lime); border:1px solid var(--L-border); }
+.overview-lesson-title{ color:#fff; }
+.overview-lesson-count{ color:var(--L-muted2); }
+.overview-meta{ color:var(--L-muted2); }
+
+/* Slides */
+.slide-card{ background:var(--L-bg2); border:1px solid var(--L-line); box-shadow:0 14px 40px rgba(0,0,0,.35); }
+.slide-heading{ color:#fff; }
+.slide-body{ color:#c3cfda; }
+.slide-body strong{ color:#fff; }
+.slide-lesson-banner{ background:var(--L-card); border:1px solid var(--L-border); color:var(--L-text); }
+.slide-lesson-chip{ background:rgba(193,255,34,.1); color:var(--L-lime); border:1px solid var(--L-border); }
+.slide-lesson-name{ color:#fff; }
+.slide-lesson-pos, .slide-lesson-label{ color:var(--L-muted2); }
+.slide-dot{ background:var(--L-card2); }
+.slide-dot.active{ background:var(--L-lime); }
+.slide-dot.done{ background:rgba(193,255,34,.45); }
+.slide-dot-sep{ color:var(--L-muted2); }
+.slide-btn-back{ background:transparent; border:1px solid var(--L-line); color:var(--L-muted); }
+.slide-btn-back:hover{ border-color:var(--L-lime); color:var(--L-lime); }
+.slide-btn-next{ background:var(--L-card); color:var(--L-text); border:1px solid var(--L-line); }
+.slide-btn-next.primary, .btn.btn-primary{ background:var(--L-lime); color:#06100a; border-color:var(--L-lime); }
+.btn.btn-ghost{ background:transparent; border:1px solid var(--L-line); color:var(--L-muted); }
+.btn.btn-ghost:hover{ border-color:var(--L-lime); color:var(--L-lime); }
+
+/* Lesson intro */
+.lesson-intro-card{ background:var(--L-bg2); border:1px solid var(--L-border); box-shadow:none; }
+.lesson-intro-eyebrow{ color:var(--L-lime); }
+.lesson-intro-title{ color:#fff; }
+.lesson-intro-slides{ color:var(--L-muted2); }
+.lesson-intro-preview-item{ color:var(--L-muted); }
+.lesson-intro-preview-dot{ background:var(--L-lime); }
+
+/* Progress */
+.lesson-progress-bar{ background:var(--L-card); }
+.lesson-progress-fill{ background:var(--L-lime); }
+.lesson-progress-label, .lesson-module-label{ color:var(--L-muted2); }
+
+/* Quiz */
+.module-quiz-header{ border-color:var(--L-line); }
+.module-quiz-title, .module-quiz-q{ color:#fff; }
+.module-quiz-sub{ color:var(--L-muted); }
+.module-quiz-num{ background:var(--L-card); color:var(--L-lime); border:1px solid var(--L-border); }
+.module-quiz-section{ background:var(--L-bg2); border:1px solid var(--L-line); box-shadow:none; }
+.lesson-quiz-q{ color:#fff; }
+.lesson-quiz-opt{ background:var(--L-card); border:1.5px solid var(--L-line); color:var(--L-text); }
+.lesson-quiz-opt:hover{ border-color:rgba(193,255,34,.45); background:var(--L-card2); }
+.lesson-opt-letter{ background:var(--L-bg); color:var(--L-lime); border:1px solid var(--L-border); }
+.lesson-quiz-opt.correct{ border-color:var(--L-lime); background:rgba(193,255,34,.1); color:#fff; }
+.lesson-quiz-opt.wrong{ border-color:var(--L-red); background:rgba(224,82,82,.1); color:#fff; }
+.lesson-quiz-result.correct{ background:rgba(193,255,34,.08); border:1.5px solid rgba(193,255,34,.3); color:var(--L-lime); }
+.lesson-quiz-result.wrong{ background:rgba(224,82,82,.08); border:1.5px solid rgba(224,82,82,.35); color:#f28b8b; }
+
+/* Completion */
+.lesson-complete-section{ background:var(--L-bg2); border:1px solid var(--L-border); box-shadow:none; }
+.lesson-complete-title{ color:#fff; }
+.lesson-complete-sub{ color:var(--L-muted); }
+.lesson-complete-icon{ filter:none; }
+.lesson-module-complete-badge{ background:rgba(193,255,34,.1); color:var(--L-lime); border:1px solid var(--L-border); }
+</style>
 </head>
 <body>
 
-<div style="padding-top:0;min-height:100vh;background:var(--off);">
+<div style="padding-top:0;min-height:100vh;background:#020f1e;">
 
   <!-- Lesson header bar -->
   <div style="background:var(--navy);padding:16px 0;border-bottom:1px solid rgba(255,255,255,.08);position:sticky;top:0;z-index:50;">
