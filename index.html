@@ -1,0 +1,151 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>First Down Academy — Player App</title>
+<meta name="description" content="Sign in to First Down Academy to train your Gridiron IQ, or take the free IQ quiz — no account needed.">
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.ico">
+<link rel="apple-touch-icon" href="apple-touch-icon.png">
+<script>
+/* Session check BEFORE paint: if a live Supabase session exists, go straight
+   to the dashboard. Supabase-js stores it as localStorage "sb-<ref>-auth-token".
+   This is a soft fast-path only — dashboard.html still does the real check. */
+(function () {
+  try {
+    for (var i = 0; i < localStorage.length; i++) {
+      var k = localStorage.key(i);
+      if (/^sb-.*-auth-token$/.test(k)) {
+        var s = JSON.parse(localStorage.getItem(k));
+        var exp = s && (s.expires_at || (s.currentSession && s.currentSession.expires_at));
+        if (exp && exp * 1000 > Date.now()) {
+          location.replace("dashboard.html");
+          return;
+        }
+      }
+    }
+  } catch (e) { /* no session — show the entry screen */ }
+})();
+</script>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,800;0,900;1,800&family=Barlow:wght@400;500&family=JetBrains+Mono:wght@500&family=Fraunces:ital,opsz,wght@1,9..144,300&display=swap" rel="stylesheet">
+<link rel="prefetch" href="auth.html">
+<link rel="prefetch" href="signup.html">
+<link rel="prefetch" href="giq-exam.html">
+<style>
+:root{
+  --bg:#020f1e; --bg2:#051526; --card:#0a1f36;
+  --lime:#C1FF22; --border:rgba(193,255,34,.14);
+  --muted:#93a4b5; --muted2:#5f7386;
+  --fd:"Barlow Condensed",sans-serif; --fb:"Barlow",sans-serif;
+  --fm:"JetBrains Mono",monospace; --fs:"Fraunces",serif;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);color:#e8eef4;font-family:var(--fb);
+  display:flex;flex-direction:column;-webkit-font-smoothing:antialiased;
+}
+/* faint field texture */
+body::before{
+  content:"";position:fixed;inset:0;pointer-events:none;opacity:.5;
+  background:
+    radial-gradient(90% 60% at 85% -10%, rgba(193,255,34,.08), transparent 60%),
+    repeating-linear-gradient(90deg, rgba(255,255,255,.025) 0 1px, transparent 1px 96px);
+}
+main{
+  flex:1;display:grid;place-items:center;padding:32px 20px;position:relative;
+}
+.entry{width:100%;max-width:400px;text-align:center}
+.mark{
+  width:64px;height:64px;margin:0 auto 20px;
+  background:var(--lime);color:#06100a;display:grid;place-items:center;
+  font-family:var(--fd);font-weight:900;font-size:28px;transform:skewX(-8deg);
+}
+.eyebrow{font-family:var(--fm);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--lime);margin-bottom:10px}
+h1{
+  font-family:var(--fd);font-weight:900;font-size:clamp(44px,12vw,58px);
+  line-height:.9;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:10px;
+}
+h1 .serif{font-family:var(--fs);font-style:italic;font-weight:300;color:var(--lime);text-transform:none}
+.sub{color:var(--muted);font-size:14.5px;margin-bottom:30px}
+
+.actions{display:grid;gap:12px;text-align:left}
+.action{
+  display:grid;grid-template-columns:1fr auto;align-items:center;gap:12px;
+  background:var(--bg2);border:1px solid var(--border);border-radius:6px;
+  padding:16px 18px;text-decoration:none;color:inherit;
+  transition:border-color .15s ease, transform .15s ease;
+}
+.action:hover{border-color:var(--lime);transform:translateY(-1px)}
+.action-title{font-family:var(--fd);font-weight:800;font-size:20px;text-transform:uppercase;letter-spacing:.03em;color:#fff}
+.action-sub{font-size:12.5px;color:var(--muted);margin-top:2px}
+.action-arrow{font-family:var(--fd);font-weight:800;font-size:20px;color:var(--lime)}
+.action.primary{background:var(--lime);border-color:var(--lime)}
+.action.primary .action-title{color:#06100a}
+.action.primary .action-sub{color:rgba(6,16,10,.7)}
+.action.primary .action-arrow{color:#06100a}
+
+.divider{
+  display:flex;align-items:center;gap:12px;margin:6px 0;
+  font-family:var(--fm);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted2);
+}
+.divider::before,.divider::after{content:"";flex:1;height:1px;background:var(--border)}
+
+footer{
+  position:relative;padding:20px;text-align:center;
+  font-family:var(--fm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);
+}
+footer a{color:var(--muted);text-decoration:none}
+footer a:hover{color:var(--lime)}
+footer span{margin:0 6px;opacity:.5}
+</style>
+</head>
+<body>
+
+<main>
+  <div class="entry">
+    <div class="mark">FD</div>
+    <div class="eyebrow">Player App · Ages 8–18</div>
+    <h1>Train your <span class="serif">IQ.</span></h1>
+    <p class="sub">Sign in to pick up where you left off — or see where your game stands first.</p>
+
+    <div class="actions">
+      <a class="action primary" href="auth.html">
+        <span>
+          <span class="action-title">Sign In</span>
+          <div class="action-sub">Back to your dashboard and lessons</div>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+
+      <a class="action" href="signup.html">
+        <span>
+          <span class="action-title">Create Free Account</span>
+          <div class="action-sub">Unlock all modules — 100% free, ages 8–18</div>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+
+      <div class="divider">No account needed</div>
+
+      <a class="action" href="giq-exam.html">
+        <span>
+          <span class="action-title">Take the IQ Quiz</span>
+          <div class="action-sub">15 adaptive questions · instant letter grade</div>
+        </span>
+        <span class="action-arrow">→</span>
+      </a>
+    </div>
+  </div>
+</main>
+
+<footer>
+  <a href="https://firstdownacademy.com">firstdownacademy.com</a><span>·</span>
+  <a href="https://firstdownacademy.com/coaches.html">Coaches</a><span>·</span>
+  <a href="https://firstdownacademy.com/legal.html">Privacy &amp; Terms</a>
+</footer>
+
+</body>
+</html>
