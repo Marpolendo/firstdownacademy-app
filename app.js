@@ -922,6 +922,8 @@ checkSession();
 var FDA_NAV = (function () {
 
   var ICONS = {
+    safety: '<svg viewBox="0 0 24 24" fill="none"><path d="M12 3l8 3v6c0 5-3.5 8-8 9-4.5-1-8-4-8-9V6l8-3z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 12l2 2 4-4" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg>',
+    premium: '<svg viewBox="0 0 24 24" fill="none"><path d="M3 8l4 3 5-7 5 7 4-3-2 11H5L3 8z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     home: '<svg viewBox="0 0 24 24" fill="none"><path d="m3 9 9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/><path d="M9 22V12h6v10" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     playbook: '<svg viewBox="0 0 24 24" fill="none"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20" stroke="currentColor" stroke-width="1.8"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z" stroke="currentColor" stroke-width="1.8" stroke-linejoin="round"/></svg>',
     iq: '<svg viewBox="0 0 24 24" fill="none"><path d="M13 2 4.5 13.5H11L9.5 22 19 9.5h-6.5L13 2z" fill="currentColor"/></svg>',
@@ -941,11 +943,11 @@ var FDA_NAV = (function () {
       { id: 'signin',   label: 'Sign In',  href: 'auth.html?tab=login', icon: 'signin' }
     ],
     in: [
-      { id: 'home',      label: 'Home',      href: 'index.html',     icon: 'home' },
-      { id: 'playbook',  label: 'Playbook',  href: 'program.html',   icon: 'playbook' },
-      { id: 'iq',        label: 'IQ Quiz',   href: 'giq-exam.html',  icon: 'iq', cta: true },
+      { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', icon: 'dashboard' },
       { id: 'learn',     label: 'Learn',     href: 'lesson.html',    icon: 'learn' },
-      { id: 'dashboard', label: 'Dashboard', href: 'dashboard.html', icon: 'dashboard' }
+      { id: 'iq',        label: 'IQ Quiz',   href: 'giq-exam.html',  icon: 'iq', cta: true },
+      { id: 'safety',    label: 'Safety',    href: 'safety.html',    icon: 'safety' },
+      { id: 'premium',   label: 'Premium',   href: 'premium.html',   icon: 'premium' }
     ]
   };
 
@@ -957,7 +959,9 @@ var FDA_NAV = (function () {
     'coaches': 'coaches',
     'auth': 'signin',
     'lesson': 'learn',
-    'dashboard': 'dashboard'
+    'dashboard': 'dashboard',
+    'safety': 'safety',
+    'premium': 'premium'
   };
 
   var CSS = [
