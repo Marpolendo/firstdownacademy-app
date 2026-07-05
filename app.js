@@ -517,7 +517,7 @@ async function loadCoachDashboard() {
   var teamEl = document.getElementById('dashCoachTeam');
   if (teamEl) teamEl.textContent = currentProfile.team_name || '';
   var refCode = currentProfile.referral_code || '';
-  var fullLink = 'https://firstdownacademy.com/auth.html?ref=' + refCode;
+  var fullLink = 'https://app.firstdownacademy.com/auth.html?ref=' + refCode;
   var refLinkEl = document.getElementById('coachRefLink');
   if (refLinkEl) refLinkEl.textContent = fullLink;
   var codeEl = document.getElementById('coachStatCode');
@@ -558,7 +558,7 @@ async function loadCoachDashboard() {
 
 function copyCoachLink() {
   var refCode = currentProfile ? currentProfile.referral_code : '';
-  var link = 'https://firstdownacademy.com/auth.html?ref=' + refCode;
+  var link = 'https://app.firstdownacademy.com/auth.html?ref=' + refCode;
   // Try clipboard API first, fall back to selecting the text
   if (navigator.clipboard && navigator.clipboard.writeText) {
     navigator.clipboard.writeText(link).then(function() {
@@ -1038,3 +1038,272 @@ var FDA_NAV = (function () {
 
   return { render: render };
 })();
+
+// ══════════════════════════════════════════════════════════════
+// LESSON ENGINE — recovered 2026-07-05 from commit c8bd0e18
+// (Mar 21, 2026). Lost in same-day upload 31a36954; lessons were
+// broken from then until this recovery. Do not remove.
+// ══════════════════════════════════════════════════════════════
+// ══════════════════════════════════════════
+// LESSON ENGINE
+// ══════════════════════════════════════════
+
+var moduleState = {
+  moduleIdx: 0, lessonIdx: 0, slideIdx: 0,
+  phase: 'overview', quizAnswers: [], quizScore: 0, quizPassed: false,
+  skipIntro: false, touchStartX: 0
+};
+var quizResponses = {};
+
+function openModule(mIdx) {
+  moduleState.moduleIdx = mIdx;
+  moduleState.lessonIdx = 0;
+  moduleState.slideIdx  = 0;
+  moduleState.phase     = 'overview';
+  moduleState.skipIntro = false;
+  quizResponses = {};
+  // Only navigate to lesson.html if not already there
+  var onLessonPage = window.location.pathname.indexOf('lesson.html') !== -1;
+  if (!onLessonPage) {
+    sessionStorage.setItem('openModule', mIdx);
+    window.location.href = 'lesson.html';
+    return;
+  }
+  // Already on lesson page — just render
+  renderModule();
+}
+
+function renderModule() {
+  var mIdx = moduleState.moduleIdx;
+  var mod  = CURRICULUM[mIdx];
+  var phase = moduleState.phase;
+  var header = document.getElementById('lessonHeader');
+  var body   = document.getElementById('lessonBody');
+  if (!body) return;
+
+  if (header) {
+    var totalS = totalSlides(mIdx);
+    var currentS = phase === 'slides' ? absoluteSlideIdx(mIdx, moduleState.lessonIdx, moduleState.slideIdx) + 1 : 0;
+    var pct = phase === 'slides' ? Math.round((currentS / totalS) * 100) : (phase === 'quiz' || phase === 'complete' ? 100 : 0);
+    header.innerHTML =
+      '<div class="lesson-module-label">Module ' + mod.num + '</div>' +
+      '<div class="lesson-title">' + mod.name + '</div>' +
+      (phase === 'slides' ?
+        '<div class="lesson-progress-row"><div class="lesson-progress-bar"><div class="lesson-progress-fill" style="width:' + pct + '%"></div></div><span class="lesson-progress-label">Slide ' + currentS + ' of ' + totalS + '</span></div>' : '');
+  }
+
+  if (phase === 'overview') renderOverview(mod);
+  else if (phase === 'slides') renderSlide(mod);
+  else if (phase === 'quiz')   renderQuiz(mod);
+  else if (phase === 'complete') renderComplete(mod);
+}
+
+function renderOverview(mod) {
+  var body = document.getElementById('lessonBody');
+  body.innerHTML =
+    '<div class="module-overview">' +
+    '<div class="overview-meta">' +
+      '<span class="overview-chip">' + mod.lessons.length + ' lessons</span>' +
+      '<span class="overview-chip">' + totalSlides(moduleState.moduleIdx) + ' slides</span>' +
+      '<span class="overview-chip">' + mod.quiz.length + '-question quiz</span>' +
+    '</div>' +
+    '<p class="overview-desc">' + mod.desc + '</p>' +
+    '<div class="overview-lessons">' +
+      mod.lessons.map(function(l, i) {
+        return '<div class="overview-lesson-item"><div class="overview-lesson-num">' + (i+1) + '</div><div class="overview-lesson-info"><div class="overview-lesson-title">' + l.title + '</div><div class="overview-lesson-count">' + l.slides.length + ' slides</div></div></div>';
+      }).join('') +
+    '</div>' +
+    '<button class="btn btn-primary lesson-advance-btn" onclick="startSlides()">Start Module ' + mod.num + ' &#8594;</button>' +
+    '</div>';
+}
+
+function startSlides() {
+  moduleState.lessonIdx = 0;
+  moduleState.slideIdx  = 0;
+  moduleState.phase     = 'slides';
+  renderModule();
+}
+
+function renderSlide(mod) {
+  var body   = document.getElementById('lessonBody');
+  var lIdx   = moduleState.lessonIdx;
+  var sIdx   = moduleState.slideIdx;
+  if (sIdx === 0 && lIdx > 0 && !moduleState.skipIntro) { renderLessonIntro(mod, lIdx); return; }
+  moduleState.skipIntro = false;
+  var lesson = mod.lessons[lIdx];
+  var slide  = lesson.slides[sIdx];
+  var isLast = lIdx === mod.lessons.length - 1 && sIdx === lesson.slides.length - 1;
+  var isFirst = lIdx === 0 && sIdx === 0;
+  body.innerHTML =
+    '<div class="slide-container" id="slideContainer" ontouchstart="handleTouchStart(event)" ontouchend="handleTouchEnd(event)">' +
+    '<div class="slide-lesson-banner"><div class="slide-lesson-banner-left"><span class="slide-lesson-chip">Lesson ' + (lIdx+1) + ' of ' + mod.lessons.length + '</span><span class="slide-lesson-name">' + lesson.title + '</span></div><span class="slide-lesson-pos">Slide ' + (sIdx+1) + ' of ' + lesson.slides.length + '</span></div>' +
+    '<div class="slide-card" id="slideCard"><div class="slide-heading">' + slide.heading + '</div><div class="slide-body">' + slide.body + '</div></div>' +
+    '<div class="slide-dots">' + generateDots(lIdx, sIdx, mod) + '</div>' +
+    '<div class="slide-nav">' +
+      '<button class="slide-btn-back" onclick="prevSlide()" ' + (isFirst ? 'disabled' : '') + '>&#8592; Back</button>' +
+      (isLast ? '<button class="slide-btn-next primary" onclick="goToQuiz()">Take the Quiz &#8594;</button>' : '<button class="slide-btn-next" onclick="nextSlide()">Next &#8594;</button>') +
+    '</div></div>';
+}
+
+function renderLessonIntro(mod, lIdx) {
+  var body   = document.getElementById('lessonBody');
+  var lesson = mod.lessons[lIdx];
+  var colors = ['#E8630A','#1B3A8C','#22C55E','#8B5CF6'];
+  var color  = colors[lIdx % colors.length];
+  body.innerHTML =
+    '<div class="lesson-intro-card" style="border-top:4px solid ' + color + ';">' +
+    '<div class="lesson-intro-eyebrow" style="color:' + color + ';">Lesson ' + (lIdx+1) + ' of ' + mod.lessons.length + '</div>' +
+    '<div class="lesson-intro-title">' + lesson.title + '</div>' +
+    '<div class="lesson-intro-slides">' + lesson.slides.length + ' slides</div>' +
+    '<div class="lesson-intro-previews">' + lesson.slides.map(function(s) { return '<div class="lesson-intro-preview-item"><div class="lesson-intro-preview-dot" style="background:' + color + '"></div><span>' + s.heading + '</span></div>'; }).join('') + '</div>' +
+    '<div class="slide-nav" style="margin-top:28px;"><button class="slide-btn-back" onclick="prevSlide()">&#8592; Back</button><button class="slide-btn-next" style="background:' + color + ';border-color:' + color + ';" onclick="skipIntroAndStart()">Start Lesson ' + (lIdx+1) + ' &#8594;</button></div>' +
+    '</div>';
+}
+
+function skipIntroAndStart() { moduleState.skipIntro = true; renderSlide(CURRICULUM[moduleState.moduleIdx]); }
+
+function generateDots(curLIdx, curSIdx, mod) {
+  var dots = '';
+  var colors = ['#E8630A','#1B3A8C','#22C55E','#8B5CF6'];
+  mod.lessons.forEach(function(l, li) {
+    var color = colors[li % colors.length];
+    if (li > 0) dots += '<span class="slide-dot-sep"></span>';
+    l.slides.forEach(function(s, si) {
+      var isActive = li === curLIdx && si === curSIdx;
+      var isPast   = li < curLIdx || (li === curLIdx && si < curSIdx);
+      var style = isActive ? 'background:' + color + ';width:20px;' : isPast ? 'background:' + color + ';opacity:.35;' : '';
+      dots += '<span class="slide-dot" style="' + style + '"></span>';
+    });
+  });
+  return dots;
+}
+
+function nextSlide() {
+  var mod    = CURRICULUM[moduleState.moduleIdx];
+  var lesson = mod.lessons[moduleState.lessonIdx];
+  if (moduleState.slideIdx + 1 < lesson.slides.length) { moduleState.slideIdx++; moduleState.skipIntro = false; }
+  else if (moduleState.lessonIdx + 1 < mod.lessons.length) { moduleState.lessonIdx++; moduleState.slideIdx = 0; moduleState.skipIntro = false; }
+  renderModule();
+}
+
+function prevSlide() {
+  if (moduleState.slideIdx > 0) { moduleState.slideIdx--; moduleState.skipIntro = false; }
+  else if (moduleState.lessonIdx > 0) {
+    moduleState.lessonIdx--;
+    moduleState.slideIdx = CURRICULUM[moduleState.moduleIdx].lessons[moduleState.lessonIdx].slides.length - 1;
+    moduleState.skipIntro = true;
+  }
+  renderModule();
+}
+
+function handleTouchStart(e) { moduleState.touchStartX = e.touches[0].clientX; }
+function handleTouchEnd(e) {
+  var diff = moduleState.touchStartX - e.changedTouches[0].clientX;
+  if (Math.abs(diff) > 50) { if (diff > 0) nextSlide(); else prevSlide(); }
+}
+
+function goToQuiz() { moduleState.phase = 'quiz'; quizResponses = {}; renderModule(); }
+
+function renderQuiz(mod) {
+  var body = document.getElementById('lessonBody');
+  var questions = mod.quiz.map(function(q, qi) {
+    var opts = q.opts.map(function(opt, oi) {
+      var letters = ['A','B','C','D'];
+      return '<button class="lesson-quiz-opt" id="qOpt_' + qi + '_' + oi + '" onclick="answerQuizQ(' + qi + ',' + oi + ',' + q.correct + ')">' +
+        '<span class="lesson-opt-letter">' + letters[oi] + '</span><span>' + opt + '</span></button>';
+    }).join('');
+    return '<div class="module-quiz-q" id="quizQ_' + qi + '">' +
+      '<div class="module-quiz-num">Q' + (qi+1) + '</div>' +
+      '<div class="lesson-quiz-q">' + q.q + '</div>' +
+      '<div class="lesson-quiz-opts">' + opts + '</div>' +
+      '<div class="lesson-quiz-result" id="quizResult_' + qi + '"></div></div>';
+  }).join('');
+  body.innerHTML =
+    '<div class="module-quiz-section">' +
+    '<div class="module-quiz-header"><div class="module-quiz-title">Module ' + mod.num + ' Quiz</div><div class="module-quiz-sub">Answer all ' + mod.quiz.length + ' questions. You need 70% to complete this module.</div></div>' +
+    '<div id="quizQuestions">' + questions + '</div>' +
+    '<div id="quizSubmitArea" style="display:none;margin-top:28px;"><button class="btn btn-primary lesson-advance-btn" onclick="submitQuiz()">Submit Quiz &#8594;</button></div>' +
+    '</div>';
+}
+
+function answerQuizQ(qi, chosen, correct) {
+  if (quizResponses[qi] !== undefined) return;
+  quizResponses[qi] = chosen;
+  for (var i = 0; i < 4; i++) {
+    var el = document.getElementById('qOpt_' + qi + '_' + i);
+    if (el) el.disabled = true;
+  }
+  var chosenEl  = document.getElementById('qOpt_' + qi + '_' + chosen);
+  var correctEl = document.getElementById('qOpt_' + qi + '_' + correct);
+  var resultEl  = document.getElementById('quizResult_' + qi);
+  var explanation = CURRICULUM[moduleState.moduleIdx].quiz[qi].explanation;
+  if (chosen === correct) {
+    if (chosenEl) chosenEl.classList.add('correct');
+    if (resultEl) { resultEl.className = 'lesson-quiz-result correct show'; resultEl.textContent = explanation; }
+  } else {
+    if (chosenEl) chosenEl.classList.add('wrong');
+    if (correctEl) correctEl.classList.add('correct');
+    if (resultEl) { resultEl.className = 'lesson-quiz-result wrong show'; resultEl.textContent = explanation; }
+  }
+  if (Object.keys(quizResponses).length >= CURRICULUM[moduleState.moduleIdx].quiz.length) {
+    var submitArea = document.getElementById('quizSubmitArea');
+    if (submitArea) { submitArea.style.display = 'block'; submitArea.scrollIntoView({behavior:'smooth'}); }
+  }
+}
+
+async function submitQuiz() {
+  var mod     = CURRICULUM[moduleState.moduleIdx];
+  var total   = mod.quiz.length;
+  var correct = 0;
+  for (var qi = 0; qi < total; qi++) { if (quizResponses[qi] === mod.quiz[qi].correct) correct++; }
+  var score  = Math.round((correct / total) * 100);
+  var passed = score >= 70;
+  if (currentUser) {
+    try {
+      await db.from('progress').upsert({
+        user_id: currentUser.id, module_num: mod.num,
+        lesson_num: 0, slide_num: 0,
+        completed: passed, quiz_passed: passed,
+        completed_at: new Date().toISOString()
+      }, { onConflict: 'user_id,module_num,lesson_num' });
+    } catch(e) { console.error('Progress save error:', e); }
+  }
+  quizResponses = {};
+  moduleState.phase      = 'complete';
+  moduleState.quizScore  = score;
+  moduleState.quizPassed = passed;
+  renderModule();
+}
+
+function renderComplete(mod) {
+  var body   = document.getElementById('lessonBody');
+  var passed = moduleState.quizPassed;
+  var score  = moduleState.quizScore;
+  var nextMod = moduleState.moduleIdx + 1 < CURRICULUM.length ? CURRICULUM[moduleState.moduleIdx + 1] : null;
+  if (passed) {
+    body.innerHTML =
+      '<div class="lesson-complete-section">' +
+      '<div class="lesson-complete-icon">&#127941;</div>' +
+      '<div class="lesson-complete-title">Module Complete!</div>' +
+      '<div class="lesson-complete-sub">You scored ' + score + '% on the quiz.</div>' +
+      '<div class="lesson-module-complete-badge">&#127944; Module ' + mod.num + ' — ' + mod.name + '</div>' +
+      (nextMod ? '<button class="btn btn-primary lesson-advance-btn" onclick="openModule(' + (moduleState.moduleIdx+1) + ')">Start Module ' + nextMod.num + ': ' + nextMod.name + ' &#8594;</button>' : '<button class="btn btn-primary lesson-advance-btn" onclick="showPage(\'dashboard\')">Back to Dashboard &#8594;</button>') +
+      '<button class="btn btn-ghost" onclick="showPage(\'dashboard\')" style="width:100%;justify-content:center;margin-top:12px;">Back to Dashboard</button>' +
+      '</div>';
+  } else {
+    body.innerHTML =
+      '<div class="lesson-complete-section">' +
+      '<div class="lesson-complete-icon">&#128172;</div>' +
+      '<div class="lesson-complete-title">Not Quite Yet</div>' +
+      '<div class="lesson-complete-sub">You scored ' + score + '%. You need 70% to complete this module.</div>' +
+      '<button class="btn btn-primary lesson-advance-btn" onclick="retakeModule()">Review Slides &#8594;</button>' +
+      '<button class="btn btn-ghost" onclick="goToQuiz()" style="width:100%;justify-content:center;margin-top:12px;">Retake Quiz Immediately</button>' +
+      '</div>';
+  }
+}
+
+function retakeModule() {
+  moduleState.lessonIdx = 0; moduleState.slideIdx = 0;
+  moduleState.phase     = 'slides'; quizResponses = {};
+  renderModule();
+}
