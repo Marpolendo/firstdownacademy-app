@@ -27,6 +27,12 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;bac
 .nav-brand{display:flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:800;font-size:17px;letter-spacing:.06em;text-transform:uppercase}
 .nav-brand .shield{width:17px;height:19px;background:var(--accent);flex-shrink:0;clip-path:polygon(50% 0%,100% 18%,100% 62%,50% 100%,0% 62%,0% 18%);box-shadow:0 0 10px rgba(193,255,34,.4)}
 .nav-brand b{color:var(--accent)}
+a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
+.nav-tag-wrap{display:flex;align-items:center;gap:14px;}
+.nav-exit{font-family:inherit;font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+  color:rgba(255,255,255,.55);text-decoration:none;border:1px solid rgba(255,255,255,.16);
+  border-radius:999px;padding:6px 13px;transition:color .15s,border-color .15s;}
+.nav-exit:hover{color:#C1FF22;border-color:#C1FF22;}
 .nav-tag{font-family:var(--disp);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:3px 10px;border:1px solid var(--line-2)}
 
 /* ══ SCREENS ══ */
@@ -270,10 +276,13 @@ body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;bac
 <body>
 
 <header class="nav">
-  <div class="nav-brand">
+  <a class="nav-brand" href="index.html" onclick="return exitQuiz(event)">
     <span class="shield"></span>FIRST DOWN <b>ACADEMY</b>
+  </a>
+  <div class="nav-tag-wrap">
+    <div class="nav-tag">Gridiron IQ Exam</div>
+    <a class="nav-exit" href="index.html" onclick="return exitQuiz(event)">Exit ✕</a>
   </div>
-  <div class="nav-tag">Gridiron IQ Exam</div>
 </header>
 
 <!-- INTRO -->
@@ -616,6 +625,15 @@ function buildDowns(){
     if(i===state.idx) s.classList.add('current');
     t.appendChild(s);
   }
+}
+
+function exitQuiz(e){
+  var quizActive = document.getElementById('screenQuiz').classList.contains('active');
+  if (quizActive) {
+    var ok = confirm("Leave the quiz? Your progress won't be saved.");
+    if (!ok) { e.preventDefault(); return false; }
+  }
+  return true;
 }
 
 function startQuiz(){
