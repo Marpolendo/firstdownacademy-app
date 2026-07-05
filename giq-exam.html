@@ -1,0 +1,873 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Gridiron IQ Exam · First Down Academy</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,400;0,500;0,600;0,700;0,800;0,900;1,700;1,800&family=Barlow:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020f1e;--bg-2:#051628;--bg-3:#081e35;--bg-4:#0c2644;
+  --line:#0d2e4e;--line-2:#1a4570;--ink:#fff;--muted:#6b8caa;--muted-2:#3d5f7a;
+  --accent:#C1FF22;--accent-dim:#94cc0a;--accent-ink:#020f1e;
+  --ok:#22D27C;--warn:#F5A524;--hot:#ff4f1f;
+  --sans:'Barlow',system-ui,sans-serif;--disp:'Barlow Condensed','Arial Narrow',sans-serif;
+  --nav:50px;
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;background:var(--bg);color:var(--ink);font-family:var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+body{background:radial-gradient(ellipse 80% 50% at 50% -10%,rgba(193,255,34,.06),transparent 60%),radial-gradient(ellipse 60% 40% at 90% 100%,rgba(193,255,34,.03),transparent 60%),var(--bg)}
+button{font:inherit;color:inherit;background:none;border:none;cursor:pointer}
+body::before{content:"";position:fixed;inset:0;pointer-events:none;z-index:1;background-image:url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='160' height='160'><filter id='n'><feTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/><feColorMatrix values='0 0 0 0 1  0 0 0 0 1  0 0 0 0 1  0 0 0 0.04 0'/></filter><rect width='100%' height='100%' filter='url(%23n)'/></svg>");mix-blend-mode:overlay;opacity:.5}
+
+/* ══ NAV ══ */
+.nav{position:fixed;top:0;left:0;right:0;z-index:50;height:var(--nav);display:flex;align-items:center;justify-content:space-between;padding:0 20px;background:linear-gradient(180deg,#020c17,#030f1e);border-bottom:1px solid var(--line);box-shadow:0 4px 20px rgba(0,0,0,.5)}
+.nav-brand{display:flex;align-items:center;gap:9px;font-family:var(--disp);font-weight:800;font-size:17px;letter-spacing:.06em;text-transform:uppercase}
+.nav-brand .shield{width:17px;height:19px;background:var(--accent);flex-shrink:0;clip-path:polygon(50% 0%,100% 18%,100% 62%,50% 100%,0% 62%,0% 18%);box-shadow:0 0 10px rgba(193,255,34,.4)}
+.nav-brand b{color:var(--accent)}
+.nav-tag{font-family:var(--disp);font-size:10px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:600;padding:3px 10px;border:1px solid var(--line-2)}
+
+/* ══ SCREENS ══ */
+.screen{display:none;position:relative;z-index:2;padding-top:var(--nav)}
+.screen.active{display:flex;flex-direction:column}
+
+/* ══════════════════
+   INTRO
+   ══════════════════ */
+#screenIntro.active{min-height:100dvh;align-items:center;justify-content:center;padding:calc(var(--nav) + 12px) 16px 16px}
+.intro-card{width:100%;max-width:460px;background:linear-gradient(180deg,#0a1e33,#061525);border:1px solid var(--line);box-shadow:0 0 0 1px rgba(193,255,34,.05),0 24px 48px -16px rgba(0,0,0,.8);position:relative;overflow:hidden}
+.intro-card::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.ic-head{padding:12px 18px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.01)}
+.ic-head-left{font-family:var(--disp);font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.ic-head-right{font-family:var(--disp);font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:var(--accent);font-weight:700}
+.ic-body{padding:22px 22px 18px}
+.ic-eyebrow{font-family:var(--disp);font-size:10px;letter-spacing:.24em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:5px}
+.ic-title{font-family:var(--disp);font-weight:900;font-size:clamp(34px,8vw,50px);line-height:.92;text-transform:uppercase;margin-bottom:10px}
+.ic-title em{color:var(--accent);font-style:normal;-webkit-text-stroke:1.5px var(--accent);-webkit-text-fill-color:transparent}
+.ic-sub{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:18px}
+.ic-stats{display:grid;grid-template-columns:repeat(3,1fr);background:var(--line);gap:1px;border:1px solid var(--line);margin-bottom:18px}
+.ic-stat{background:var(--bg-3);padding:12px 6px;text-align:center}
+.ic-stat-n{font-family:var(--disp);font-weight:800;font-size:30px;line-height:1;color:var(--accent)}
+.ic-stat-l{font-family:var(--disp);font-size:9px;letter-spacing:.15em;text-transform:uppercase;color:var(--muted);margin-top:3px;font-weight:600}
+.ic-scoring{display:flex;gap:3px;margin-bottom:14px}
+.ic-sc{flex:1;background:var(--bg-3);border:1px solid var(--line);padding:7px 3px;text-align:center}
+.ic-sc-pts{font-family:var(--disp);font-weight:800;font-size:17px;line-height:1;color:var(--ok)}
+.ic-sc-pts.neg{color:var(--hot)}
+.ic-sc-lab{font-family:var(--disp);font-size:7px;letter-spacing:.09em;text-transform:uppercase;color:var(--muted);line-height:1.3;margin-top:2px;font-weight:600}
+.ic-scoring-note{font-family:var(--disp);font-size:11px;letter-spacing:.04em;color:var(--muted);margin-bottom:18px;line-height:1.5;font-weight:600}
+.ic-scoring-note b{color:#fff}
+.ic-btn{width:100%;padding:16px 18px;background:var(--accent);color:var(--accent-ink);font-family:var(--disp);font-weight:800;font-size:16px;letter-spacing:.22em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;clip-path:polygon(0 0,100% 0,calc(100% - 11px) 100%,0 100%);transition:all .22s;box-shadow:0 8px 24px -6px rgba(193,255,34,.3)}
+.ic-btn:hover{background:#d4ff4a;transform:translateY(-1px);box-shadow:0 14px 32px -8px rgba(193,255,34,.5)}
+.ic-btn .arr{font-size:18px;transition:transform .22s}
+.ic-btn:hover .arr{transform:translateX(5px)}
+.ic-note{margin-top:9px;font-family:var(--disp);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted-2);text-align:center;font-weight:600}
+
+/* ══════════════════
+   QUIZ
+   ══════════════════ */
+#screenQuiz.active{min-height:100dvh}
+.exam{flex:1;display:flex;flex-direction:column;max-width:1200px;width:100%;margin:0 auto;padding:16px 16px calc(80px + env(safe-area-inset-bottom))}
+.stat-bar{display:grid;grid-template-columns:1fr auto 1fr;background:linear-gradient(180deg,#091e33,#061525);border:1px solid var(--line);margin-bottom:10px;position:relative;overflow:hidden}
+.stat-bar::before{content:"";position:absolute;top:0;left:0;right:0;height:2px;background:var(--accent)}
+.sb-left,.sb-right{padding:9px 14px;display:flex;align-items:center;gap:12px}
+.sb-left{border-right:1px solid var(--line)}
+.sb-right{border-left:1px solid var(--line);justify-content:flex-end}
+.sb-block{display:flex;flex-direction:column;gap:1px}
+.sb-lab{font-family:var(--disp);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.sb-val{font-family:var(--disp);font-weight:800;font-size:19px;line-height:1;color:#fff}
+.sb-val.hi{color:var(--accent)}
+.sb-val .u{font-size:10px;color:var(--muted);margin-left:2px}
+.sb-center{padding:7px 16px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:1px;background:rgba(0,0,0,.2);min-width:90px}
+.sb-center-lab{font-family:var(--disp);font-size:8px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.sb-center-val{font-family:var(--disp);font-weight:800;font-size:20px;line-height:1}
+.sb-center-val .of{color:var(--muted);font-size:13px;font-weight:600}
+.downs{display:grid;grid-template-columns:repeat(15,1fr);gap:2px;margin-bottom:10px}
+.down-seg{height:5px;background:var(--bg-3);position:relative;overflow:hidden;transition:background .2s}
+.down-seg.correct{background:var(--ok)}
+.down-seg.wrong{background:var(--hot)}
+.down-seg.current{background:var(--accent)}
+.down-seg.current::after{content:"";position:absolute;inset:0;background:var(--accent);animation:blink 1.2s ease-in-out infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+.exam-layout{display:grid;grid-template-columns:1fr 280px;gap:14px;flex:1}
+.q-card{background:var(--bg-2);border:1px solid var(--line);position:relative;overflow:hidden;flex:1;display:flex;flex-direction:column}
+.q-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent)}
+.q-card-head{display:flex;align-items:center;gap:10px;padding:11px 18px;background:linear-gradient(90deg,rgba(193,255,34,.08),transparent 60%);border-bottom:1px solid var(--line);flex-shrink:0}
+.q-num-chip{background:var(--accent);color:var(--accent-ink);padding:4px 11px 4px 13px;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);font-family:var(--disp);font-weight:800;font-size:12px;letter-spacing:.2em;text-transform:uppercase}
+.q-domain-chip{font-family:var(--disp);font-size:11px;letter-spacing:.16em;text-transform:uppercase;color:#fff;font-weight:700}
+.q-diff-chip{margin-left:auto;font-family:var(--disp);font-size:10px;letter-spacing:.14em;text-transform:uppercase;padding:3px 7px;border:1px solid;font-weight:700}
+.q-diff-chip.easy{color:var(--ok);border-color:rgba(34,210,124,.4)}
+.q-diff-chip.medium{color:var(--accent);border-color:rgba(193,255,34,.4)}
+.q-diff-chip.hard{color:var(--hot);border-color:rgba(255,79,31,.5)}
+.q-body{padding:18px 18px 14px;flex:1;display:flex;flex-direction:column}
+.q-text{font-family:var(--disp);font-weight:800;font-size:clamp(19px,3.5vw,30px);line-height:1.05;text-transform:uppercase;color:#fff;margin-bottom:14px;text-wrap:balance;flex-shrink:0}
+.q-text em{color:var(--accent);font-style:normal}
+.q-opts{display:grid;grid-template-columns:1fr 1fr;gap:7px;flex:1;align-content:start}
+.q-opt{text-align:left;display:flex;align-items:center;gap:10px;padding:11px 12px;background:var(--bg-3);border:1px solid var(--line);transition:all .15s;position:relative;overflow:hidden}
+.q-opt::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(193,255,34,.08),transparent 70%);opacity:0;transition:opacity .16s}
+.q-opt:hover{border-color:var(--accent-dim);transform:translateY(-1px)}
+.q-opt:hover::before,.q-opt.selected::before{opacity:1}
+.q-opt.selected{border-color:var(--accent);background:rgba(193,255,34,.07)}
+.q-opt-key{width:30px;height:30px;flex:0 0 30px;background:rgba(0,0,0,.4);border:1px solid var(--line-2);font-family:var(--disp);font-weight:800;font-size:13px;display:flex;align-items:center;justify-content:center;clip-path:polygon(0 0,100% 0,calc(100% - 5px) 100%,0 100%);transition:all .15s;position:relative;z-index:1}
+.q-opt:hover .q-opt-key,.q-opt.selected .q-opt-key{background:var(--accent);border-color:var(--accent);color:var(--accent-ink)}
+.q-opt-text{font-family:var(--sans);font-size:14px;font-weight:500;line-height:1.25;color:var(--ink);position:relative;z-index:1}
+
+/* desktop conviction */
+.conviction{background:var(--bg-2);border:1px solid var(--line);align-self:flex-start;position:sticky;top:calc(var(--nav) + 16px)}
+.conv-head{padding:11px 14px;border-bottom:1px solid var(--line);display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,.01)}
+.conv-head h3{font-family:var(--disp);font-weight:700;font-size:12px;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.conv-head h3 .dot{width:6px;height:6px;background:var(--accent)}
+.conv-req{font-family:var(--disp);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.conv-title{padding:12px 14px 3px;font-family:var(--disp);font-weight:800;font-size:18px;text-transform:uppercase;line-height:1}
+.conv-title em{color:var(--accent);font-style:normal}
+.conv-sub{padding:0 14px 10px;color:var(--muted);font-size:11px;line-height:1.45;border-bottom:1px solid var(--line)}
+.conv-list{display:flex;flex-direction:column}
+.conv-row{width:100%;display:grid;grid-template-columns:32px 1fr auto;gap:9px;align-items:center;padding:12px 14px;border-bottom:1px solid var(--line);text-align:left;position:relative;transition:all .15s;overflow:hidden}
+.conv-row:last-child{border-bottom:none}
+.conv-row::before{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(193,255,34,.08),transparent 80%);opacity:0;transition:opacity .15s}
+.conv-row:hover::before,.conv-row.active::before{opacity:1}
+.conv-meter{display:flex;gap:2px;align-items:center}
+.conv-bar{width:4px;height:11px;background:var(--line-2)}
+.conv-bar.on{background:var(--accent)}
+.conv-label{font-family:var(--disp);font-size:14px;font-weight:700;text-transform:uppercase;line-height:1}
+.conv-label small{display:block;font-family:var(--disp);font-size:9px;letter-spacing:.1em;color:var(--muted);margin-top:2px;font-weight:600;text-transform:uppercase}
+.conv-mult{font-family:var(--disp);font-weight:800;font-size:18px;color:var(--muted)}
+.conv-row.active .conv-mult{color:var(--accent)}
+.conv-row.active .conv-label{color:#fff}
+.key-hints{padding:8px 14px;border-top:1px solid var(--line);background:rgba(0,0,0,.2);display:flex;justify-content:space-between;font-family:var(--disp);font-size:8px;letter-spacing:.11em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.kbd{display:inline-block;background:rgba(0,0,0,.5);color:#fff;padding:2px 5px;border:1px solid var(--line-2);font-weight:700;margin-right:3px}
+
+/* mobile conviction bar — only shown when body.quiz-active on mobile */
+.conv-bottom-bar{display:none}
+@media(max-width:900px){
+  body.quiz-active .conv-bottom-bar{
+    display:block;position:fixed;bottom:0;left:0;right:0;z-index:40;
+    background:linear-gradient(180deg,#061525,#030d1c);
+    border-top:2px solid var(--accent);
+    padding:8px 12px calc(8px + env(safe-area-inset-bottom));
+    box-shadow:0 -6px 24px rgba(0,0,0,.7);
+  }
+}
+.conv-bar-label{font-family:var(--disp);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700;text-align:center;margin-bottom:5px}
+.conv-bar-btns{display:grid;grid-template-columns:repeat(3,1fr);gap:6px}
+.conv-bar-btn{display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;padding:9px 4px;background:var(--bg-3);border:1px solid var(--line-2);font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.04em;text-transform:uppercase;transition:all .15s;color:var(--muted);position:relative;overflow:hidden}
+.conv-bar-btn::before{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(193,255,34,.1),transparent);opacity:0;transition:opacity .15s}
+.conv-bar-btn.active{border-color:var(--accent);color:#fff;background:rgba(193,255,34,.08)}
+.conv-bar-btn.active::before{opacity:1}
+.cb-mult{font-size:9px;color:var(--muted);font-weight:600;letter-spacing:.06em}
+.conv-bar-btn.active .cb-mult{color:var(--accent)}
+
+/* ══════════════════
+   RESULTS
+   ══════════════════ */
+.results{flex:1;max-width:860px;width:100%;margin:0 auto;padding:18px 16px 60px;display:flex;flex-direction:column;gap:14px}
+.res-top{display:flex;align-items:center;gap:10px;font-family:var(--disp);font-size:11px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:600}
+.res-top .final{background:var(--accent);color:var(--accent-ink);padding:4px 12px 4px 14px;font-weight:800;letter-spacing:.15em;clip-path:polygon(0 0,100% 0,calc(100% - 9px) 100%,0 100%)}
+.res-top .bar{flex:0 0 50px;height:1px;background:var(--line)}
+.res-hero{display:grid;grid-template-columns:1.2fr 1fr;background:linear-gradient(135deg,#091e33,#040e1c);border:1px solid var(--line);position:relative;overflow:hidden}
+.res-hero::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.rh-left{padding:24px 24px 20px;position:relative;overflow:hidden;border-right:1px solid var(--line)}
+.rh-left::before{content:"";position:absolute;top:-40%;right:-10%;width:50%;height:180%;background:radial-gradient(ellipse,rgba(193,255,34,.07),transparent 60%)}
+.rh-eye{font-family:var(--disp);font-size:10px;letter-spacing:.22em;text-transform:uppercase;color:var(--accent);font-weight:700;margin-bottom:7px}
+.rh-verdict{font-family:var(--disp);font-weight:900;font-size:clamp(32px,5.5vw,60px);line-height:.9;text-transform:uppercase;margin-bottom:10px}
+.rh-verdict em{color:var(--accent);font-style:normal;-webkit-text-stroke:1.5px var(--accent);-webkit-text-fill-color:transparent}
+.rh-sub{font-size:13px;line-height:1.45;color:var(--muted)}
+.rh-right{padding:20px 24px;display:flex;flex-direction:column;justify-content:space-between;gap:12px}
+.rh-score-lab{font-family:var(--disp);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.rh-score-row{display:flex;align-items:flex-end;justify-content:space-between;gap:10px;margin-top:3px}
+.rh-score-num{font-family:var(--disp);font-weight:900;font-size:clamp(56px,9vw,96px);line-height:.85;color:#fff}
+.rh-score-max{font-family:var(--disp);font-size:22px;color:var(--muted);align-self:flex-end;padding-bottom:4px}
+.rh-grade{padding:5px 13px 4px;background:var(--accent);color:var(--accent-ink);font-family:var(--disp);font-weight:900;font-size:clamp(30px,5vw,48px);line-height:1;clip-path:polygon(0 0,100% 0,calc(100% - 9px) 100%,0 100%);align-self:flex-end}
+.rh-minis{display:grid;grid-template-columns:1fr 1fr;border-top:1px solid var(--line);padding-top:12px}
+.rh-mini{border-right:1px solid var(--line);padding-right:10px}
+.rh-mini:last-child{border-right:none;padding-left:10px;padding-right:0}
+.rh-mini-lab{font-family:var(--disp);font-size:9px;letter-spacing:.18em;text-transform:uppercase;color:var(--muted);font-weight:700}
+.rh-mini-val{font-family:var(--disp);font-weight:800;font-size:20px;margin-top:2px}
+.stat-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:2px;background:var(--line);border:1px solid var(--line)}
+.stat-cell{background:var(--bg-2);padding:14px 12px;position:relative;overflow:hidden}
+.stat-cell::before{content:"";position:absolute;top:0;left:0;width:22px;height:2px;background:var(--accent)}
+.stat-lab{font-family:var(--disp);font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:var(--muted);font-weight:700;margin-bottom:6px}
+.stat-val{font-family:var(--disp);font-weight:900;font-size:clamp(24px,4.5vw,40px);line-height:1}
+.stat-val .unit{font-family:var(--disp);font-size:12px;color:var(--muted);font-weight:600}
+.stat-note{font-size:11px;color:var(--muted);margin-top:5px;line-height:1.35}
+.stat-note b{color:#fff;font-weight:600}
+.breakdown{display:grid;grid-template-columns:1fr 300px;gap:14px}
+.bk-panel{background:var(--bg-2);border:1px solid var(--line)}
+.bk-head{display:flex;align-items:center;justify-content:space-between;padding:11px 16px;border-bottom:1px solid var(--line);background:rgba(255,255,255,.01)}
+.bk-head h2{font-family:var(--disp);font-weight:800;font-size:13px;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.bk-head h2 .dot{width:7px;height:7px;background:var(--accent)}
+.bk-head .meta{font-family:var(--disp);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--muted);font-weight:600}
+
+/* Pentagon radar */
+.radar-wrap{padding:16px;display:flex;flex-direction:column;align-items:center;gap:16px}
+#radarSvg{width:100%;max-width:320px;height:auto;overflow:visible}
+.radar-legend{width:100%;display:flex;flex-direction:column;gap:6px}
+.rl-row{display:grid;grid-template-columns:10px 1fr auto auto;align-items:center;gap:8px}
+.rl-dot{width:10px;height:10px;border-radius:2px;flex-shrink:0}
+.rl-name{font-family:var(--disp);font-size:13px;font-weight:700;text-transform:uppercase;letter-spacing:.03em}
+.rl-pct{font-family:var(--disp);font-weight:800;font-size:15px;text-align:right}
+.rl-tag{font-family:var(--disp);font-size:8px;letter-spacing:.13em;text-transform:uppercase;font-weight:800;padding:2px 5px;border:1px solid;white-space:nowrap}
+.rl-tag.good{color:var(--ok);border-color:rgba(34,210,124,.4)}
+.rl-tag.mid{color:var(--warn);border-color:rgba(245,165,36,.4)}
+.rl-tag.bad{color:var(--hot);border-color:rgba(255,79,31,.5)}
+.playcard{background:linear-gradient(180deg,#0a1e33,#061525);border:1px solid var(--line);position:relative;overflow:hidden;align-self:flex-start}
+.playcard::before{content:"";position:absolute;top:0;left:0;right:0;height:3px;background:var(--accent)}
+.pc-head{display:flex;align-items:center;justify-content:space-between;padding:11px 14px;border-bottom:1px solid var(--line)}
+.pc-head .ttl{font-family:var(--disp);font-weight:800;font-size:12px;letter-spacing:.18em;text-transform:uppercase;display:flex;align-items:center;gap:7px}
+.pc-head .ttl .dot{width:6px;height:6px;background:var(--accent)}
+.pc-head .tag{font-family:var(--disp);font-size:9px;letter-spacing:.13em;text-transform:uppercase;color:var(--accent);border:1px solid rgba(193,255,34,.3);padding:2px 5px;font-weight:700}
+.pc-body{padding:14px 14px 12px}
+.pc-title{font-family:var(--disp);font-weight:900;font-size:22px;line-height:1;text-transform:uppercase;margin-bottom:5px}
+.pc-title em{color:var(--accent);font-style:normal}
+.pc-sub{color:var(--muted);font-size:12px;line-height:1.45;margin-bottom:12px}
+.pc-list{border-top:1px solid var(--line)}
+.pc-item{display:grid;grid-template-columns:22px 1fr;gap:8px;padding:9px 0;border-bottom:1px solid var(--line);align-items:baseline}
+.pc-item:last-child{border-bottom:none}
+.pc-num{font-family:var(--disp);font-weight:800;font-size:14px;color:var(--accent);line-height:1}
+.pc-text{font-size:12px;line-height:1.45;color:var(--ink)}
+.pc-actions{padding:12px 14px 14px;border-top:1px solid var(--line);display:flex;flex-direction:column;gap:7px}
+.btn-primary{width:100%;padding:12px 16px;background:var(--accent);color:var(--accent-ink);font-family:var(--disp);font-weight:800;font-size:12px;letter-spacing:.2em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;clip-path:polygon(0 0,100% 0,calc(100% - 10px) 100%,0 100%);transition:all .16s}
+.btn-primary:hover{background:#d4ff4a;transform:translateX(2px)}
+.btn-ghost{width:100%;padding:10px 16px;background:transparent;color:#fff;border:1px solid var(--line-2);font-family:var(--disp);font-weight:700;font-size:11px;letter-spacing:.17em;text-transform:uppercase;display:flex;align-items:center;justify-content:space-between;transition:all .16s}
+.btn-ghost:hover{border-color:var(--accent);color:var(--accent)}
+.toast{position:fixed;left:50%;bottom:80px;transform:translateX(-50%) translateY(14px);background:var(--accent);color:var(--accent-ink);padding:9px 20px;font-family:var(--disp);font-weight:800;font-size:11px;letter-spacing:.18em;text-transform:uppercase;opacity:0;transition:all .26s;pointer-events:none;z-index:100;clip-path:polygon(0 0,100% 0,calc(100% - 8px) 100%,0 100%);padding-right:26px}
+.toast.show{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* ══ RESPONSIVE ══ */
+@media(max-width:900px){
+  .exam-layout{grid-template-columns:1fr}
+  .conviction{display:none}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .breakdown{grid-template-columns:1fr}
+  .res-hero{grid-template-columns:1fr}
+  .rh-left{border-right:none;border-bottom:1px solid var(--line)}
+}
+@media(max-width:640px){
+  .exam{padding:10px 10px calc(84px + env(safe-area-inset-bottom))}
+  .stat-bar{grid-template-columns:1fr 1fr}
+  .sb-center{display:none}
+  .sb-left{border-right:1px solid var(--line)}
+  .q-opts{grid-template-columns:1fr;gap:5px}
+  .q-opt{padding:10px 11px}
+  .q-text{font-size:clamp(17px,5vw,24px);margin-bottom:10px}
+  .rh-score-num{font-size:60px}
+  .stat-grid{grid-template-columns:1fr 1fr}
+  .pillar-row{grid-template-columns:1.5fr 1fr 40px 60px;gap:7px}
+  .pillar-rank{display:none}
+}
+@media(max-width:420px){
+  :root{--nav:44px}
+  .nav-brand{font-size:14px}
+  .nav-tag{display:none}
+  .ic-scoring,.ic-scoring-note{display:none}
+  .stat-grid{grid-template-columns:1fr}
+  .rh-grade{font-size:28px}
+}
+::selection{background:var(--accent);color:var(--accent-ink)}
+</style>
+</head>
+<body>
+
+<header class="nav">
+  <div class="nav-brand">
+    <span class="shield"></span>FIRST DOWN <b>ACADEMY</b>
+  </div>
+  <div class="nav-tag">Gridiron IQ Exam</div>
+</header>
+
+<!-- INTRO -->
+<section class="screen active" id="screenIntro">
+  <div class="intro-card">
+    <div class="ic-head">
+      <span class="ic-head-left">Gridiron IQ · Season I</span>
+      <span class="ic-head-right" id="coverDate">—</span>
+    </div>
+    <div class="ic-body">
+      <div class="ic-eyebrow">▲ Test Your Football IQ</div>
+      <div class="ic-title">WHAT DO<br>YOU <em>REALLY</em><br>KNOW?</div>
+      <div class="ic-sub">15 adaptive questions. Confidence-weighted. Five domains of the modern game.</div>
+      <div class="ic-stats">
+        <div class="ic-stat"><div class="ic-stat-n">15</div><div class="ic-stat-l">Questions</div></div>
+        <div class="ic-stat"><div class="ic-stat-n">5</div><div class="ic-stat-l">Domains</div></div>
+        <div class="ic-stat"><div class="ic-stat-n" style="font-size:22px;padding-top:4px">Adaptive</div><div class="ic-stat-l">Difficulty</div></div>
+      </div>
+      <div class="ic-scoring">
+        <div class="ic-sc"><div class="ic-sc-pts">+9</div><div class="ic-sc-lab">Hard<br>Locked</div></div>
+        <div class="ic-sc"><div class="ic-sc-pts">+3</div><div class="ic-sc-lab">Easy<br>Locked</div></div>
+        <div class="ic-sc"><div class="ic-sc-pts">+1</div><div class="ic-sc-lab">Easy<br>Guess</div></div>
+        <div class="ic-sc"><div class="ic-sc-pts neg">−2</div><div class="ic-sc-lab">Easy<br>Sure ✗</div></div>
+        <div class="ic-sc"><div class="ic-sc-pts neg">−6</div><div class="ic-sc-lab">Hard<br>Sure ✗</div></div>
+      </div>
+      <div class="ic-scoring-note">Score = <b>difficulty × confidence</b>. Hard + Locked In = 9 pts. Wrong and sure costs you points too.</div>
+      <button class="ic-btn" onclick="startQuiz()"><span>Snap the Ball</span><span class="arr">▶</span></button>
+      <div class="ic-note">5–8 min · No signup required</div>
+    </div>
+  </div>
+</section>
+
+<!-- QUIZ -->
+<section class="screen" id="screenQuiz">
+  <div class="exam">
+    <div class="stat-bar">
+      <div class="sb-left">
+        <div class="sb-block"><div class="sb-lab">Domain</div><div class="sb-val" id="gbDomain">—</div></div>
+        <div class="sb-block"><div class="sb-lab">Tier</div><div class="sb-val" id="gbDiff">—</div></div>
+      </div>
+      <div class="sb-center">
+        <div class="sb-center-lab">Question</div>
+        <div class="sb-center-val"><span id="gbNum">01</span><span class="of"> / 15</span></div>
+      </div>
+      <div class="sb-right">
+        <div class="sb-block"><div class="sb-lab">Correct</div><div class="sb-val hi" id="gbCorrect">0</div></div>
+        <div class="sb-block"><div class="sb-lab">Score</div><div class="sb-val" id="gbScore">0<span class="u">pts</span></div></div>
+      </div>
+    </div>
+    <div class="downs" id="downs"></div>
+    <div class="exam-layout">
+      <div class="q-card">
+        <div class="q-card-head">
+          <div class="q-num-chip">Q.<span id="qNumChip">01</span></div>
+          <div class="q-domain-chip" id="qDomainHead">—</div>
+          <div class="q-diff-chip easy" id="qDiffChip">Easy</div>
+        </div>
+        <div class="q-body">
+          <h2 class="q-text" id="qText">Loading…</h2>
+          <div class="q-opts" id="qOpts"></div>
+        </div>
+      </div>
+      <aside class="conviction">
+        <div class="conv-head">
+          <h3><span class="dot"></span>Conviction</h3>
+          <span class="conv-req">Required</span>
+        </div>
+        <div class="conv-title">How <em>sure</em> are you?</div>
+        <div class="conv-sub">Locked once answer + conviction are both set.</div>
+        <div class="conv-list">
+          <button class="conv-row" data-c="1" onclick="selectConf(1)">
+            <div class="conv-meter"><div class="conv-bar on"></div><div class="conv-bar"></div><div class="conv-bar"></div></div>
+            <div class="conv-label">Guess<small>Hedge it</small></div>
+            <div class="conv-mult">×1</div>
+          </button>
+          <button class="conv-row" data-c="2" onclick="selectConf(2)">
+            <div class="conv-meter"><div class="conv-bar on"></div><div class="conv-bar on"></div><div class="conv-bar"></div></div>
+            <div class="conv-label">Confident<small>Pretty sure</small></div>
+            <div class="conv-mult">×2</div>
+          </button>
+          <button class="conv-row" data-c="3" onclick="selectConf(3)">
+            <div class="conv-meter"><div class="conv-bar on"></div><div class="conv-bar on"></div><div class="conv-bar on"></div></div>
+            <div class="conv-label">Locked In<small>All-in</small></div>
+            <div class="conv-mult">×3</div>
+          </button>
+        </div>
+        <div class="key-hints">
+          <span><span class="kbd">A</span><span class="kbd">B</span><span class="kbd">C</span><span class="kbd">D</span>answer</span>
+          <span><span class="kbd">1</span><span class="kbd">2</span><span class="kbd">3</span>conviction</span>
+        </div>
+      </aside>
+    </div>
+  </div>
+</section>
+
+<!-- RESULTS -->
+<section class="screen" id="screenResults">
+  <div class="results">
+    <div class="res-top">
+      <span class="final">FINAL</span>
+      <span>Postgame Report</span>
+      <span class="bar"></span>
+      <span id="resDate">—</span>
+    </div>
+    <div class="res-hero">
+      <div class="rh-left">
+        <div class="rh-eye">◆ Final Verdict</div>
+        <h1 class="rh-verdict" id="resVerdict">THE <em>FILM</em> SPEAKS.</h1>
+        <p class="rh-sub" id="resSub">Your reads broken down below.</p>
+      </div>
+      <div class="rh-right">
+        <div>
+          <div class="rh-score-lab">Final Score</div>
+          <div class="rh-score-row">
+            <div style="display:flex;align-items:flex-end;gap:8px">
+              <span class="rh-score-num" id="resScore">0</span>
+              <span class="rh-score-max" id="resMax">/ 90</span>
+            </div>
+            <span class="rh-grade" id="resGrade">—</span>
+          </div>
+        </div>
+        <div class="rh-minis">
+          <div class="rh-mini"><div class="rh-mini-lab">Tier</div><div class="rh-mini-val" id="resTier">—</div></div>
+          <div class="rh-mini"><div class="rh-mini-lab">Percentile</div><div class="rh-mini-val" id="resPct">—</div></div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-cell"><div class="stat-lab">Correct</div><div class="stat-val"><span id="dsCorrect">0</span><span class="unit"> / 15</span></div><div class="stat-note" id="dsCorrectNote">—</div></div>
+      <div class="stat-cell"><div class="stat-lab">Accuracy</div><div class="stat-val"><span id="dsAcc">0</span><span class="unit">%</span></div><div class="stat-note" id="dsAccNote">—</div></div>
+      <div class="stat-cell"><div class="stat-lab">Tier Reached</div><div class="stat-val" id="dsTier" style="font-size:clamp(20px,3.5vw,32px)">—</div><div class="stat-note" id="dsTierNote">—</div></div>
+      <div class="stat-cell"><div class="stat-lab">Calibration</div><div class="stat-val" id="dsCal" style="font-size:clamp(20px,3.5vw,32px)">—</div><div class="stat-note">How well conviction <b>matched</b> reality.</div></div>
+    </div>
+    <div class="breakdown">
+      <div class="bk-panel">
+        <div class="bk-head"><h2><span class="dot"></span>Performance by Domain</h2><span class="meta">Pillar Breakdown</span></div>
+        <div class="radar-wrap">
+          <svg id="radarSvg" viewBox="0 0 320 300" xmlns="http://www.w3.org/2000/svg"></svg>
+          <div class="radar-legend" id="radarLegend"></div>
+        </div>
+      </div>
+      <div class="playcard">
+        <div class="pc-head"><div class="ttl"><span class="dot"></span>Next Rep</div><span class="tag">COACH'S CALL</span></div>
+        <div class="pc-body">
+          <div class="pc-title">Close the <em>gap</em>.</div>
+          <p class="pc-sub" id="pcSub">Your weakest domain holds the fastest gains.</p>
+          <div class="pc-list" id="pcList"></div>
+        </div>
+        <div class="pc-actions">
+          <a href="/program.html" class="btn-primary" style="text-decoration:none"><span>Join the Program</span><span>→</span></a>
+          <button class="btn-ghost" onclick="shareResult()"><span>Share Scorecard</span><span>↗</span></button>
+          <button class="btn-ghost" onclick="restart()" style="opacity:.6"><span>Retake the Exam</span><span>↻</span></button>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- Mobile conviction bar — only visible via body.quiz-active -->
+<div class="conv-bottom-bar" id="convBottomBar">
+  <div class="conv-bar-label">How sure are you?</div>
+  <div class="conv-bar-btns">
+    <button class="conv-bar-btn" data-c="1" onclick="selectConf(1)"><span>Guess</span><span class="cb-mult">×1 pt</span></button>
+    <button class="conv-bar-btn" data-c="2" onclick="selectConf(2)"><span>Confident</span><span class="cb-mult">×2 pts</span></button>
+    <button class="conv-bar-btn" data-c="3" onclick="selectConf(3)"><span>Locked In</span><span class="cb-mult">×3 pts</span></button>
+  </div>
+</div>
+
+<div class="toast" id="toast">Copied</div>
+
+<script>
+// ── Question Pool: 3 difficulties × 5 domains × 3 questions each ──
+const POOL={
+  "Rules & Objectives":{
+    easy:[
+      {q:"How many points is a <em>touchdown</em> worth?",opts:["Three","Six","Seven","Two"],ans:1},
+      {q:"How many players are on the field per team at one time?",opts:["9","11","12","10"],ans:1},
+      {q:"Which team gets the ball first after a touchdown?",opts:["The team that scored","The other team receives the kickoff","It alternates each quarter","The referee decides"],ans:1},
+    ],
+    medium:[
+      {q:"How many <em>yards</em> are needed for a first down?",opts:["Five","Ten","Fifteen","Twenty"],ans:1},
+      {q:"What happens if the offense fails to gain a first down in four downs?",opts:["They get a bonus play","The defense takes over at the spot","A penalty is assessed","The offense keeps the ball"],ans:1},
+      {q:"A <em>safety</em> is scored when…",opts:["The kicker misses a field goal","The ball carrier is tackled in their own end zone","A receiver catches in the back of the end zone","A defender intercepts in the end zone"],ans:1},
+    ],
+    hard:[
+      {q:"Why might a team <em>kneel</em> inside field-goal range when leading late?",opts:["Drain the clock and deny the opponent time","Give the kicker a better angle","The rules require it inside two minutes","Force the defense to burn timeouts"],ans:0},
+      {q:"Under NFL rules, what triggers an automatic first down on a defensive penalty?",opts:["Any penalty over 10 yards","Holding, PI, or roughing the passer","Only pass interference","Any penalty inside the red zone"],ans:1},
+      {q:"The <em>tuck rule</em> (now removed) governed what situation?",opts:["When a runner's knee hits the ground","When a QB's passing motion is interrupted mid-tuck","When a receiver tucks the ball before going out","When a center snaps the ball early"],ans:1},
+    ],
+  },
+  "Positions & Roles":{
+    easy:[
+      {q:"Which player usually <em>throws</em> the football?",opts:["Running back","Wide receiver","Quarterback","Tight end"],ans:2},
+      {q:"Which position <em>snaps</em> the ball to start each play?",opts:["Guard","Center","Tackle","Fullback"],ans:1},
+      {q:"A <em>wide receiver's</em> primary job is to…",opts:["Block the defensive end","Run routes and catch passes","Protect the quarterback","Hand off to the running back"],ans:1},
+    ],
+    medium:[
+      {q:"In <em>man coverage</em>, a cornerback is responsible for…",opts:["An assigned area of the field","One receiver, across the whole field","Rushing the quarterback","Supporting the run first"],ans:1},
+      {q:"The <em>MIKE linebacker</em> is typically responsible for…",opts:["Covering the slot receiver","Making defensive line calls and filling the A-gaps","Rushing the edge on every play","Shadowing the tight end"],ans:1},
+      {q:"A <em>tight end</em> is considered a hybrid because…",opts:["They play both offense and defense","They block like a lineman and run routes like a receiver","They can take direct snaps","They alternate with the fullback"],ans:1},
+    ],
+    hard:[
+      {q:"A QB identifies a <em>blitz</em> pre-snap. The sharpest response?",opts:["Hold the ball a beat longer","Scramble immediately","Call a timeout","Adjust to a quick-release hot route"],ans:3},
+      {q:"The difference between a <em>Will</em> and <em>Sam</em> linebacker is…",opts:["Will is stronger, Sam is faster","Will aligns to the weak side, Sam to the strong side","Sam covers backs, Will blitzes","Will plays inside, Sam plays outside always"],ans:1},
+      {q:"A <em>free safety</em> differs from a strong safety primarily in…",opts:["Jersey number","Assignment — free safety reads the QB and plays centerfield","Free safety always covers the tight end","Strong safety never blitzes"],ans:1},
+    ],
+  },
+  "Formations & Alignments":{
+    easy:[
+      {q:"When the QB lines up several yards behind center, the formation is…",opts:["Under center","I-Formation","Shotgun","Wildcat"],ans:2},
+      {q:"An <em>empty backfield</em> means…",opts:["No receivers are split wide","No running back lines up in the backfield","The QB is absent","Only one wide receiver is used"],ans:1},
+      {q:"The <em>I-Formation</em> gets its name from…",opts:["The inventor's initial","The alignment of QB, fullback, and running back in a vertical line","The shape of the offensive line","A penalty rule reference"],ans:1},
+    ],
+    medium:[
+      {q:"A defense <em>loads the box</em> when it…",opts:["Drops everyone deep","Packs defenders near the line to stop the run","Spreads wide to match empty sets","Rushes only three"],ans:1},
+      {q:"<em>Cover 2</em> splits the deep field between…",opts:["Two corners","Two safeties","A safety and a corner on each side","The two outside linebackers"],ans:1},
+      {q:"A <em>nickel</em> package replaces a linebacker with…",opts:["An extra lineman","A fifth defensive back","A second tight end","A hybrid safety"],ans:1},
+    ],
+    hard:[
+      {q:"If a defender <em>follows</em> a receiver in pre-snap motion, coverage is most likely…",opts:["Zone","Man","Prevent","Cover 2"],ans:1},
+      {q:"<em>Cover 3 buzz</em> adjusts standard Cover 3 by…",opts:["Adding a fourth deep zone","Dropping a safety into the flat to take away the curl-flat","Pressing all three receivers","Running a zone blitz from the boundary"],ans:1},
+      {q:"An offense shifts from 2×2 to <em>3×1 trips</em> pre-snap. The defense's immediate concern is…",opts:["A QB draw up the middle","Overloading one side to stress zone coverage rotations","Getting an extra rusher","A tackle-eligible package"],ans:1},
+    ],
+  },
+  "Plays & Concepts":{
+    easy:[
+      {q:"<em>Play-action</em> is…",opts:["A fake pass to set up a run","A fake run to set up a pass","Running the same play twice","A trick special-teams play"],ans:1},
+      {q:"A <em>handoff</em> occurs when the QB…",opts:["Throws a short pass","Directly gives the ball to a running back","Pitches it backwards","Spikes the ball"],ans:1},
+      {q:"A <em>punt</em> is used when the offense…",opts:["Scores a touchdown","Wants to attempt a field goal","Kicks the ball away on 4th down to flip field position","Is penalized"],ans:2},
+    ],
+    medium:[
+      {q:"A <em>screen pass</em> works by…",opts:["Sending receivers deep to clear space","Letting rushers through, then throwing behind them to a blocked runner","Throwing immediately at the snap","Running the ball off-tackle"],ans:1},
+      {q:"<em>RPO</em> stands for — and gives the QB…",opts:["Run-Pass Option; a post-snap read to hand off or throw based on a defender","Reverse Pass Offense; a reverse with a pass option","Run Protection Option; a protection scheme","Read-Pass Only; a passing concept"],ans:0},
+      {q:"A <em>naked bootleg</em> differs from a standard bootleg because…",opts:["The QB keeps the ball every time","No pulling blockers accompany the QB — he runs unprotected to one side","It's always combined with play-action","The fullback leads the QB outside"],ans:1},
+    ],
+    hard:[
+      {q:"The <em>Mesh</em> concept asks two crossing receivers to…",opts:["Block edge rushers","Pick and rub defenders in man coverage","Run identical routes as safety valves","Stay near the sidelines"],ans:1},
+      {q:"<em>Four Verticals</em> stresses a Cover 2 defense by…",opts:["Running the ball four times","Flooding the flats with four routes","Forcing both safeties to choose a vertical threat, leaving a seam open","Running a draw on fourth down"],ans:2},
+      {q:"The <em>Y-Cross</em> is designed to attack…",opts:["Zone defenses by dragging the tight end across the middle at 12 yards","Man coverage with a rub route from the slot","The flat with a wheel route","A linebacker in man coverage with a fade"],ans:0},
+    ],
+  },
+  "Situation & Strategy":{
+    easy:[
+      {q:"4th-and-1 on your own 40. Up 10 with six minutes left. Standard call?",opts:["Go for it","Punt","Field goal","Fake punt"],ans:1},
+      {q:"Why do teams typically <em>spike the ball</em> late in a half?",opts:["To save a timeout","To stop the clock and preserve time for a field goal attempt","To draw a penalty","To rest the offense"],ans:1},
+      {q:"An <em>onside kick</em> is attempted when…",opts:["A team is winning and wants to keep possession","A team needs to recover the ball quickly because they're trailing late","The kicker has a strong leg","The weather is bad"],ans:1},
+    ],
+    medium:[
+      {q:"Down 3, ball on the 35, 0:40 left, no timeouts. Right first move?",opts:["Kneel to set up a field goal","Spike to stop the clock, then take shots","Run inside","Throw deep immediately"],ans:1},
+      {q:"Why would a defense intentionally give up a <em>safety</em> late in the game?",opts:["It's a forfeit gesture","To get the ball back via a free kick with a lead — better than punting from the end zone","It resets the clock","It prevents a touchdown"],ans:1},
+      {q:"A team trailing by 7 converts a TD with 45 seconds left. Why might they go for <em>two</em>?",opts:["They always go for two late","To try and win outright rather than risk losing in overtime","The extra point is too far","The rulebook requires it"],ans:1},
+    ],
+    hard:[
+      {q:"Down 8, TD scored with 2:10 left. <em>Analytically</em> correct call?",opts:["Kick the extra point","Go for two — win expectancy rises if it connects","Squib the kickoff","Onside kick immediately"],ans:1},
+      {q:"A team trails by 14 with 4 minutes left and receives the kickoff. What is the optimal <em>clock management</em> strategy?",opts:["Hurry-up on every play to score quickly, kick deep, and stop them","Score quickly, use all 3 timeouts defensively, then score again","Run the ball to keep the defense honest, then pass","Call timeouts immediately before the first snap"],ans:1},
+      {q:"The <em>Belichick rule</em> in analytics suggests teams should go for it on 4th-and-short near midfield because…",opts:["Punts rarely pin opponents inside the 10","Expected points gained from possession outweigh the field position risk","The offense is more reliable than the kicker","Fourth-down attempts have a higher conversion rate than reported"],ans:1},
+    ],
+  },
+};
+
+// Domains in order
+const DOMAINS=Object.keys(POOL);
+// Difficulties
+const DIFFS=['easy','medium','hard'];
+
+// ── Adaptive state ──
+// quiz runs 5 blocks (one per domain), 3 questions each = 15 total
+// block difficulty adapts after each block based on performance
+let state={
+  answers:[],          // all submitted answers
+  queue:[],            // the 15 selected questions in order
+  idx:0,               // current question index in queue
+  blockDiff:[],        // difficulty chosen for each block [0..4]
+  pickedIdx:null,
+  pickedConf:null,
+};
+
+function buildQueue(){
+  // Start every quiz at medium for block 0
+  // After each block: ≥2/3 correct → step up; ≤0/3 correct → step down; 1/3 → stay
+  const queue=[];
+  const blockDiffs=[];
+  let diff=1; // 0=easy,1=medium,2=hard
+  for(let b=0;b<DOMAINS.length;b++){
+    const domain=DOMAINS[b];
+    const dKey=DIFFS[diff];
+    blockDiffs.push(dKey);
+    // Shuffle and pick 3 from this domain/difficulty
+    const pool=[...POOL[domain][dKey]].map(q=>({...q,domain,diff:dKey}));
+    for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+    queue.push(...pool.slice(0,3));
+    // After block b, decide next difficulty based on how player did
+    // (can't look ahead for block 0 start, so this runs after we already know block b's questions)
+    if(b<DOMAINS.length-1){
+      const blockAnswers=state.answers.slice(b*3,(b+1)*3);
+      const correct=blockAnswers.filter(a=>a.correct).length;
+      if(correct>=2) diff=Math.min(2,diff+1);      // step up
+      else if(correct<=0) diff=Math.max(0,diff-1); // step down
+      // else stay
+    }
+  }
+  return{queue,blockDiffs};
+}
+
+// We build the queue incrementally — the next block is only selected
+// once the previous block is complete (so difficulty adapts in real time)
+function buildNextBlock(blockIdx){
+  const domain=DOMAINS[blockIdx];
+  // Determine difficulty for this block
+  let diff;
+  if(blockIdx===0){
+    diff=1; // always start medium
+  } else {
+    const prevBlockAnswers=state.answers.slice((blockIdx-1)*3,blockIdx*3);
+    const correct=prevBlockAnswers.filter(a=>a.correct).length;
+    const prevDiffIdx=DIFFS.indexOf(state.blockDiff[blockIdx-1]);
+    if(correct>=2) diff=Math.min(2,prevDiffIdx+1);
+    else if(correct<=0) diff=Math.max(0,prevDiffIdx-1);
+    else diff=prevDiffIdx;
+  }
+  const dKey=DIFFS[diff];
+  state.blockDiff.push(dKey);
+  // Pick 3 shuffled questions
+  const pool=[...POOL[domain][dKey]].map(q=>({...q,domain,diff:dKey}));
+  for(let i=pool.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[pool[i],pool[j]]=[pool[j],pool[i]];}
+  state.queue.push(...pool.slice(0,3));
+}
+
+function today(){return new Date().toLocaleDateString('en-US',{month:'short',day:'numeric',year:'numeric'}).toUpperCase()}
+document.getElementById('coverDate').textContent=today();
+
+function buildDowns(){
+  const t=document.getElementById('downs');t.innerHTML='';
+  const total=15;
+  for(let i=0;i<total;i++){
+    const s=document.createElement('div');s.className='down-seg';
+    // Block separator — subtle gap every 3
+    if(i>0&&i%3===0) s.style.marginLeft='4px';
+    if(i<state.idx){const a=state.answers[i];s.classList.add(a&&a.correct?'correct':'wrong')}
+    if(i===state.idx) s.classList.add('current');
+    t.appendChild(s);
+  }
+}
+
+function startQuiz(){
+  document.getElementById('screenIntro').classList.remove('active');
+  document.getElementById('screenQuiz').classList.add('active');
+  document.body.classList.add('quiz-active');
+  state={answers:[],queue:[],idx:0,blockDiff:[],pickedIdx:null,pickedConf:null};
+  // Build first block immediately
+  buildNextBlock(0);
+  renderQ();
+}
+
+function renderQ(){
+  state.pickedIdx=null;state.pickedConf=null;
+  const q=state.queue[state.idx];
+  const blockIdx=Math.floor(state.idx/3);
+  const posInBlock=(state.idx%3)+1;
+
+  buildDowns();updateStats();
+
+  document.getElementById('gbNum').textContent=String(state.idx+1).padStart(2,'0');
+  document.getElementById('gbDomain').textContent=q.domain.split(' ')[0];
+  document.getElementById('gbDiff').textContent=q.diff.charAt(0).toUpperCase()+q.diff.slice(1);
+  document.getElementById('qNumChip').textContent=String(state.idx+1).padStart(2,'0');
+  document.getElementById('qDomainHead').textContent=q.domain;
+  const dc=document.getElementById('qDiffChip');
+  dc.className='q-diff-chip '+q.diff;dc.textContent=q.diff.charAt(0).toUpperCase()+q.diff.slice(1);
+  const qText=document.getElementById('qText');qText.innerHTML=q.q;
+  const opts=document.getElementById('qOpts');opts.innerHTML='';
+  ['A','B','C','D'].forEach((k,i)=>{
+    const btn=document.createElement('button');btn.className='q-opt';
+    btn.innerHTML=`<div class="q-opt-key">${k}</div><div class="q-opt-text">${q.opts[i]}</div>`;
+    btn.onclick=()=>selectOpt(i);opts.appendChild(btn);
+  });
+  document.querySelectorAll('.conv-row,.conv-bar-btn').forEach(r=>r.classList.remove('active'));
+  qText.animate([{opacity:0,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,easing:'cubic-bezier(.22,1,.36,1)'});
+}
+
+function selectOpt(i){
+  state.pickedIdx=i;
+  document.querySelectorAll('#qOpts .q-opt').forEach((el,idx)=>el.classList.toggle('selected',idx===i));
+  if(state.pickedConf!==null)setTimeout(commit,170);
+}
+function selectConf(n){
+  state.pickedConf=n;
+  document.querySelectorAll('.conv-row').forEach(r=>r.classList.toggle('active',+r.getAttribute('data-c')===n));
+  document.querySelectorAll('.conv-bar-btn').forEach(r=>r.classList.toggle('active',+r.getAttribute('data-c')===n));
+  if(state.pickedIdx!==null)setTimeout(commit,190);
+}
+function commit(){
+  const q=state.queue[state.idx],c=state.pickedConf,correct=state.pickedIdx===q.ans;
+  const diffMult={easy:1,medium:2,hard:3}[q.diff]||1;
+  let pts;
+  if(correct){ pts=diffMult*c; }
+  else { pts=c===1?0:c===2?-1*diffMult:-2*diffMult; }
+  state.answers.push({pick:state.pickedIdx,correct,conf:c,points:pts,domain:q.domain,diff:q.diff});
+  state.idx++;
+
+  // If we just finished a block and there's a next block to build, build it now
+  if(state.idx%3===0 && state.idx<15){
+    buildNextBlock(state.idx/3);
+  }
+
+  if(state.idx>=15) renderResults(); else renderQ();
+}
+function updateStats(){
+  const s=state.answers.reduce((a,x)=>a+x.points,0);
+  const c=state.answers.filter(x=>x.correct).length;
+  document.getElementById('gbScore').innerHTML=s+'<span class="u">pts</span>';
+  document.getElementById('gbCorrect').textContent=c;
+}
+document.addEventListener('keydown',(e)=>{
+  if(!document.getElementById('screenQuiz').classList.contains('active'))return;
+  const k=e.key.toLowerCase();
+  if(['a','b','c','d'].includes(k))selectOpt({a:0,b:1,c:2,d:3}[k]);
+  else if(['1','2','3'].includes(k))selectConf(+k);
+});
+function gradeFor(score,max){
+  const p=score/max;
+  if(p>=.85)return{g:'A',tier:'Elite',v:'ELITE <em>READ</em>.',s:"You see the field like a coordinator. The what, the why, the next play — all of it."};
+  if(p>=.70)return{g:'A−',tier:'Pro',v:'A <em>SHARP</em> MIND.',s:"You're hunting the last few points. The Elite tier is within reach."};
+  if(p>=.55)return{g:'B+',tier:'Starter',v:'SOLID <em>STARTER</em>.',s:"You run the huddle. Sharpen the hard-tier reads and you're Pro-level."};
+  if(p>=.40)return{g:'B',tier:'Contributor',v:'<em>CAPABLE</em> PLAYER.',s:"The fundamentals are there. Difficult concepts and strategy need more film time."};
+  if(p>=.25)return{g:'C',tier:'Developing',v:'<em>DEVELOPING</em> EYE.',s:"You know the shape of the game. Now layer in the nuance — rep by rep."};
+  return{g:'D',tier:'Rookie',v:'<em>ROOKIE</em> CAMP.',s:"Everyone starts here. The next rep is the one that matters."};
+}
+function renderResults(){
+  document.getElementById('screenQuiz').classList.remove('active');
+  document.getElementById('screenResults').classList.add('active');
+  document.body.classList.remove('quiz-active');
+  window.scrollTo({top:0});
+  document.getElementById('resDate').textContent=today();
+  // MAX = sum of (diffMult × 3) for each question actually served
+  const diffMult={easy:1,medium:2,hard:3};
+  const MAX=state.queue.reduce((sum,q)=>sum+(diffMult[q.diff]||1)*3,0);
+  const raw=state.answers.reduce((a,x)=>a+x.points,0),disp=Math.max(0,raw),g=gradeFor(disp,MAX);
+  document.getElementById('resVerdict').innerHTML=g.v;
+  document.getElementById('resSub').textContent=g.s;
+  document.getElementById('resGrade').textContent=g.g;
+  document.getElementById('resTier').textContent=g.tier;
+  document.getElementById('resPct').textContent=Math.round((disp/MAX)*100)+'th';
+  document.getElementById('resMax').textContent='/ '+MAX;
+  animateNumber(document.getElementById('resScore'),0,disp,1400);
+  const correct=state.answers.filter(a=>a.correct).length,acc=Math.round((correct/state.queue.length)*100);
+  document.getElementById('dsCorrect').textContent=correct;
+  document.getElementById('dsAcc').textContent=acc;
+  document.getElementById('dsCorrectNote').innerHTML=correct>=12?'<b>Dominant</b> showing.':correct>=8?'<b>Solid</b>, with room.':'<b>Reps needed.</b>';
+  document.getElementById('dsAccNote').innerHTML=acc>=75?'<b>Above</b> the average.':acc>=50?'<b>Middle</b> of the pack.':'<b>Below</b> the bar — for now.';
+  const tiersReached=new Set(state.answers.filter(a=>a.correct).map(a=>a.diff));
+  let reached='—';
+  if(tiersReached.has('hard'))reached='HARD';
+  else if(tiersReached.has('medium'))reached='MED';
+  else if(tiersReached.has('easy'))reached='EASY';
+  document.getElementById('dsTier').textContent=reached;
+  document.getElementById('dsTierNote').innerHTML=reached==='HARD'?'Cleared the <b>top-tier</b> questions.':reached==='MED'?'<b>Hard tier</b> awaits next rep.':'Build from the <b>fundamentals.</b>';
+  const lr=state.answers.filter(a=>a.correct&&a.conf===3).length,lw=state.answers.filter(a=>!a.correct&&a.conf===3).length,cal=lr-lw;
+  let cl='BALANCED';if(cal>=4)cl='SHARP';else if(cal>=2)cl='TUNED';else if(cal<=-2)cl='RECKLESS';
+  document.getElementById('dsCal').textContent=cl;
+  const ds=DOMAINS.map(d=>{
+    const items=state.answers.filter(a=>a.domain===d);
+    const c=items.filter(a=>a.correct).length;
+    return{d,c,t:items.length,pct:items.length?Math.round((c/items.length)*100):0};
+  });
+
+  // Pillar colors — one distinct color per domain
+  const PILLAR_COLORS=['#C1FF22','#22D2E0','#FF6B35','#A855F7','#F5A524'];
+  const PILLAR_SHORT=['Rules','Positions','Formations','Plays','Situations'];
+
+  // Draw pentagon radar
+  const svg=document.getElementById('radarSvg');
+  svg.innerHTML='';
+  const cx=160,cy=152,R=108,n=5;
+  const angle=i=>(-Math.PI/2)+(2*Math.PI*i/n);
+  const pt=(r,i)=>({x:cx+r*Math.cos(angle(i)),y:cy+r*Math.sin(angle(i))});
+  const poly=pts=>pts.map(p=>`${p.x},${p.y}`).join(' ');
+
+  // Grid rings
+  [0.25,0.5,0.75,1].forEach(f=>{
+    const ring=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+    ring.setAttribute('points',poly([0,1,2,3,4].map(i=>pt(R*f,i))));
+    ring.setAttribute('fill','none');
+    ring.setAttribute('stroke',f===1?'#1a4570':'#0d2e4e');
+    ring.setAttribute('stroke-width',f===1?'1.5':'1');
+    svg.appendChild(ring);
+  });
+
+  // Axis spokes
+  for(let i=0;i<n;i++){
+    const end=pt(R,i);
+    const line=document.createElementNS('http://www.w3.org/2000/svg','line');
+    line.setAttribute('x1',cx);line.setAttribute('y1',cy);
+    line.setAttribute('x2',end.x);line.setAttribute('y2',end.y);
+    line.setAttribute('stroke','#0d2e4e');line.setAttribute('stroke-width','1');
+    svg.appendChild(line);
+  }
+
+  // Data polygon — filled with lime glow
+  const dataPoints=ds.map((d,i)=>pt(R*(d.pct/100),i));
+  const dataPoly=document.createElementNS('http://www.w3.org/2000/svg','polygon');
+  dataPoly.setAttribute('points',poly(dataPoints));
+  dataPoly.setAttribute('fill','rgba(193,255,34,0.12)');
+  dataPoly.setAttribute('stroke','#C1FF22');
+  dataPoly.setAttribute('stroke-width','2');
+  dataPoly.setAttribute('stroke-linejoin','round');
+  svg.appendChild(dataPoly);
+
+  // Animate the data polygon in
+  dataPoly.style.opacity='0';
+  setTimeout(()=>{
+    dataPoly.style.transition='opacity 0.6s ease';
+    dataPoly.style.opacity='1';
+  },100);
+
+  // Vertex dots + colored glow per pillar
+  ds.forEach((d,i)=>{
+    const p=pt(R*(d.pct/100),i);
+    const color=PILLAR_COLORS[i];
+    // glow circle
+    const glow=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    glow.setAttribute('cx',p.x);glow.setAttribute('cy',p.y);glow.setAttribute('r','10');
+    glow.setAttribute('fill',color);glow.setAttribute('opacity','0.18');
+    svg.appendChild(glow);
+    // dot
+    const dot=document.createElementNS('http://www.w3.org/2000/svg','circle');
+    dot.setAttribute('cx',p.x);dot.setAttribute('cy',p.y);dot.setAttribute('r','5');
+    dot.setAttribute('fill',color);dot.setAttribute('stroke','#020f1e');dot.setAttribute('stroke-width','1.5');
+    svg.appendChild(dot);
+  });
+
+  // Axis labels
+  ds.forEach((d,i)=>{
+    const labelR=R+22;
+    const p=pt(labelR,i);
+    const text=document.createElementNS('http://www.w3.org/2000/svg','text');
+    text.setAttribute('x',p.x);text.setAttribute('y',p.y);
+    text.setAttribute('text-anchor','middle');text.setAttribute('dominant-baseline','middle');
+    text.setAttribute('font-family','Barlow Condensed, Arial Narrow, sans-serif');
+    text.setAttribute('font-weight','700');text.setAttribute('font-size','11');
+    text.setAttribute('letter-spacing','1');text.setAttribute('text-transform','uppercase');
+    text.setAttribute('fill',PILLAR_COLORS[i]);
+    text.textContent=PILLAR_SHORT[i].toUpperCase();
+    svg.appendChild(text);
+  });
+
+  // Center label
+  const cLabel=document.createElementNS('http://www.w3.org/2000/svg','text');
+  cLabel.setAttribute('x',cx);cLabel.setAttribute('y',cy);
+  cLabel.setAttribute('text-anchor','middle');cLabel.setAttribute('dominant-baseline','middle');
+  cLabel.setAttribute('font-family','Barlow Condensed, Arial Narrow, sans-serif');
+  cLabel.setAttribute('font-weight','800');cLabel.setAttribute('font-size','10');
+  cLabel.setAttribute('fill','#3d5f7a');cLabel.setAttribute('letter-spacing','2');
+  cLabel.textContent='IQ';
+  svg.appendChild(cLabel);
+
+  // Legend rows
+  const legend=document.getElementById('radarLegend');legend.innerHTML='';
+  ds.forEach((x,i)=>{
+    const tag=x.pct>=67?{cls:'good',t:'Strength'}:x.pct>=34?{cls:'mid',t:'Steady'}:{cls:'bad',t:'Gap'};
+    const row=document.createElement('div');row.className='rl-row';
+    row.innerHTML=`
+      <div class="rl-dot" style="background:${PILLAR_COLORS[i]}"></div>
+      <div class="rl-name">${x.d}</div>
+      <div class="rl-pct" style="color:${PILLAR_COLORS[i]}">${x.pct}%</div>
+      <div class="rl-tag ${tag.cls}">${tag.t}</div>
+    `;
+    legend.appendChild(row);
+  });
+  const weak=[...ds].sort((a,b)=>a.pct-b.pct)[0];
+  document.getElementById('pcSub').innerHTML=`Weakest domain: <em style="color:var(--accent);font-style:normal">${weak.d}</em>. Close that gap and your whole score climbs.`;
+  const pc=document.getElementById('pcList');pc.innerHTML='';
+  prescriptionFor(weak.d).forEach((s,i)=>{const el=document.createElement('div');el.className='pc-item';el.innerHTML=`<span class="pc-num">0${i+1}</span><span class="pc-text">${s}</span>`;pc.appendChild(el)});
+}
+function prescriptionFor(d){
+  const map={"Rules & Objectives":["Re-read the scoring, downs, and clock sections of the rulebook.","Watch five drives muted. Narrate the rule at every stoppage.","Quiz yourself on penalty yardage and automatic first-down triggers."],"Positions & Roles":["Map all 22 positions on a blank field diagram from memory.","Shadow one position per game — watch stance, first-step, leverage.","Learn strong vs. free safety, Will / Mike / Sam linebacker roles."],"Formations & Alignments":["Build flashcards for the ten most-used offensive formations.","Pause the broadcast at the snap. Name the alignment out loud.","Study motion — the cheapest way offense unmasks a defense."],"Plays & Concepts":["Pick one concept a week — Mesh, Y-Cross, Four Verts — and learn it cold.","Re-watch a full game and label every play: run, pass, or play-action.","Draw three screen variants on paper until the spacing is obvious."],"Situation & Strategy":["Memorize the 4th-down decision chart by field position.","Chart the final two minutes of three close games — every call, every stop.","Study two-point conversion math. It's simpler than it looks."]};
+  return map[d]||[];
+}
+function animateNumber(el,from,to,dur){const s=performance.now();function t(n){const p=Math.min(1,(n-s)/dur),e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*e);if(p<1)requestAnimationFrame(t)}requestAnimationFrame(t)}
+function restart(){
+  document.getElementById('screenResults').classList.remove('active');
+  document.getElementById('screenIntro').classList.add('active');
+  state={answers:[],queue:[],idx:0,blockDiff:[],pickedIdx:null,pickedConf:null};
+  window.scrollTo({top:0});
+}
+function shareResult(){
+  const diffMult={easy:1,medium:2,hard:3};
+  const MAX=state.queue.reduce((sum,q)=>sum+(diffMult[q.diff]||1)*3,0);
+  const score=Math.max(0,state.answers.reduce((a,x)=>a+x.points,0));
+  const txt=`I scored ${score}/${MAX} — ${document.getElementById('resGrade').textContent} · ${document.getElementById('resTier').textContent} · First Down Academy Gridiron IQ. firstdownacademy.com`;
+  if(navigator.share)navigator.share({title:'First Down Academy · Gridiron IQ',text:txt}).catch(()=>{});
+  else if(navigator.clipboard){navigator.clipboard.writeText(txt);showToast('Scorecard copied');}
+}
+function showToast(m){const t=document.getElementById('toast');t.textContent=m;t.classList.add('show');setTimeout(()=>t.classList.remove('show'),2400)}
+</script>
+</body>
+</html>
