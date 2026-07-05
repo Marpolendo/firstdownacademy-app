@@ -28,6 +28,18 @@ a{text-decoration:none;}
   padding:48px 52px;overflow:hidden;
 }
 @media(max-width:860px){.auth-left{display:none;}}
+.auth-left-photo{
+  position:absolute;inset:0;margin:0;pointer-events:none;overflow:hidden;
+}
+.auth-left-photo img{
+  width:100%;height:100%;object-fit:cover;display:block;
+  filter:grayscale(1) contrast(1.15) brightness(.62);
+  mix-blend-mode:luminosity;opacity:.85;
+}
+.auth-left-photo::after{
+  content:'';position:absolute;inset:0;
+  background:linear-gradient(180deg,rgba(2,15,30,.35) 0%,rgba(2,15,30,.55) 55%,rgba(2,15,30,.92) 100%);
+}
 .auth-left-grid{
   position:absolute;inset:0;pointer-events:none;
   background-image:
@@ -275,6 +287,9 @@ a{text-decoration:none;}
 
   <!-- ── LEFT PANEL ── -->
   <div class="auth-left">
+    <figure class="auth-left-photo" aria-hidden="true">
+      <img src="https://firstdownacademy.com/img/home-player.jpg" alt="" loading="lazy" onerror="this.closest('figure').style.display='none'">
+    </figure>
     <div class="auth-left-grid"></div>
     <div class="auth-left-glow"></div>
     <div class="auth-left-hash"></div>
@@ -485,7 +500,7 @@ a{text-decoration:none;}
         <div class="auth-field">
           <div class="auth-label">
             Password
-            <a onclick="handleForgotPassword()" style="color:#1a2d6b;text-decoration:none;cursor:pointer;">Forgot password?</a>
+            <a onclick="handleForgotPassword()" style="color:#8a96b0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;">Forgot password?</a>
           </div>
           <input class="auth-input" id="loginPassword" type="password" placeholder="Your password" autocomplete="current-password">
         </div>
@@ -543,7 +558,7 @@ function handleForgotPassword() {
   }
   showToast('loading', 'Sending reset link...');
   db.auth.resetPasswordForEmail(email, {
-    redirectTo: 'https://firstdownacademy.com/reset.html'
+    redirectTo: window.location.origin + '/reset.html'
   }).then(function(result) {
     if (result.error) {
       showToast('error', result.error.message);
