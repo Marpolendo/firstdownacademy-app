@@ -401,6 +401,26 @@ a{text-decoration:none;}
             </select>
           </div>
           <div class="auth-field">
+            <div class="auth-label">
+              Position
+              <span class="auth-label-opt">Optional</span>
+            </div>
+            <select class="auth-input" id="playerPosition">
+              <option value="">Select...</option>
+              <option>Quarterback</option>
+              <option>Running Back</option>
+              <option>Wide Receiver</option>
+              <option>Tight End</option>
+              <option>Offensive Line</option>
+              <option>Defensive Line</option>
+              <option>Linebacker</option>
+              <option>Cornerback</option>
+              <option>Safety</option>
+              <option>Kicker / Punter</option>
+              <option>Athlete / Multi</option>
+            </select>
+          </div>
+          <div class="auth-field">
             <div class="auth-label">Password</div>
             <input class="auth-input" id="playerPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value); checkPasswordMatch()">
             <div class="pw-strength" id="pwStrength">

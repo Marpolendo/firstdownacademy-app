@@ -223,6 +223,7 @@ async function doSignup() {
   var email    = document.getElementById('playerEmail') ? document.getElementById('playerEmail').value.trim() : '';
   var password = document.getElementById('playerPassword') ? document.getElementById('playerPassword').value.trim() : '';
   var age      = document.getElementById('playerAge') ? document.getElementById('playerAge').value : '';
+  var position = document.getElementById('playerPosition') ? document.getElementById('playerPosition').value : '';
   var refCode  = document.getElementById('playerReferral') ? document.getElementById('playerReferral').value.trim().toLowerCase() : '';
 
   if (!name || !email || !password) { showAuthMsg('error', 'Please fill in your name, email, and password.'); return; }
@@ -238,17 +239,18 @@ async function doSignup() {
     }
     var signupResult = await db.auth.signUp({
       email: email, password: password,
-      options: { data: { full_name: name, role: 'player', age: age } }
+      options: { data: { full_name: name, role: 'player', age: age, position: position } }
     });
     if (signupResult.error) { showAuthMsg('error', signupResult.error.message); return; }
     if (signupResult.data.user) {
       await db.from('profiles').insert({
         id: signupResult.data.user.id, full_name: name,
-        age: parseInt(age) || 0, referral_code: refCode || null,
+        age: parseInt(age) || 0, position: position || null,
+        referral_code: refCode || null,
         coach_id: coachId, created_at: new Date().toISOString()
       });
       currentUser = signupResult.data.user;
-      currentProfile = { full_name: name, coach_id: coachId, referral_code: refCode };
+      currentProfile = { full_name: name, coach_id: coachId, referral_code: refCode, position: position || null };
     }
     // Check if email confirmation is required
     var sessionCheck = await db.auth.getSession();
