@@ -109,6 +109,14 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 .tag{font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:0.12em;text-transform:uppercase;border-radius:2px;padding:4px 10px;}
 .tag-lime{background:var(--lime-dim);color:var(--lime);border:1px solid rgba(193,255,34,0.15);}
 .tag-orange{background:var(--orange-dim);color:var(--orange);border:1px solid rgba(232,99,10,0.15);}
+.player-coach-card{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);flex-wrap:wrap;}
+.player-coach-name{font-family:var(--font-d);font-size:13px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);}
+.player-coach-team{font-size:12px;color:var(--muted);}
+.joinCoachInput{background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;transition:border-color .2s;min-width:180px;}
+.joinCoachInput:focus{border-color:rgba(193,255,34,.4);}
+.joinCoachInput::placeholder{color:var(--muted);}
+.join-coach-btn{background:var(--lime);color:#061000;font-family:var(--font-d);font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:transform .2s;}
+.join-coach-btn:hover{transform:translateY(-1px);}
 .hero-streak{display:flex;align-items:center;gap:5px;font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);}
 .hero-streak svg{width:14px;height:14px;fill:var(--amber);}
 .hero-title{font-family:var(--font-d);font-size:clamp(36px,5vw,52px);font-weight:900;font-style:italic;letter-spacing:-0.01em;text-transform:uppercase;color:white;line-height:0.95;margin-bottom:18px;}
@@ -220,6 +228,10 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 .pdb-mod-row{display:flex;align-items:center;gap:16px;padding:16px 22px;border-bottom:1px solid var(--border);cursor:pointer;transition:background .2s;}
 .pdb-mod-row:last-child{border-bottom:none;}
 .pdb-mod-row:hover{background:var(--s1);}
+.pdb-mod-row.locked-row{cursor:not-allowed;}
+.pdb-mod-row.locked-row:hover{background:none;}
+.pdb-mod-row.shake{animation:pdb-shake .35s ease;}
+@keyframes pdb-shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
 .pdb-mod-num{width:34px;height:34px;border-radius:50%;background:var(--s3);border:1px solid var(--border2);display:flex;align-items:center;justify-content:center;font-family:var(--font-d);font-size:13px;font-weight:800;color:var(--muted);flex-shrink:0;transition:background .3s,border-color .3s;}
 .pdb-mod-num.done{background:rgba(193,255,34,0.12);border-color:rgba(193,255,34,0.3);color:var(--lime);}
 .pdb-mod-num.next{background:var(--orange-dim);border-color:rgba(232,99,10,0.3);color:var(--orange);box-shadow:0 0 10px rgba(232,99,10,0.2);}
@@ -659,7 +671,19 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
       <div>
         <div class="dash-welcome-name">Hey, <span id="dashPlayerName">Player</span></div>
         <div class="dash-welcome-sub">Level 1 — Foundations · Keep building your Gridiron IQ</div>
+        <div id="playerCoachCard" class="player-coach-card" style="display:none;">
+          <span class="tag tag-lime">Your Coach</span>
+          <span class="player-coach-name" id="playerCoachName">—</span>
+          <span class="player-coach-team" id="playerCoachTeam"></span>
+        </div>
       </div>
+    </div>
+
+    <div id="joinCoachCard" class="player-coach-card fade-up" style="display:none;">
+      <span class="tag tag-orange">No Coach Yet</span>
+      <input type="text" id="joinCoachCode" class="joinCoachInput" placeholder="Enter your coach's referral code" onkeydown="if(event.key==='Enter') joinCoach()">
+      <button class="join-coach-btn" onclick="joinCoach()">Link Coach</button>
+      <span id="joinCoachMsg" class="player-coach-team"></span>
     </div>
 
     <div class="dash-grid">
@@ -1019,6 +1043,36 @@ async function ensureReferralCode() {
     await db.from('profiles').update({ referral_code: code }).eq('id', currentUser.id);
     currentProfile.referral_code = code;
   } catch(e) { console.error('Code gen error:', e); }
+}
+
+async function joinCoach() {
+  var input  = document.getElementById('joinCoachCode');
+  var msgEl  = document.getElementById('joinCoachMsg');
+  if (!input || !currentUser) return;
+
+  var code = input.value.trim();
+  if (!code) { msgEl.textContent = 'Enter a code first.'; return; }
+
+  msgEl.textContent = 'Checking…';
+  try {
+    var result = await db.rpc('get_coach_id_by_referral_code', { p_code: code });
+    if (!result.data) {
+      msgEl.textContent = 'That code was not found. Check with your coach.';
+      return;
+    }
+    var upd = await db.from('profiles').update({ coach_id: result.data }).eq('id', currentUser.id);
+    if (upd.error) {
+      msgEl.textContent = 'Something went wrong. Please try again.';
+      return;
+    }
+    currentProfile.coach_id = result.data;
+    msgEl.textContent = "You're linked!";
+    document.getElementById('joinCoachCard').style.display = 'none';
+    if (typeof loadPlayerDashboard === 'function') loadPlayerDashboard();
+  } catch(e) {
+    console.error('Join coach error:', e);
+    msgEl.textContent = 'Something went wrong. Please try again.';
+  }
 }
 
 // Invite role state

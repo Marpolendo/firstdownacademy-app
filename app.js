@@ -476,19 +476,22 @@ async function loadPlayerDashboard() {
           var nameEl2 = document.getElementById('pdb-name-' + i);
           var barEl  = document.getElementById('pdb-bar-' + i);
           var pctEl  = document.getElementById('pdb-pct-' + i);
+          var rowEl  = document.getElementById('pdb-row-' + i);
 
           if (isDone) {
             if (numEl)  { numEl.className = 'pdb-mod-num done'; numEl.innerHTML = '<svg width="16" height="16" viewBox="0 0 24 24" fill="none"><path d="M5 12l5 5L20 7" stroke="white" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>'; }
             if (nameEl2) nameEl2.className = 'pdb-mod-name';
             if (barEl)  barEl.style.width = '100%';
             if (pctEl)  { pctEl.textContent = '100%'; pctEl.className = 'pdb-mod-pct done'; }
+            if (rowEl)  { rowEl.classList.remove('locked-row'); rowEl.title = ''; }
           } else if (isNext) {
             if (numEl)  numEl.className = 'pdb-mod-num next';
             if (nameEl2) nameEl2.className = 'pdb-mod-name';
             if (barEl)  barEl.style.width = '0%';
             if (pctEl)  pctEl.textContent = '';
+            if (rowEl)  { rowEl.classList.remove('locked-row'); rowEl.title = ''; }
           }
-          // locked modules stay as-is
+          // locked modules stay as-is (locked-row class + tooltip set at build time)
         });
       }
     }
@@ -499,13 +502,16 @@ async function loadPlayerDashboard() {
       var coachResult = await db.from('profiles').select('full_name, team_name').eq('id', currentProfile.coach_id).single();
       if (coachResult.data) {
         var coachCard = document.getElementById('playerCoachCard');
-        if (coachCard) coachCard.style.display = 'block';
+        if (coachCard) coachCard.style.display = 'flex';
         var coachNameEl = document.getElementById('playerCoachName');
         if (coachNameEl) coachNameEl.textContent = coachResult.data.full_name || '—';
         var coachTeamEl = document.getElementById('playerCoachTeam');
         if (coachTeamEl) coachTeamEl.textContent = coachResult.data.team_name || '';
       }
     } catch(e) { console.error('Coach load error:', e); }
+  } else {
+    var joinCard = document.getElementById('joinCoachCard');
+    if (joinCard) joinCard.style.display = 'flex';
   }
 }
 
@@ -635,8 +641,15 @@ function buildDashModuleList() {
   list.innerHTML = '';
   CURRICULUM.forEach(function(m, i) {
     var row = document.createElement('div');
-    row.className = 'pdb-mod-row';
+    row.className = 'pdb-mod-row locked-row';
+    row.title = 'Complete the previous module to unlock this one';
     row.onclick = function() {
+      if (row.classList.contains('locked-row')) {
+        row.classList.remove('shake');
+        void row.offsetWidth; // restart animation if clicked repeatedly
+        row.classList.add('shake');
+        return;
+      }
       sessionStorage.setItem('openModule', i);
       window.location.href = 'lesson.html';
     };

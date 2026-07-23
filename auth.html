@@ -576,6 +576,13 @@ if (_params.get('tab') === 'login') {
   document.addEventListener('DOMContentLoaded', function() { switchTab('login'); });
 }
 
+// Pre-fill referral code from URL param (coach invite links use ?ref=CODE)
+var _ref = _params.get('ref');
+if (_ref) {
+  var _refInput = document.getElementById('playerReferral');
+  if (_refInput) _refInput.value = _ref;
+}
+
 // Handle ?next=giq-exam.html — show quiz result context on left panel
 (function() {
   var next = _params.get('next');
