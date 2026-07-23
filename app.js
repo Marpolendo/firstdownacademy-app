@@ -232,8 +232,8 @@ async function doSignup() {
   try {
     var coachId = null;
     if (refCode) {
-      var coachResult = await db.from('profiles').select('id').eq('referral_code', refCode).single();
-      if (coachResult.data) { coachId = coachResult.data.id; }
+      var coachResult = await db.rpc('get_coach_id_by_referral_code', { p_code: refCode });
+      if (coachResult.data) { coachId = coachResult.data; }
       else { showAuthMsg('error', 'That referral code was not found. Check with your coach.'); return; }
     }
     var signupResult = await db.auth.signUp({

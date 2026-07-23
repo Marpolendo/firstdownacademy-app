@@ -587,12 +587,12 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 
 <header class="top-nav">
   <a class="nav-logo" href="index.html">
-    <img src="logo.png" alt="First Down Academy" onerror="this.style.display='none'">
+    <img src="https://firstdownacademy.com/logo.png" alt="First Down Academy" onerror="this.style.display='none'">
     <div class="nav-brand">First Down<br><span>Academy</span></div>
   </a>
   <nav class="nav-links">
     <a class="nav-link" href="index.html">Home</a>
-    <a class="nav-link" href="program.html">Program</a>
+    <a class="nav-link" href="https://firstdownacademy.com/program.html">Program</a>
     <a class="nav-link active" href="dashboard.html">Dashboard</a>
     <a class="nav-link" href="giq-exam.html">IQ Exam</a>
   </nav>
@@ -607,7 +607,7 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 
 <aside class="sidebar">
   <nav class="sidebar-nav">
-    <a class="sidebar-link" href="program.html">
+    <a class="sidebar-link" href="https://firstdownacademy.com/program.html">
       <svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"></path><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"></path></svg>
       Playbook
     </a>
@@ -1000,7 +1000,7 @@ async function ensureReferralCode() {
   var code = generateReferralCode(currentProfile.team_name || '');
   // Make sure code is unique
   try {
-    var check = await db.from('profiles').select('id').eq('referral_code', code).maybeSingle();
+    var check = await db.rpc('get_coach_id_by_referral_code', { p_code: code });
     if (check.data) {
       // Collision — regenerate with different numbers
       code = generateReferralCode(currentProfile.team_name || '') + Math.floor(Math.random()*9);
