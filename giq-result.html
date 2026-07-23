@@ -435,6 +435,23 @@ body::before {
   border-radius: 999px;
   opacity: 0.6;
 }
+.mock-dot--p0, .mock-fill--p0 { background: var(--p0); }
+.mock-dot--p1, .mock-fill--p1 { background: var(--p1); }
+.mock-dot--p2, .mock-fill--p2 { background: var(--p2); }
+.mock-dot--p3, .mock-fill--p3 { background: var(--p3); }
+.mock-dot--p4, .mock-fill--p4 { background: var(--p4); }
+.mock-fill--p0 { width: 85%; }
+.mock-fill--p1 { width: 72%; }
+.mock-fill--p2 { width: 60%; }
+.mock-fill--p3 { width: 90%; }
+.mock-fill--p4 { width: 55%; }
+.zone-tick--0 { color: #6b7280; }
+.zone-tick--1 { color: #3B82F6; }
+.zone-tick--2 { color: #F59E0B; }
+.zone-tick--3 { color: #E8630A; }
+.zone-tick--4 { color: #22C55E; }
+.text-lime { color: var(--lime); }
+.icon-sm { width: 15px; height: 15px; fill: currentColor; }
 
 .mock-pct {
   font-family: 'Barlow Condensed', sans-serif;
@@ -963,11 +980,11 @@ body::before {
         <div class="score-indicator" id="scoreIndicator"></div>
       </div>
       <div class="score-zone-ticks">
-        <span class="zone-tick" id="zt0" style="color:#6b7280">Rookie</span>
-        <span class="zone-tick" id="zt1" style="color:#3B82F6">Learning</span>
-        <span class="zone-tick" id="zt2" style="color:#F59E0B">Developing</span>
-        <span class="zone-tick" id="zt3" style="color:#E8630A">Advanced</span>
-        <span class="zone-tick" id="zt4" style="color:#22C55E">Elite IQ</span>
+        <span class="zone-tick zone-tick--0" id="zt0">Rookie</span>
+        <span class="zone-tick zone-tick--1" id="zt1">Learning</span>
+        <span class="zone-tick zone-tick--2" id="zt2">Developing</span>
+        <span class="zone-tick zone-tick--3" id="zt3">Advanced</span>
+        <span class="zone-tick zone-tick--4" id="zt4">Elite IQ</span>
       </div>
       <div class="score-label">
         <span>0</span>
@@ -989,33 +1006,33 @@ body::before {
     <!-- Locked (guest) view -->
     <div class="pillars-locked" id="pillarsLocked">
       <div class="pillar-row-mock">
-        <div class="mock-dot" style="background:var(--p0)"></div>
+        <div class="mock-dot mock-dot--p0"></div>
         <div class="mock-name">Rules</div>
-        <div class="mock-track"><div class="mock-fill" style="background:var(--p0);width:85%"></div></div>
+        <div class="mock-track"><div class="mock-fill mock-fill--p0"></div></div>
         <div class="mock-pct">85%</div>
       </div>
       <div class="pillar-row-mock">
-        <div class="mock-dot" style="background:var(--p1)"></div>
+        <div class="mock-dot mock-dot--p1"></div>
         <div class="mock-name">Positions</div>
-        <div class="mock-track"><div class="mock-fill" style="background:var(--p1);width:72%"></div></div>
+        <div class="mock-track"><div class="mock-fill mock-fill--p1"></div></div>
         <div class="mock-pct">72%</div>
       </div>
       <div class="pillar-row-mock">
-        <div class="mock-dot" style="background:var(--p2)"></div>
+        <div class="mock-dot mock-dot--p2"></div>
         <div class="mock-name">Formations</div>
-        <div class="mock-track"><div class="mock-fill" style="background:var(--p2);width:60%"></div></div>
+        <div class="mock-track"><div class="mock-fill mock-fill--p2"></div></div>
         <div class="mock-pct">60%</div>
       </div>
       <div class="pillar-row-mock">
-        <div class="mock-dot" style="background:var(--p3)"></div>
+        <div class="mock-dot mock-dot--p3"></div>
         <div class="mock-name">Plays</div>
-        <div class="mock-track"><div class="mock-fill" style="background:var(--p3);width:90%"></div></div>
+        <div class="mock-track"><div class="mock-fill mock-fill--p3"></div></div>
         <div class="mock-pct">90%</div>
       </div>
       <div class="pillar-row-mock">
-        <div class="mock-dot" style="background:var(--p4)"></div>
+        <div class="mock-dot mock-dot--p4"></div>
         <div class="mock-name">Situational</div>
-        <div class="mock-track"><div class="mock-fill" style="background:var(--p4);width:55%"></div></div>
+        <div class="mock-track"><div class="mock-fill mock-fill--p4"></div></div>
         <div class="mock-pct">55%</div>
       </div>
 
@@ -1041,7 +1058,7 @@ body::before {
     <div class="unlock-card-icon">🏈</div>
     <div class="unlock-card-title">Unlock Your Full Breakdown</div>
     <div class="unlock-card-body">
-      See your score across all 5 pillars — then access <strong style="color:var(--lime)">free training</strong> built around your weakest areas. Most players improve their score by a full letter grade after completing the Rookie course.
+      See your score across all 5 pillars — then access <strong class="text-lime">free training</strong> built around your weakest areas. Most players improve their score by a full letter grade after completing the Rookie course.
     </div>
     <button class="btn-primary" onclick="openModal()">Create Free Account & Unlock →</button>
     <a href="auth.html" class="btn-ghost">Already have an account? Log in</a>
@@ -1478,7 +1495,7 @@ function copyResult() {
   navigator.clipboard.writeText(text).then(function() {
     var btn = event.currentTarget;
     var orig = btn.innerHTML;
-    btn.innerHTML = '<svg viewBox="0 0 24 24" style="width:15px;height:15px;fill:currentColor"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg> Copied!';
+    btn.innerHTML = '<svg viewBox="0 0 24 24" class="icon-sm"><polyline points="20 6 9 17 4 12" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" fill="none"/></svg> Copied!';
     btn.style.color = 'var(--green)';
     setTimeout(function() { btn.innerHTML = orig; btn.style.color = ''; }, 2000);
   });
