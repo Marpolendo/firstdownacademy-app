@@ -1325,16 +1325,24 @@ function gradeColor(grade) {
 async function loadCoachRoster() {
   if (!currentUser) return;
   try {
-    // Fetch players linked to this coach
+    // Fetch players linked to this coach — direct signups (13+) live in
+    // profiles; parent-managed players (COPPA under-13) have no profiles
+    // row of their own and live in managed_players instead. Both carry
+    // a coach_id, so both need to be queried and merged into one roster.
     var result = await db
       .from('profiles')
       .select('id, full_name, created_at, referral_code')
       .eq('coach_id', currentUser.id);
-
     var players = result.data || [];
 
-    // Fetch IQ scores for these players
+    var managedResult = await db
+      .from('managed_players')
+      .select('id, full_name, created_at')
+      .eq('coach_id', currentUser.id);
+    var managedPlayers = managedResult.data || [];
+
     var playerIds = players.map(function(p){ return p.id; });
+    var managedIds = managedPlayers.map(function(p){ return p.id; });
     var iqMap = {};
     var progressMap = {};
 
@@ -1353,7 +1361,7 @@ async function loadCoachRoster() {
       // Module progress per player
       var progResult = await db
         .from('progress')
-        .select('user_id, module_id, completed')
+        .select('user_id, module_num, completed')
         .in('user_id', playerIds)
         .eq('completed', true);
 
@@ -1362,7 +1370,32 @@ async function loadCoachRoster() {
       });
     }
 
-    _rosterData = players.map(function(p) {
+    var iqMapManaged = {};
+    var progressMapManaged = {};
+
+    if (managedIds.length > 0) {
+      var iqResultManaged = await db
+        .from('giq_scores')
+        .select('managed_player_id, grade, score')
+        .in('managed_player_id', managedIds)
+        .order('taken_at', { ascending: false });
+
+      (iqResultManaged.data || []).forEach(function(row) {
+        if (!iqMapManaged[row.managed_player_id]) iqMapManaged[row.managed_player_id] = row.grade || '—';
+      });
+
+      var progResultManaged = await db
+        .from('progress')
+        .select('managed_player_id, module_num, completed')
+        .in('managed_player_id', managedIds)
+        .eq('completed', true);
+
+      (progResultManaged.data || []).forEach(function(row) {
+        progressMapManaged[row.managed_player_id] = (progressMapManaged[row.managed_player_id] || 0) + 1;
+      });
+    }
+
+    var directRows = players.map(function(p) {
       var mods = progressMap[p.id] || 0;
       return {
         name:     p.full_name || 'Player',
@@ -1373,6 +1406,20 @@ async function loadCoachRoster() {
         progress: Math.round((mods / 8) * 100)
       };
     });
+
+    var managedRows = managedPlayers.map(function(p) {
+      var mods = progressMapManaged[p.id] || 0;
+      return {
+        name:     p.full_name || 'Player',
+        joined:   p.created_at,
+        status:   'active',
+        role:     'player',
+        iqGrade:  iqMapManaged[p.id] || null,
+        progress: Math.round((mods / 8) * 100)
+      };
+    });
+
+    _rosterData = directRows.concat(managedRows);
 
     // Update counts
     var total = _rosterData.length;
