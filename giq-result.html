@@ -1117,15 +1117,10 @@ body::before {
         <input type="text" id="mName" placeholder="Your name" autocomplete="name">
       </div>
 
-      <div class="form-field">
-        <label>Email *</label>
-        <input type="email" id="mEmail" placeholder="you@email.com" autocomplete="email">
-      </div>
-
       <div class="form-row">
         <div class="form-field">
           <label>Age *</label>
-          <input type="number" id="mAge" placeholder="13" min="8" max="25">
+          <input type="number" id="mAge" placeholder="13" min="8" max="25" oninput="handleModalAgeChange()">
         </div>
         <div class="form-field">
           <label>Position (optional)</label>
@@ -1145,13 +1140,34 @@ body::before {
           </select>
         </div>
       </div>
-
-      <div class="form-field">
-        <label>Password *</label>
-        <input type="password" id="mPassword" placeholder="At least 6 characters" autocomplete="new-password">
+      <div class="modal-fine" id="mUnder13Notice" style="display:none;margin-bottom:14px;">
+        Players under 13 don't create their own login — a parent or guardian creates and manages the account instead. Ask below.
       </div>
 
-      <button class="btn-primary" id="signupBtn" onclick="doModalSignup()">
+      <div id="mKidFields">
+        <div class="form-field">
+          <label>Email *</label>
+          <input type="email" id="mEmail" placeholder="you@email.com" autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label>Password *</label>
+          <input type="password" id="mPassword" placeholder="At least 6 characters" autocomplete="new-password">
+        </div>
+      </div>
+
+      <div id="mParentFields" style="display:none;">
+        <div class="form-field">
+          <label>Parent/Guardian Full Name *</label>
+          <input type="text" id="mParentName" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="form-field">
+          <label>Parent/Guardian Email *</label>
+          <input type="email" id="mParentEmail" placeholder="your@email.com" autocomplete="email">
+          <div class="modal-fine" style="margin-top:6px;">We'll email you a link to confirm and review exactly what data we collect — including this quiz score — before the account is created.</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="signupBtn" onclick="handleModalSubmit()">
         Create Account & Unlock →
       </button>
 
@@ -1184,8 +1200,8 @@ body::before {
 
 <script>
 // ── SUPABASE CONFIG ──
-const SUPABASE_URL = 'PASTE_YOUR_SUPABASE_URL_HERE';
-const SUPABASE_KEY = 'PASTE_YOUR_PUBLISHABLE_KEY_HERE';
+const SUPABASE_URL = 'https://wzylgwvifdfnkmuleoxn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_FaPj5NQeqzsRE8kOme2lKQ_uXrHArbt';
 const { createClient } = supabase;
 const db = createClient(SUPABASE_URL, SUPABASE_KEY);
 
@@ -1413,6 +1429,102 @@ function showFormMsg(type, msg) {
   var el = document.getElementById('formMsg');
   el.className = 'form-msg ' + type;
   el.textContent = msg;
+}
+
+// ── AGE BRANCHING ──
+function modalIsUnder13() {
+  var age = parseInt(document.getElementById('mAge').value, 10);
+  return !isNaN(age) && age > 0 && age < 13;
+}
+
+function handleModalAgeChange() {
+  var under13 = modalIsUnder13();
+  var notice  = document.getElementById('mUnder13Notice');
+  var kid     = document.getElementById('mKidFields');
+  var parent  = document.getElementById('mParentFields');
+  var btn     = document.getElementById('signupBtn');
+  if (notice) notice.style.display = under13 ? 'block' : 'none';
+  if (kid)    kid.style.display    = under13 ? 'none' : 'block';
+  if (parent) parent.style.display = under13 ? 'block' : 'none';
+  if (btn)    btn.textContent = under13 ? 'Send Parent Consent Email →' : 'Create Account & Unlock →';
+}
+
+function handleModalSubmit() {
+  if (modalIsUnder13()) { doModalParentSignup(); }
+  else { doModalSignup(); }
+}
+
+// Under-13 path: no account is created directly here. The quiz score
+// and signup form data are staged against a single-use token, and a
+// verified parent has to click through a magic-link email (the same
+// mechanism used by auth.html's parent signup) before any account or
+// managed_players row exists. See 0003_giq_result_parent_signup.sql.
+async function doModalParentSignup() {
+  var childName   = document.getElementById('mName').value.trim();
+  var childAge    = document.getElementById('mAge').value.trim();
+  var position    = document.getElementById('mPosition').value;
+  var parentName  = document.getElementById('mParentName').value.trim();
+  var parentEmail = document.getElementById('mParentEmail').value.trim();
+
+  if (!childName)   { showFormMsg('error', "Please enter the player's name."); return; }
+  if (!parentName || !parentEmail) { showFormMsg('error', "Please enter the parent or guardian's name and email."); return; }
+
+  var btn = document.getElementById('signupBtn');
+  btn.disabled = true;
+  btn.textContent = 'Sending…';
+  showFormMsg('loading', 'Sending consent email…');
+
+  try {
+    var pillarData = {};
+    PILLAR_NAMES.forEach(function(p, i) {
+      var key = 'pillar_' + p.replace(/[^a-zA-Z]/g,'').toLowerCase();
+      pillarData[key] = examData.pillars['p' + i] || '0/3';
+    });
+
+    var token = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+    var insertResult = await db.from('pending_child_signups').insert({
+      token: token,
+      child_name: childName,
+      child_age: parseInt(childAge, 10) || 0,
+      position: position || null,
+      parent_name: parentName,
+      parent_email: parentEmail,
+      giq_score: examData.score,
+      giq_grade: examData.grade,
+      giq_correct: examData.correct,
+      giq_pillars: pillarData
+    });
+    if (insertResult.error) {
+      showFormMsg('error', 'Something went wrong. Please try again.');
+      console.error(insertResult.error);
+      btn.disabled = false;
+      btn.textContent = 'Send Parent Consent Email →';
+      return;
+    }
+
+    var redirectTo = window.location.origin + '/parent-consent.html?token=' + encodeURIComponent(token);
+    var otpResult = await db.auth.signInWithOtp({
+      email: parentEmail,
+      options: { emailRedirectTo: redirectTo, data: { full_name: parentName, role: 'parent' } }
+    });
+    if (otpResult.error) {
+      showFormMsg('error', otpResult.error.message);
+      btn.disabled = false;
+      btn.textContent = 'Send Parent Consent Email →';
+      return;
+    }
+
+    document.getElementById('modalForm').style.display    = 'none';
+    document.getElementById('modalSuccess').style.display = 'block';
+    document.getElementById('successBody').textContent =
+      "We've emailed " + parentEmail + " a link to confirm and create the account. Your score will be saved the moment they consent.";
+  } catch(err) {
+    console.error(err);
+    showFormMsg('error', 'Something went wrong. Please try again.');
+    btn.disabled = false;
+    btn.textContent = 'Send Parent Consent Email →';
+  }
 }
 
 // ── MODAL SIGNUP ──

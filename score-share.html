@@ -390,19 +390,15 @@ a{text-decoration:none;}
 <script>
 
 // ── SUPABASE INIT ──────────────────────────────────────────────────────────
-// Uses the same keys as the rest of your FDA site
-var SUPABASE_URL = '';
-var SUPABASE_KEY = '';
-
-// Try to pull from app.js globals if available, otherwise read from meta or env
-// This file expects window.FDA_SUPABASE_URL and window.FDA_SUPABASE_KEY
-// to be set by app.js before this script runs — or hard-code them here.
-// If app.js sets up `db` globally, we'll use that directly below.
+// This page reuses the global `db` client that app.js (loaded further
+// down) sets up, falling back to window.FDA_SUPABASE_URL/KEY below if
+// app.js hasn't run yet.
 
 // ── PILLAR CONFIG ──────────────────────────────────────────────────────────
-var PILLARS     = ['Rules & Objectives','Positions & Responsibilities','Formations & Alignments','Plays & Concepts','Situational Awareness'];
-var PILLAR_KEYS = ['pillarrulesobjectives','pillarpositionsresponsibilities','pillarformationsalignments','pillarplaysconcepts','pillarsituationalawareness'];
-var SHORT       = ['Rules','Positions','Formations','Plays','Situational'];
+// Prefixed to avoid colliding with curriculum.js's own PILLARS global.
+var SS_PILLARS     = ['Rules & Objectives','Positions & Responsibilities','Formations & Alignments','Plays & Concepts','Situational Awareness'];
+var SS_PILLAR_KEYS = ['pillarrulesobjectives','pillarpositionsresponsibilities','pillarformationsalignments','pillarplaysconcepts','pillarsituationalawareness'];
+var SS_SHORT       = ['Rules','Positions','Formations','Plays','Situational'];
 
 // ── MAIN ──────────────────────────────────────────────────────────────────
 document.addEventListener('DOMContentLoaded', async function() {
@@ -486,10 +482,10 @@ function buildPillarPreview() {
   var el = document.getElementById('pillarPreview');
   var html = '';
   // Use randomised percentages so it looks like real data but reveals nothing
-  PILLARS.forEach(function(p, i) {
+  SS_PILLARS.forEach(function(p, i) {
     var fakePct = Math.floor(Math.random() * 45) + 40; // 40–84
     html += '<div class="pillar-row-prev">' +
-      '<div class="pillar-name-prev">' + SHORT[i] + '</div>' +
+      '<div class="pillar-name-prev">' + SS_SHORT[i] + '</div>' +
       '<div class="pillar-track-prev"><div class="pillar-fill-prev" style="width:' + fakePct + '%"></div></div>' +
       '<div class="pillar-pct-prev">' + fakePct + '%</div>' +
     '</div>';
