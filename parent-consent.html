@@ -1,0 +1,267 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Parent Consent — First Down Academy</title>
+<meta name="robots" content="noindex">
+<link rel="icon" href="favicon.ico">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Barlow:wght@400;500;600&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#020f1e; --bg2:#051526; --card:#0a1f36;
+  --lime:#C1FF22; --border:rgba(193,255,34,.14);
+  --muted:#93a4b5; --muted2:#5f7386; --text:#e8eef4;
+  --red:#f28b8b;
+  --fd:"Barlow Condensed",sans-serif; --fb:"Barlow",sans-serif;
+  --fm:"JetBrains Mono",monospace;
+}
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{height:100%}
+body{
+  background:var(--bg);color:var(--text);font-family:var(--fb);
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:32px 20px;-webkit-font-smoothing:antialiased;
+}
+.wrap{width:100%;max-width:460px}
+.mark{
+  width:52px;height:52px;margin:0 auto 20px;
+  background:var(--lime);color:#06100a;display:grid;place-items:center;
+  font-family:var(--fd);font-weight:900;font-size:22px;transform:skewX(-8deg);
+}
+.eyebrow{text-align:center;font-family:var(--fm);font-size:10.5px;letter-spacing:.22em;text-transform:uppercase;color:var(--lime);margin-bottom:10px}
+h1{
+  text-align:center;font-family:var(--fd);font-weight:900;font-size:clamp(28px,6vw,36px);
+  line-height:1;letter-spacing:-.01em;text-transform:uppercase;margin-bottom:28px;
+}
+.card{background:var(--card);border:1px solid var(--border);border-radius:12px;padding:28px;}
+.card + .card{margin-top:16px}
+.state-icon{font-size:36px;text-align:center;margin-bottom:12px}
+.state-title{font-family:var(--fd);font-weight:800;font-size:20px;text-transform:uppercase;text-align:center;margin-bottom:10px}
+.state-body{color:var(--muted);font-size:14px;line-height:1.7;text-align:center}
+.state-body a{color:var(--lime)}
+
+.notice-label{font-family:var(--fm);font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.child-name{font-family:var(--fd);font-weight:900;font-size:26px;text-transform:uppercase;color:#fff;margin-bottom:2px}
+.child-meta{font-size:13px;color:var(--muted);margin-bottom:20px}
+.section-title{font-family:var(--fd);font-size:13px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--lime);margin:20px 0 10px}
+.section-title:first-of-type{margin-top:0}
+ul.data-list{list-style:none;display:flex;flex-direction:column;gap:8px}
+ul.data-list li{font-size:14px;color:var(--text);line-height:1.6;padding-left:18px;position:relative}
+ul.data-list li::before{content:"•";position:absolute;left:0;color:var(--lime)}
+.legal-links{font-size:12.5px;color:var(--muted);margin-top:16px}
+.legal-links a{color:var(--lime)}
+
+.field{margin-top:18px}
+.field label{display:block;font-family:var(--fm);font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--muted2);margin-bottom:6px}
+.field input{
+  width:100%;background:var(--bg2);border:1px solid rgba(255,255,255,.12);border-radius:6px;
+  padding:11px 14px;color:var(--text);font-family:var(--fb);font-size:14px;outline:none;
+}
+.field input:focus{border-color:var(--lime)}
+
+.consent-row{display:flex;align-items:flex-start;gap:10px;margin-top:22px;}
+.consent-row input{margin-top:3px;flex-shrink:0}
+.consent-row label{font-size:13.5px;color:var(--text);line-height:1.6}
+
+.btn{
+  width:100%;margin-top:20px;background:var(--lime);color:#06100a;border:none;border-radius:6px;
+  font-family:var(--fd);font-weight:800;font-size:14px;letter-spacing:.08em;text-transform:uppercase;
+  padding:14px;cursor:pointer;transition:transform .15s ease;
+}
+.btn:hover{transform:translateY(-1px)}
+.btn:disabled{opacity:.5;cursor:not-allowed;transform:none}
+.msg{font-size:13px;margin-top:14px;text-align:center;line-height:1.6}
+.msg.error{color:var(--red)}
+.msg.success{color:var(--lime)}
+</style>
+</head>
+<body>
+
+<div class="wrap">
+  <div class="mark">FD</div>
+  <div class="eyebrow">Parent / Guardian</div>
+  <h1>Consent &amp; Account Setup</h1>
+
+  <div id="loadingState" class="card">
+    <div class="state-icon">⏳</div>
+    <div class="state-title">Checking your link…</div>
+  </div>
+
+  <div id="errorState" class="card" style="display:none;">
+    <div class="state-icon">⚠️</div>
+    <div class="state-title" id="errorTitle">Something's not right</div>
+    <div class="state-body" id="errorBody"></div>
+  </div>
+
+  <div id="consentState" class="card" style="display:none;">
+    <div class="notice-label">Creating an account for</div>
+    <div class="child-name" id="childName">—</div>
+    <div class="child-meta" id="childMeta"></div>
+
+    <div class="section-title">What we'll collect</div>
+    <ul class="data-list">
+      <li>Name and age (to personalize training content)</li>
+      <li>Position, if provided (for future tailored training)</li>
+      <li>Lesson progress and quiz scores (to track learning)</li>
+      <li id="coachLine" style="display:none;">Their coach can see progress and scores, if linked via a referral code</li>
+    </ul>
+
+    <div class="section-title">What we don't do</div>
+    <ul class="data-list">
+      <li>We never sell this data or use it for advertising</li>
+      <li>We don't share it with third parties</li>
+      <li>Your child does not get their own separate login — you control the account</li>
+    </ul>
+
+    <div class="legal-links">Full details in our <a href="https://firstdownacademy.com/legal.html" target="_blank" rel="noopener">Privacy Policy</a>. You can review, edit, or delete this data anytime from your parent dashboard.</div>
+
+    <div class="field">
+      <label for="parentPassword">Set a password (optional)</label>
+      <input type="password" id="parentPassword" placeholder="So you can log in directly next time" autocomplete="new-password">
+    </div>
+
+    <div class="consent-row">
+      <input type="checkbox" id="consentCheck">
+      <label for="consentCheck">I am this child's parent or legal guardian, and I consent to First Down Academy collecting and using this information as described above.</label>
+    </div>
+
+    <button class="btn" id="consentBtn" onclick="submitConsent()">Create Account →</button>
+    <div class="msg" id="consentMsg"></div>
+  </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js?v=1"></script>
+<script>
+var _token = new URLSearchParams(window.location.search).get('token');
+var _pending = null;
+
+function showError(title, body) {
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('consentState').style.display = 'none';
+  document.getElementById('errorState').style.display = 'block';
+  document.getElementById('errorTitle').textContent = title;
+  document.getElementById('errorBody').innerHTML = body;
+}
+
+function waitForSession(timeoutMs) {
+  return new Promise(function(resolve) {
+    var done = false;
+    var finish = function(session) {
+      if (done) return;
+      done = true;
+      resolve(session || null);
+    };
+    db.auth.getSession().then(function(r) {
+      var s = r.data && r.data.session;
+      if (s) finish(s);
+    });
+    var sub = db.auth.onAuthStateChange(function(event, session) {
+      if (session) finish(session);
+    });
+    setTimeout(function() {
+      try { sub.data.subscription.unsubscribe(); } catch(e) {}
+      finish(null);
+    }, timeoutMs);
+  });
+}
+
+async function init() {
+  if (!_token) {
+    showError('Missing link', 'This page needs a valid consent link — please use the link from your email, or start over from the sign up page.');
+    return;
+  }
+
+  if (!db) {
+    showError('Connection problem', "We couldn't reach the server. Please refresh the page and try again.");
+    return;
+  }
+
+  // The magic-link click needs a moment for Supabase to exchange the
+  // URL token for a real session — a single immediate getSession()
+  // call can race that. Fall back to onAuthStateChange, which fires
+  // reliably once the exchange completes (or immediately, if a
+  // session already existed).
+  var session = await waitForSession(6000);
+  if (!session) {
+    showError('Not signed in', 'This link should have signed you in automatically. Please open the link from your email again, or request a new one from the sign up page.');
+    return;
+  }
+
+  var result = await db.rpc('get_pending_child_signup', { p_token: _token });
+  if (result.error || !result.data || !result.data.length) {
+    showError('Link not found', "We couldn't find this consent request. It may have already been used — please start over from the sign up page if needed.");
+    return;
+  }
+  _pending = result.data[0];
+
+  if (_pending.consumed) {
+    showError('Already used', 'This consent link has already been used to create an account. If you meant to add another child, please start a new sign up.');
+    return;
+  }
+  if (_pending.expired) {
+    showError('Link expired', 'This consent link has expired. Please go back to the sign up page and try again.');
+    return;
+  }
+  if (!session.user.email || session.user.email.toLowerCase() !== _pending.parent_email.toLowerCase()) {
+    showError('Email mismatch', 'This link was sent to <strong>' + _pending.parent_email + '</strong>. Please open it from an email account signed in as that address.');
+    return;
+  }
+
+  document.getElementById('loadingState').style.display = 'none';
+  document.getElementById('consentState').style.display = 'block';
+  document.getElementById('childName').textContent = _pending.child_name;
+  document.getElementById('childMeta').textContent = 'Age ' + _pending.child_age + (_pending.position ? ' · ' + _pending.position : '');
+  if (_pending.referral_code) document.getElementById('coachLine').style.display = 'list-item';
+}
+
+async function submitConsent() {
+  var check = document.getElementById('consentCheck');
+  var msgEl = document.getElementById('consentMsg');
+  var btn = document.getElementById('consentBtn');
+  if (!check.checked) {
+    msgEl.className = 'msg error';
+    msgEl.textContent = 'Please check the box to confirm you consent.';
+    return;
+  }
+
+  btn.disabled = true;
+  msgEl.className = 'msg';
+  msgEl.textContent = 'Creating account…';
+
+  try {
+    var pw = document.getElementById('parentPassword').value;
+    if (pw && pw.length >= 6) {
+      await db.auth.updateUser({ password: pw });
+    }
+
+    var result = await db.rpc('complete_parental_consent', { p_token: _token });
+    if (result.error) {
+      msgEl.className = 'msg error';
+      msgEl.textContent = result.error.message || 'Something went wrong. Please try again.';
+      btn.disabled = false;
+      return;
+    }
+
+    msgEl.className = 'msg success';
+    msgEl.textContent = "You're all set! Taking you to your dashboard…";
+    setTimeout(function() { window.location.href = 'dashboard.html'; }, 1200);
+  } catch (e) {
+    console.error(e);
+    msgEl.className = 'msg error';
+    msgEl.textContent = 'Something went wrong. Please try again.';
+    btn.disabled = false;
+  }
+}
+
+// Call directly rather than waiting on app.js's sessionReady event —
+// by the time this script tag runs, app.js has already synchronously
+// initialized `db` (or not), so there's nothing more to wait for, and
+// depending on that event risks a race if it fires before this
+// listener is registered.
+init();
+</script>
+</body>
+</html>

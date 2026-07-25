@@ -117,6 +117,20 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 .joinCoachInput::placeholder{color:var(--muted);}
 .join-coach-btn{background:var(--lime);color:#061000;font-family:var(--font-d);font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:transform .2s;}
 .join-coach-btn:hover{transform:translateY(-1px);}
+.parent-children-list{display:flex;flex-direction:column;gap:12px;}
+.parent-child-card{display:flex;align-items:center;gap:16px;padding:18px 22px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);flex-wrap:wrap;}
+.parent-child-name{font-family:var(--font-d);font-size:16px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);}
+.parent-child-meta{font-size:12px;color:var(--muted);margin-top:2px;}
+.parent-child-actions{display:flex;gap:8px;margin-left:auto;}
+.play-as-btn{background:var(--lime);color:#061000;font-family:var(--font-d);font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;border:none;border-radius:6px;padding:9px 16px;cursor:pointer;white-space:nowrap;transition:transform .2s;}
+.play-as-btn:hover{transform:translateY(-1px);}
+.delete-child-btn{background:none;color:var(--muted);font-family:var(--font-d);font-size:11px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;border:1px solid var(--border2);border-radius:6px;padding:9px 14px;cursor:pointer;white-space:nowrap;transition:color .2s,border-color .2s;}
+.delete-child-btn:hover{color:#f28b8b;border-color:rgba(242,139,139,0.4);}
+.parent-empty-state{padding:32px;text-align:center;color:var(--muted);font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);}
+.parent-empty-state a{color:var(--lime);}
+.managed-player-banner{display:flex;align-items:center;justify-content:space-between;gap:12px;background:var(--orange-dim);border:1px solid rgba(232,99,10,0.25);border-radius:var(--r-lg);padding:12px 18px;margin-bottom:14px;}
+.managed-player-banner span{font-family:var(--font-d);font-size:12px;font-weight:800;letter-spacing:0.06em;text-transform:uppercase;color:var(--orange);}
+.exit-managed-btn{background:none;border:1px solid rgba(232,99,10,0.4);color:var(--orange);font-family:var(--font-d);font-size:11px;font-weight:800;letter-spacing:0.08em;text-transform:uppercase;border-radius:6px;padding:7px 14px;cursor:pointer;}
 .hero-streak{display:flex;align-items:center;gap:5px;font-family:var(--font-d);font-size:10px;font-weight:700;letter-spacing:0.1em;text-transform:uppercase;color:var(--amber);}
 .hero-streak svg{width:14px;height:14px;fill:var(--amber);}
 .hero-title{font-family:var(--font-d);font-size:clamp(36px,5vw,52px);font-weight:900;font-style:italic;letter-spacing:-0.01em;text-transform:uppercase;color:white;line-height:0.95;margin-bottom:18px;}
@@ -667,6 +681,10 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 
   <!-- PLAYER DASHBOARD -->
   <div id="dashPlayer" style="display:none;">
+    <div id="managedPlayerBanner" class="managed-player-banner" style="display:none;">
+      <span>Playing as <span id="managedPlayerBannerName"></span></span>
+      <button class="exit-managed-btn" onclick="exitManagedMode()">Back to Parent Dashboard</button>
+    </div>
     <div class="dash-welcome-bar fade-up">
       <div>
         <div class="dash-welcome-name">Hey, <span id="dashPlayerName">Player</span></div>
@@ -945,6 +963,21 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
     </div>
 
   </div>
+
+  <!-- PARENT DASHBOARD -->
+  <div id="dashParent" style="display:none;">
+    <div class="dash-welcome-bar fade-up">
+      <div>
+        <div class="dash-welcome-name dash-welcome-name--coach">Parent Dashboard</div>
+        <div class="dash-welcome-sub">Manage the accounts you've created for your kids.</div>
+      </div>
+    </div>
+
+    <div id="parentChildrenList" class="parent-children-list fade-up"></div>
+    <div id="parentEmptyState" class="parent-empty-state fade-up" style="display:none;">
+      No managed accounts yet. <a href="auth.html">Sign up a player under 13</a> to get started.
+    </div>
+  </div>
 </main>
 
 
@@ -1072,6 +1105,88 @@ async function joinCoach() {
   } catch(e) {
     console.error('Join coach error:', e);
     msgEl.textContent = 'Something went wrong. Please try again.';
+  }
+}
+
+// ══════════════════════════════════════════
+// PARENT DASHBOARD
+// ══════════════════════════════════════════
+
+async function loadParentDashboard() {
+  if (!currentUser) return;
+  var listEl = document.getElementById('parentChildrenList');
+  var emptyEl = document.getElementById('parentEmptyState');
+  if (!listEl) return;
+
+  try {
+    var result = await db.from('managed_players')
+      .select('id, full_name, age, position, created_at')
+      .eq('parent_id', currentUser.id)
+      .order('created_at', { ascending: true });
+    var children = result.data || [];
+
+    if (!children.length) {
+      listEl.innerHTML = '';
+      if (emptyEl) emptyEl.style.display = 'block';
+      return;
+    }
+    if (emptyEl) emptyEl.style.display = 'none';
+
+    // Latest IQ grade per child, best-effort
+    var ids = children.map(function(c){ return c.id; });
+    var iqMap = {};
+    try {
+      var iqResult = await db.from('giq_scores').select('managed_player_id, grade, taken_at').in('managed_player_id', ids).order('taken_at', { ascending: false });
+      (iqResult.data || []).forEach(function(row) {
+        if (!iqMap[row.managed_player_id]) iqMap[row.managed_player_id] = row.grade;
+      });
+    } catch(e) { /* non-fatal */ }
+
+    listEl.innerHTML = children.map(function(c) {
+      var meta = 'Age ' + c.age + (c.position ? ' · ' + c.position : '') + (iqMap[c.id] ? ' · IQ Grade ' + iqMap[c.id] : '');
+      return '<div class="parent-child-card">' +
+        '<div><div class="parent-child-name">' + escapeHtml(c.full_name) + '</div>' +
+        '<div class="parent-child-meta">' + escapeHtml(meta) + '</div></div>' +
+        '<div class="parent-child-actions">' +
+          '<button class="play-as-btn" onclick="playAsChild(\'' + c.id + '\',' + JSON.stringify(c.full_name) + ',' + c.age + ')">Play as ' + escapeHtml(c.full_name.split(' ')[0]) + '</button>' +
+          '<button class="delete-child-btn" onclick="deleteManagedChild(\'' + c.id + '\',' + JSON.stringify(c.full_name) + ')">Delete Data</button>' +
+        '</div></div>';
+    }).join('');
+  } catch(e) {
+    console.error('Parent dashboard load error:', e);
+  }
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, function(ch) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch];
+  });
+}
+
+function playAsChild(id, fullName, age) {
+  sessionStorage.setItem('fda_activeManagedPlayer', JSON.stringify({ id: id, full_name: fullName, age: age }));
+  window.location.reload();
+}
+
+function exitManagedMode() {
+  sessionStorage.removeItem('fda_activeManagedPlayer');
+  window.location.reload();
+}
+
+async function deleteManagedChild(id, fullName) {
+  var ok = confirm('Delete ' + fullName + '’s account and all of their data (progress, quiz scores)? This cannot be undone.');
+  if (!ok) return;
+  try {
+    var result = await db.from('managed_players').delete().eq('id', id);
+    if (result.error) {
+      alert('Something went wrong deleting this account. Please try again.');
+      console.error(result.error);
+      return;
+    }
+    loadParentDashboard();
+  } catch(e) {
+    console.error('Delete managed child error:', e);
+    alert('Something went wrong deleting this account. Please try again.');
   }
 }
 

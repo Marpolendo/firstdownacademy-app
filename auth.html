@@ -379,26 +379,20 @@ a{text-decoration:none;}
         <!-- Player fields -->
         <div id="playerFields">
           <div class="auth-field">
-            <div class="auth-label">Full Name</div>
-            <input class="auth-input" id="playerName" type="text" placeholder="Your full name" autocomplete="name">
+            <div class="auth-label">Player's Full Name</div>
+            <input class="auth-input" id="playerName" type="text" placeholder="Player's full name" autocomplete="name">
           </div>
           <div class="auth-field">
-            <div class="auth-label">Email</div>
-            <div class="auth-input-wrap">
-              <input class="auth-input" id="playerEmail" type="email" placeholder="your@email.com" autocomplete="email">
-            </div>
-          </div>
-          <div class="auth-field">
-            <div class="auth-label">
-              Age
-              <span class="auth-label-opt">Under 13? Parent email required</span>
-            </div>
-            <select class="auth-input" id="playerAge">
-              <option value="">Select your age</option>
+            <div class="auth-label">Player's Age</div>
+            <select class="auth-input" id="playerAge" onchange="handleAgeChange()">
+              <option value="">Select age</option>
               <option>8</option><option>9</option><option>10</option><option>11</option>
               <option>12</option><option>13</option><option>14</option><option>15</option>
               <option>16</option><option>17</option><option>18</option><option value="18+">18+</option>
             </select>
+            <div class="auth-field-hint" id="under13Notice" style="display:none;">
+              Players under 13 don't create their own login — a parent or guardian creates and manages the account instead. Ask below.
+            </div>
           </div>
           <div class="auth-field">
             <div class="auth-label">
@@ -420,27 +414,53 @@ a{text-decoration:none;}
               <option>Athlete / Multi</option>
             </select>
           </div>
-          <div class="auth-field">
-            <div class="auth-label">Password</div>
-            <input class="auth-input" id="playerPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value); checkPasswordMatch()">
-            <div class="pw-strength" id="pwStrength">
-              <div class="pw-strength-bar">
-                <div class="pw-seg" id="pwSeg1"></div>
-                <div class="pw-seg" id="pwSeg2"></div>
-                <div class="pw-seg" id="pwSeg3"></div>
-                <div class="pw-seg" id="pwSeg4"></div>
+
+          <!-- 13+ : player creates their own login -->
+          <div id="teenOnlyFields">
+            <div class="auth-field">
+              <div class="auth-label">Email</div>
+              <div class="auth-input-wrap">
+                <input class="auth-input" id="playerEmail" type="email" placeholder="your@email.com" autocomplete="email">
               </div>
-              <div class="pw-strength-label" id="pwLabel">Enter a password</div>
+            </div>
+            <div class="auth-field">
+              <div class="auth-label">Password</div>
+              <input class="auth-input" id="playerPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value); checkPasswordMatch()">
+              <div class="pw-strength" id="pwStrength">
+                <div class="pw-strength-bar">
+                  <div class="pw-seg" id="pwSeg1"></div>
+                  <div class="pw-seg" id="pwSeg2"></div>
+                  <div class="pw-seg" id="pwSeg3"></div>
+                  <div class="pw-seg" id="pwSeg4"></div>
+                </div>
+                <div class="pw-strength-label" id="pwLabel">Enter a password</div>
+              </div>
+            </div>
+            <div class="auth-field">
+              <div class="auth-label">Confirm Password</div>
+              <div class="auth-input-wrap">
+                <input class="auth-input" id="playerPasswordConfirm" type="password" placeholder="Type it again" autocomplete="new-password" oninput="checkPasswordMatch()">
+                <span class="auth-input-icon" id="pwMatchIcon"></span>
+              </div>
+              <div class="auth-field-error" id="pwMatchError">Passwords do not match</div>
             </div>
           </div>
-          <div class="auth-field">
-            <div class="auth-label">Confirm Password</div>
-            <div class="auth-input-wrap">
-              <input class="auth-input" id="playerPasswordConfirm" type="password" placeholder="Type it again" autocomplete="new-password" oninput="checkPasswordMatch()">
-              <span class="auth-input-icon" id="pwMatchIcon"></span>
+
+          <!-- Under 13 : parent/guardian creates and owns the account -->
+          <div id="parentOnlyFields" style="display:none;">
+            <div class="auth-field">
+              <div class="auth-label">Parent/Guardian Full Name</div>
+              <input class="auth-input" id="parentName" type="text" placeholder="Your full name" autocomplete="name">
             </div>
-            <div class="auth-field-error" id="pwMatchError">Passwords do not match</div>
+            <div class="auth-field">
+              <div class="auth-label">Parent/Guardian Email</div>
+              <div class="auth-input-wrap">
+                <input class="auth-input" id="parentEmail" type="email" placeholder="your@email.com" autocomplete="email">
+              </div>
+              <div class="auth-field-hint">We'll email you a link to confirm and review exactly what data we collect before the account is created. No password needed right now.</div>
+            </div>
           </div>
+
           <div class="auth-field">
             <div class="auth-label">
               Coach Referral Code
@@ -453,7 +473,7 @@ a{text-decoration:none;}
             <input type="checkbox" id="playerTerms">
             <label for="playerTerms">I agree to the <a href="https://firstdownacademy.com/legal.html">Terms of Service</a> and <a href="https://firstdownacademy.com/legal.html">Privacy Policy</a></label>
           </div>
-          <button class="auth-submit" onclick="doSignup()">Create Player Account &rarr;</button>
+          <button class="auth-submit" id="playerSubmitBtn">Create Player Account &rarr;</button>
           <div class="auth-switch">Already have an account? <a onclick="switchTab('login')">Log In</a></div>
         </div>
 
@@ -735,6 +755,27 @@ function checkCoachPasswordMatch() {
 
 // Coach preview removed — referral code generated on account creation
 
+// ── Age-gated signup: under 13 requires a parent-managed account ──
+function isUnder13() {
+  var ageEl = document.getElementById('playerAge');
+  if (!ageEl) return false;
+  var v = ageEl.value;
+  if (!v || v === '18+') return false;
+  return parseInt(v, 10) < 13;
+}
+
+function handleAgeChange() {
+  var under13 = isUnder13();
+  var notice = document.getElementById('under13Notice');
+  var teenFields = document.getElementById('teenOnlyFields');
+  var parentFields = document.getElementById('parentOnlyFields');
+  var submitBtn = document.getElementById('playerSubmitBtn');
+  if (notice) notice.style.display = under13 ? 'block' : 'none';
+  if (teenFields) teenFields.style.display = under13 ? 'none' : 'block';
+  if (parentFields) parentFields.style.display = under13 ? 'block' : 'none';
+  if (submitBtn) submitBtn.textContent = under13 ? 'Send Parent Consent Email →' : 'Create Player Account →';
+}
+
 // ── Signup validation wrapper ──
 var _origDoSignup = null;
 document.addEventListener('DOMContentLoaded', function() {
@@ -742,16 +783,30 @@ document.addEventListener('DOMContentLoaded', function() {
   var submitBtn = document.querySelector('#playerFields .auth-submit');
   if (submitBtn) {
     submitBtn.onclick = function() {
+      var terms = document.getElementById('playerTerms');
+      if (!terms || !terms.checked) {
+        showToast('error', 'Please agree to the Terms of Service and Privacy Policy.');
+        return;
+      }
+      if (isUnder13()) {
+        var parentName  = document.getElementById('parentName');
+        var parentEmail = document.getElementById('parentEmail');
+        if (!parentName || !parentName.value.trim()) {
+          showToast('error', "Please enter the parent or guardian's name.");
+          return;
+        }
+        if (!parentEmail || !parentEmail.value.trim()) {
+          showToast('error', "Please enter the parent or guardian's email.");
+          return;
+        }
+        doParentSignup();
+        return;
+      }
       var pw   = document.getElementById('playerPassword');
       var conf = document.getElementById('playerPasswordConfirm');
-      var terms = document.getElementById('playerTerms');
       if (pw && conf && pw.value !== conf.value) {
         showToast('error', 'Passwords do not match — please check and try again.');
         conf.focus();
-        return;
-      }
-      if (!terms || !terms.checked) {
-        showToast('error', 'Please agree to the Terms of Service and Privacy Policy.');
         return;
       }
       doSignup();

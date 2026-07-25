@@ -170,8 +170,10 @@ async function checkSession() {
 
       // If there is a pending quiz score in localStorage and we are NOT
       // already on giq-exam.html, redirect there so the score can be restored.
+      // Skip on parent-consent.html too — that flow must never be interrupted.
       var onQuizPage = window.location.pathname.indexOf('giq-exam') >= 0;
-      if (!onQuizPage) {
+      var onConsentPage = window.location.pathname.indexOf('parent-consent') >= 0;
+      if (!onQuizPage && !onConsentPage) {
         var pending = null;
         try { pending = localStorage.getItem('fda_pendingScore'); } catch(e) {}
         if (pending) {
@@ -264,6 +266,58 @@ async function doSignup() {
       showInboxConfirmation(email);
     }
   } catch(err) { showAuthMsg('error', 'Something went wrong. Please try again.'); console.error(err); }
+}
+
+// ── Under-13 signup: stage the form data, email the parent a
+// verification link. No player account or profile exists yet — the
+// managed_players row is only created once the parent clicks through
+// and explicitly consents on parent-consent.html. ──
+async function doParentSignup() {
+  var childName   = document.getElementById('playerName') ? document.getElementById('playerName').value.trim() : '';
+  var childAge    = document.getElementById('playerAge') ? document.getElementById('playerAge').value : '';
+  var position    = document.getElementById('playerPosition') ? document.getElementById('playerPosition').value : '';
+  var refCode     = document.getElementById('playerReferral') ? document.getElementById('playerReferral').value.trim().toLowerCase() : '';
+  var parentName  = document.getElementById('parentName') ? document.getElementById('parentName').value.trim() : '';
+  var parentEmail = document.getElementById('parentEmail') ? document.getElementById('parentEmail').value.trim() : '';
+
+  if (!childName) { showAuthMsg('error', "Please enter the player's name."); return; }
+  if (!parentName || !parentEmail) { showAuthMsg('error', "Please enter the parent or guardian's name and email."); return; }
+
+  showAuthMsg('loading', 'Sending consent email...');
+
+  try {
+    var token = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+
+    var insertResult = await db.from('pending_child_signups').insert({
+      token: token,
+      child_name: childName,
+      child_age: parseInt(childAge, 10) || 0,
+      position: position || null,
+      referral_code: refCode || null,
+      parent_name: parentName,
+      parent_email: parentEmail
+    });
+    if (insertResult.error) {
+      showAuthMsg('error', 'Something went wrong. Please try again.');
+      console.error(insertResult.error);
+      return;
+    }
+
+    var redirectTo = window.location.origin + '/parent-consent.html?token=' + encodeURIComponent(token);
+    var otpResult = await db.auth.signInWithOtp({
+      email: parentEmail,
+      options: { emailRedirectTo: redirectTo, data: { full_name: parentName, role: 'parent' } }
+    });
+    if (otpResult.error) {
+      showAuthMsg('error', otpResult.error.message);
+      return;
+    }
+
+    showParentConsentSent(parentEmail);
+  } catch(err) {
+    showAuthMsg('error', 'Something went wrong. Please try again.');
+    console.error(err);
+  }
 }
 
 async function doCoachSignup() {
@@ -361,6 +415,27 @@ function showInboxConfirmation(email) {
   ].join("");
 }
 
+function showParentConsentSent(email) {
+  var form = document.getElementById("formSignup");
+  if (form) form.style.display = "none";
+  var container = document.querySelector(".auth-right-inner");
+  if (!container) return;
+  container.innerHTML = [
+    "<div style='display:flex;flex-direction:column;align-items:center;justify-content:center;min-height:60vh;text-align:center;padding:0 20px'>",
+      "<div style='font-size:52px;margin-bottom:20px'>&#x1F4EC;</div>",
+      "<div style='font-family:Barlow Condensed,sans-serif;font-size:32px;font-weight:900;letter-spacing:-.01em;text-transform:uppercase;color:#fff;margin-bottom:14px'>CHECK YOUR INBOX</div>",
+      "<div style='font-size:15px;color:rgba(255,255,255,.5);line-height:1.8;max-width:360px;margin-bottom:28px'>",
+        "We sent a link to<br>",
+        "<strong style='color:#C1FF22'>" + email + "</strong><br>",
+        "Click it to review exactly what data we'll collect and confirm you're the parent or guardian. Nothing is created until you do.",
+      "</div>",
+      "<div style='background:#081b2c;border:1px solid rgba(193,255,34,.15);border-radius:8px;padding:12px 24px;'>",
+        "<span style='font-size:11px;color:rgba(255,255,255,.25)'>Check your spam folder if you don’t see it</span>",
+      "</div>",
+    "</div>"
+  ].join("");
+}
+
 function showAuthMsg(type, msg) {
   document.querySelectorAll('.auth-msg').forEach(function(e) { e.remove(); });
   if (!msg && type !== 'success') return;
@@ -394,22 +469,51 @@ async function loadDashboard() {
   }
   var playerDash = document.getElementById('dashPlayer');
   var coachDash  = document.getElementById('dashCoach');
-  if (role === 'coach') {
+  var parentDash = document.getElementById('dashParent');
+  var activeManaged = null;
+  try { activeManaged = JSON.parse(sessionStorage.getItem('fda_activeManagedPlayer') || 'null'); } catch(e) {}
+
+  if (role === 'parent' && !activeManaged) {
     if (playerDash) playerDash.style.display = 'none';
+    if (coachDash)  coachDash.style.display = 'none';
+    if (parentDash) parentDash.style.display = 'block';
+    loadParentDashboard();
+  } else if (role === 'coach') {
+    if (playerDash) playerDash.style.display = 'none';
+    if (parentDash) parentDash.style.display = 'none';
     if (coachDash)  coachDash.style.display = 'block';
     loadCoachDashboard();
   } else {
     if (coachDash)  coachDash.style.display = 'none';
+    if (parentDash) parentDash.style.display = 'none';
     if (playerDash) playerDash.style.display = 'block';
     loadPlayerDashboard();
   }
 }
 
+function getActiveManagedPlayer() {
+  try { return JSON.parse(sessionStorage.getItem('fda_activeManagedPlayer') || 'null'); } catch(e) { return null; }
+}
+
 async function loadPlayerDashboard() {
-  // Ensure profile is loaded before using it
-  if (!currentProfile && currentUser) await loadProfile();
-  var nameEl = document.getElementById('dashPlayerName');
-  if (nameEl) nameEl.textContent = (currentProfile && currentProfile.full_name) ? currentProfile.full_name.split(' ')[0] : (currentUser && currentUser.user_metadata && currentUser.user_metadata.full_name ? currentUser.user_metadata.full_name.split(' ')[0] : 'Player');
+  var managed = getActiveManagedPlayer();
+  var banner = document.getElementById('managedPlayerBanner');
+
+  if (managed) {
+    if (banner) {
+      banner.style.display = 'flex';
+      var bannerName = document.getElementById('managedPlayerBannerName');
+      if (bannerName) bannerName.textContent = managed.full_name;
+    }
+    var managedNameEl = document.getElementById('dashPlayerName');
+    if (managedNameEl) managedNameEl.textContent = managed.full_name.split(' ')[0];
+  } else {
+    if (banner) banner.style.display = 'none';
+    // Ensure profile is loaded before using it
+    if (!currentProfile && currentUser) await loadProfile();
+    var nameEl = document.getElementById('dashPlayerName');
+    if (nameEl) nameEl.textContent = (currentProfile && currentProfile.full_name) ? currentProfile.full_name.split(' ')[0] : (currentUser && currentUser.user_metadata && currentUser.user_metadata.full_name ? currentUser.user_metadata.full_name.split(' ')[0] : 'Player');
+  }
 
   // Build module list first
   buildDashModuleList();
@@ -428,7 +532,9 @@ async function loadPlayerDashboard() {
 
   // Load progress from Supabase
   try {
-    var result = await db.from('progress').select('module_num,quiz_passed').eq('user_id', currentUser.id);
+    var result = managed
+      ? await db.from('progress').select('module_num,quiz_passed').eq('managed_player_id', managed.id)
+      : await db.from('progress').select('module_num,quiz_passed').eq('user_id', currentUser.id);
     if (result.data) {
       var passedModules = result.data.filter(function(r) { return r.quiz_passed; });
       var passedSet = new Set(passedModules.map(function(r) { return r.module_num; }));
@@ -498,6 +604,10 @@ async function loadPlayerDashboard() {
       }
     }
   } catch(e) { console.error('Progress load error:', e); }
+
+  // Managed players don't have their own profiles row / RLS "own
+  // profile" identity — coach card and join-coach widget don't apply.
+  if (managed) return;
 
   if (currentProfile && currentProfile.coach_id) {
     try {
@@ -700,15 +810,14 @@ function getTierName(score) {
 }
 
 async function loadGIQScore() {
-  if (!currentUser) return;
+  var managed = getActiveManagedPlayer();
+  if (!currentUser && !managed) return;
 
   try {
     // Load all scores sorted by most recent
-    var result = await db
-      .from('giq_scores')
-      .select('*')
-      .eq('user_id', currentUser.id)
-      .order('taken_at', { ascending: false });
+    var result = managed
+      ? await db.from('giq_scores').select('*').eq('managed_player_id', managed.id).order('taken_at', { ascending: false })
+      : await db.from('giq_scores').select('*').eq('user_id', currentUser.id).order('taken_at', { ascending: false });
 
     var scores = result.data || [];
     var quizCount = scores.length;
@@ -1277,7 +1386,17 @@ async function submitQuiz() {
   for (var qi = 0; qi < total; qi++) { if (quizResponses[qi] === mod.quiz[qi].correct) correct++; }
   var score  = Math.round((correct / total) * 100);
   var passed = score >= 70;
-  if (currentUser) {
+  var managed = getActiveManagedPlayer();
+  if (managed) {
+    try {
+      await db.from('progress').upsert({
+        managed_player_id: managed.id, module_num: mod.num,
+        lesson_num: 0, slide_num: 0,
+        completed: passed, quiz_passed: passed,
+        completed_at: new Date().toISOString()
+      }, { onConflict: 'managed_player_id,module_num,lesson_num' });
+    } catch(e) { console.error('Progress save error:', e); }
+  } else if (currentUser) {
     try {
       await db.from('progress').upsert({
         user_id: currentUser.id, module_num: mod.num,

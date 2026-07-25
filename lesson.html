@@ -137,7 +137,8 @@ function loadDashboard() {
 
 // Wait for session, then render the lesson
 document.addEventListener('sessionReady', async function() {
-  if (!currentUser) {
+  var managed = getActiveManagedPlayer();
+  if (!currentUser && !managed) {
     window.location.href = 'auth.html';
     return;
   }
@@ -151,7 +152,9 @@ document.addEventListener('sessionReady', async function() {
   // locked state, so opening lesson.html directly (or via a stale
   // sessionStorage value) can't skip ahead.
   try {
-    var result = await db.from('progress').select('module_num,quiz_passed').eq('user_id', currentUser.id);
+    var result = managed
+      ? await db.from('progress').select('module_num,quiz_passed').eq('managed_player_id', managed.id)
+      : await db.from('progress').select('module_num,quiz_passed').eq('user_id', currentUser.id);
     var passedSet = new Set((result.data || []).filter(function(r) { return r.quiz_passed; }).map(function(r) { return r.module_num; }));
     var nextIdx = 0;
     for (var ni = 0; ni < 8; ni++) {
