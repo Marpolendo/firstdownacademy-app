@@ -158,6 +158,10 @@ input:focus {
   border-color: rgba(232,99,10,0.4);
   box-shadow: 0 0 0 3px rgba(232,99,10,0.07);
 }
+:focus-visible { outline: 2px solid var(--orange); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
 
 .pw-wrap { position: relative; }
 .pw-wrap input { padding-right: 48px; }

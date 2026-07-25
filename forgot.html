@@ -97,6 +97,10 @@ input {
 }
 input::placeholder { color: var(--muted); }
 input:focus { border-color: rgba(193,255,34,0.4); box-shadow: 0 0 0 3px rgba(193,255,34,0.07); }
+:focus-visible { outline: 2px solid var(--lime); outline-offset: 2px; }
+@media (prefers-reduced-motion: reduce) {
+  *, *::before, *::after { animation-duration: .01ms !important; transition-duration: .01ms !important; }
+}
 .btn-submit {
   width: 100%; background: var(--lime); color: #020f1e;
   font-family: 'Barlow Condensed', sans-serif; font-size: 16px; font-weight: 900;

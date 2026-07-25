@@ -16,7 +16,7 @@ html{scroll-behavior:smooth;}
 :root{
   --bg:#020f1e;--surface:#081b2c;--s1:#0d2134;--s2:#122a44;--s3:#1a3354;
   --border:rgba(255,255,255,0.07);--border2:rgba(255,255,255,0.12);
-  --text:#e8edf5;--muted:#5a6b84;--muted2:#8fa1bb;
+  --text:#e8edf5;--muted:#6c809e;--muted2:#8fa1bb;
   --lime:#C1FF22;--lime-dim:rgba(193,255,34,0.1);--lime-glow:rgba(193,255,34,0.25);
   --orange:#e8630a;--orange-dim:rgba(232,99,10,0.1);
   --blue:#3b82f6;--purple:#8b5cf6;--amber:#f59e0b;--green:#22c55e;--red:#ef4444;
@@ -36,6 +36,7 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 ::-webkit-scrollbar-thumb{background:var(--s3);border:3px solid var(--bg);border-radius:2px;}
 ::-webkit-scrollbar-thumb:hover{background:var(--muted);}
 :focus-visible{outline:2px solid var(--lime);outline-offset:2px;}
+[role="button"]:focus{outline:2px solid var(--lime);outline-offset:2px;}
 @media (prefers-reduced-motion: reduce){
   *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
   .fade-up{opacity:1!important;transform:none!important;}
@@ -112,7 +113,7 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 .player-coach-card{display:flex;align-items:center;gap:10px;margin-top:12px;padding:10px 14px;background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);flex-wrap:wrap;}
 .player-coach-name{font-family:var(--font-d);font-size:13px;font-weight:800;letter-spacing:0.04em;text-transform:uppercase;color:var(--text);}
 .player-coach-team{font-size:12px;color:var(--muted);}
-.joinCoachInput{background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-family:var(--font-b);font-size:13px;outline:none;transition:border-color .2s;min-width:180px;}
+.joinCoachInput{background:var(--s3);border:1px solid var(--border2);border-radius:6px;padding:8px 12px;color:var(--text);font-family:var(--font-b);font-size:13px;transition:border-color .2s;min-width:180px;}
 .joinCoachInput:focus{border-color:rgba(193,255,34,.4);}
 .joinCoachInput::placeholder{color:var(--muted);}
 .join-coach-btn{background:var(--lime);color:#061000;font-family:var(--font-d);font-size:11px;font-weight:800;letter-spacing:0.1em;text-transform:uppercase;border:none;border-radius:6px;padding:8px 16px;cursor:pointer;white-space:nowrap;transition:transform .2s;}
@@ -818,7 +819,7 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
     </div>
 
     <div class="section-block fade-up">
-      <div class="pdb-next-card" onclick="window.location.href='lesson.html'">
+      <a class="pdb-next-card" href="lesson.html">
         <div class="pdb-next-left">
           <div class="pdb-next-icon">
             <svg viewBox="0 0 24 24" fill="#061000"><polygon points="5 3 19 12 5 21"></polygon></svg>
@@ -831,7 +832,7 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
         <svg class="pdb-next-arrow" width="20" height="20" viewBox="0 0 24 24" fill="none">
           <path d="M5 12h14M13 6l6 6-6 6" stroke="rgba(255,255,255,.4)" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path>
         </svg>
-      </div>
+      </a>
     </div>
 
     <div id="dbHistorySection" class="section-block" style="display:none;">
@@ -946,9 +947,9 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
       <div class="coach-players-header">
         <div>Roster</div>
         <div class="coach-players-header-actions">
-          <div class="coach-roster-filter active" onclick="filterRoster('all')" id="filterAll">All</div>
-          <div class="coach-roster-filter" onclick="filterRoster('active')" id="filterActive">Active</div>
-          <div class="coach-roster-filter" onclick="filterRoster('pending')" id="filterPending">Pending</div>
+          <div class="coach-roster-filter active" role="button" tabindex="0" aria-pressed="true" onclick="filterRoster('all')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();filterRoster('all');}" id="filterAll">All</div>
+          <div class="coach-roster-filter" role="button" tabindex="0" aria-pressed="false" onclick="filterRoster('active')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();filterRoster('active');}" id="filterActive">Active</div>
+          <div class="coach-roster-filter" role="button" tabindex="0" aria-pressed="false" onclick="filterRoster('pending')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();filterRoster('pending');}" id="filterPending">Pending</div>
         </div>
       </div>
       <!-- Table header -->
@@ -1251,7 +1252,7 @@ function filterRoster(filter) {
   _rosterFilter = filter;
   ['all','active','pending'].forEach(function(f) {
     var el = document.getElementById('filter' + f.charAt(0).toUpperCase() + f.slice(1));
-    if (el) el.classList.toggle('active', f === filter);
+    if (el) { el.classList.toggle('active', f === filter); el.setAttribute('aria-pressed', f === filter); }
   });
   renderRoster();
 }
