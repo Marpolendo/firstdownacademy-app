@@ -109,6 +109,7 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
   100%{box-shadow:0 0 0 0 rgba(193,255,34,0)}
 }
 .nudge{animation:nudgeGlow 1s ease-out}
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}
 .exam-layout{display:grid;grid-template-columns:1fr 280px;gap:14px;flex:1}
 .q-card{background:var(--bg-2);border:1px solid var(--line);position:relative;overflow:hidden;flex:1;display:flex;flex-direction:column}
 .q-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent)}
@@ -298,6 +299,8 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
   </div>
 </header>
 
+<div id="quizAnnounce" class="sr-only" aria-live="polite" aria-atomic="true"></div>
+
 <!-- INTRO -->
 <section class="screen active" id="screenIntro">
   <div class="intro-card">
@@ -345,7 +348,7 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
         <div class="sb-block"><div class="sb-lab">Score</div><div class="sb-val" id="gbScore">0<span class="u">pts</span></div></div>
       </div>
     </div>
-    <div class="downs" id="downs"></div>
+    <div class="downs" id="downs" role="img"></div>
     <div class="exam-layout">
       <div class="q-card">
         <div class="q-card-head">
@@ -572,6 +575,7 @@ let state={
   pickedIdx:null,
   pickedConf:null,
   nudged:false,        // has the first-question nudge already fired
+  lastFeedback:null,   // correct/wrong + score summary for the sr-only announcer
 };
 
 function buildQueue(){
@@ -639,6 +643,9 @@ function buildDowns(){
     if(i===state.idx) s.classList.add('current');
     t.appendChild(s);
   }
+  const correctSoFar=state.answers.filter(a=>a.correct).length;
+  const wrongSoFar=state.idx-correctSoFar;
+  t.setAttribute('aria-label','Progress: question '+(state.idx+1)+' of '+total+'. '+correctSoFar+' correct, '+wrongSoFar+' incorrect so far.');
 }
 
 function exitQuiz(e){
@@ -650,11 +657,16 @@ function exitQuiz(e){
   return true;
 }
 
+function announce(msg){
+  const el=document.getElementById('quizAnnounce');
+  if(el) el.textContent=msg;
+}
+
 function startQuiz(){
   document.getElementById('screenIntro').classList.remove('active');
   document.getElementById('screenQuiz').classList.add('active');
   document.body.classList.add('quiz-active');
-  state={answers:[],queue:[],idx:0,blockDiff:[],pickedIdx:null,pickedConf:null};
+  state={answers:[],queue:[],idx:0,blockDiff:[],pickedIdx:null,pickedConf:null,lastFeedback:null};
   // Build first block immediately
   buildNextBlock(0);
   renderQ();
@@ -684,6 +696,16 @@ function renderQ(){
   });
   document.querySelectorAll('.conv-row,.conv-bar-btn').forEach(r=>r.classList.remove('active'));
   qText.animate([{opacity:0,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,easing:'cubic-bezier(.22,1,.36,1)'});
+
+  // Screen-reader announcement: the visual feedback for "was I right" and
+  // "what's my score" lives in the down-bar color and the scoreboard —
+  // both silent to a screen reader unless echoed here. Combined with the
+  // new-question context so a screen reader user gets both in one pass
+  // instead of needing to re-navigate to the scoreboard after every answer.
+  const parts=[];
+  if(state.lastFeedback){ parts.push(state.lastFeedback); state.lastFeedback=null; }
+  parts.push('Question '+(state.idx+1)+' of 15: '+q.domain+', '+q.diff+' difficulty.');
+  announce(parts.join(' '));
 }
 
 function triggerNudge(el){
@@ -726,6 +748,9 @@ function commit(){
   if(correct){ pts=diffMult*c; }
   else { pts=c===1?0:c===2?-1*diffMult:-2*diffMult; }
   state.answers.push({pick:state.pickedIdx,correct,conf:c,points:pts,domain:q.domain,diff:q.diff});
+  const totalScore=state.answers.reduce((a,x)=>a+x.points,0);
+  const totalCorrect=state.answers.filter(a=>a.correct).length;
+  state.lastFeedback=(correct?'Correct.':'Incorrect.')+' Score: '+totalScore+' points, '+totalCorrect+' of '+state.answers.length+' correct so far.';
   state.idx++;
 
   // If we just finished a block and there's a next block to build, build it now
@@ -774,6 +799,10 @@ function renderResults(){
   document.getElementById('resMax').textContent='/ '+MAX;
   animateNumber(document.getElementById('resScore'),0,disp,1400);
   const correct=state.answers.filter(a=>a.correct).length,acc=Math.round((correct/state.queue.length)*100);
+  const completeParts=[];
+  if(state.lastFeedback){ completeParts.push(state.lastFeedback); state.lastFeedback=null; }
+  completeParts.push('Quiz complete. Final score: '+disp+' out of '+MAX+'. Grade: '+g.g+', '+correct+' of '+state.queue.length+' correct.');
+  announce(completeParts.join(' '));
   document.getElementById('dsCorrect').textContent=correct;
   document.getElementById('dsAcc').textContent=acc;
   document.getElementById('dsCorrectNote').innerHTML=correct>=12?'<b>Dominant</b> showing.':correct>=8?'<b>Solid</b>, with room.':'<b>Reps needed.</b>';
