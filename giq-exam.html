@@ -100,6 +100,15 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
 .down-seg.current{background:var(--accent)}
 .down-seg.current::after{content:"";position:absolute;inset:0;background:var(--accent);animation:blink 1.2s ease-in-out infinite}
 @keyframes blink{0%,100%{opacity:1}50%{opacity:.4}}
+/* First-question-only nudge: draws the eye to whichever half of the
+   answer+conviction pair is still unset, since nothing else in the
+   layout otherwise links the two. */
+@keyframes nudgeGlow{
+  0%{box-shadow:0 0 0 0 rgba(193,255,34,0)}
+  25%{box-shadow:0 0 0 5px rgba(193,255,34,.3)}
+  100%{box-shadow:0 0 0 0 rgba(193,255,34,0)}
+}
+.nudge{animation:nudgeGlow 1s ease-out}
 .exam-layout{display:grid;grid-template-columns:1fr 280px;gap:14px;flex:1}
 .q-card{background:var(--bg-2);border:1px solid var(--line);position:relative;overflow:hidden;flex:1;display:flex;flex-direction:column}
 .q-card::before{content:"";position:absolute;top:0;left:0;width:4px;height:100%;background:var(--accent)}
@@ -562,6 +571,7 @@ let state={
   blockDiff:[],        // difficulty chosen for each block [0..4]
   pickedIdx:null,
   pickedConf:null,
+  nudged:false,        // has the first-question nudge already fired
 };
 
 function buildQueue(){
@@ -651,7 +661,7 @@ function startQuiz(){
 }
 
 function renderQ(){
-  state.pickedIdx=null;state.pickedConf=null;
+  state.pickedIdx=null;state.pickedConf=null;state.nudged=false;
   const q=state.queue[state.idx];
   const blockIdx=Math.floor(state.idx/3);
   const posInBlock=(state.idx%3)+1;
@@ -676,18 +686,37 @@ function renderQ(){
   qText.animate([{opacity:0,transform:'translateY(7px)'},{opacity:1,transform:'translateY(0)'}],{duration:280,easing:'cubic-bezier(.22,1,.36,1)'});
 }
 
+function triggerNudge(el){
+  if(!el)return;
+  el.classList.remove('nudge');
+  void el.offsetWidth; // restart the animation if it's already mid-play
+  el.classList.add('nudge');
+}
+function nudgeTowardConviction(){
+  if(state.idx!==0||state.nudged||state.pickedConf!==null)return;
+  state.nudged=true;
+  triggerNudge(document.querySelector('.conviction'));
+  triggerNudge(document.getElementById('convBottomBar'));
+}
+function nudgeTowardAnswer(){
+  if(state.idx!==0||state.nudged||state.pickedIdx!==null)return;
+  state.nudged=true;
+  triggerNudge(document.querySelector('.q-card'));
+}
 function selectOpt(i){
   state.pickedIdx=i;
   document.querySelectorAll('#qOpts .q-opt').forEach((el,idx)=>{
     el.classList.toggle('selected',idx===i);
     el.setAttribute('aria-pressed',idx===i?'true':'false');
   });
+  nudgeTowardConviction();
   if(state.pickedConf!==null)setTimeout(commit,170);
 }
 function selectConf(n){
   state.pickedConf=n;
   document.querySelectorAll('.conv-row').forEach(r=>{const on=+r.getAttribute('data-c')===n;r.classList.toggle('active',on);r.setAttribute('aria-pressed',on?'true':'false');});
   document.querySelectorAll('.conv-bar-btn').forEach(r=>{const on=+r.getAttribute('data-c')===n;r.classList.toggle('active',on);r.setAttribute('aria-pressed',on?'true':'false');});
+  nudgeTowardAnswer();
   if(state.pickedIdx!==null)setTimeout(commit,190);
 }
 function commit(){
