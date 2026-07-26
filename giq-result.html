@@ -1431,6 +1431,21 @@ function showFormMsg(type, msg) {
   el.textContent = msg;
 }
 
+// Consent tokens gate a child's staged PII (get_pending_child_signup is
+// callable by anon with just the token) — Math.random()/Date.now() are
+// not unpredictable enough for that. crypto.getRandomValues is far more
+// widely available than randomUUID, so it's a real fallback rather than
+// a second weak one.
+function generateSecureToken() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  if (window.crypto && crypto.getRandomValues) {
+    var bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.prototype.map.call(bytes, function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  throw new Error('Secure random number generation is not available in this browser.');
+}
+
 // ── AGE BRANCHING ──
 function modalIsUnder13() {
   var age = parseInt(document.getElementById('mAge').value, 10);
@@ -1481,7 +1496,7 @@ async function doModalParentSignup() {
       pillarData[key] = examData.pillars['p' + i] || '0/3';
     });
 
-    var token = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+    var token = generateSecureToken();
 
     var insertResult = await db.from('pending_child_signups').insert({
       token: token,

@@ -1201,12 +1201,6 @@ async function loadParentDashboard() {
   }
 }
 
-function escapeHtml(str) {
-  return String(str).replace(/[&<>"']/g, function(ch) {
-    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch];
-  });
-}
-
 function playAsChild(id, fullName, age) {
   sessionStorage.setItem('fda_activeManagedPlayer', JSON.stringify({ id: id, full_name: fullName, age: age }));
   window.location.reload();
@@ -1322,13 +1316,13 @@ function renderRoster() {
   }
 
   listEl.innerHTML = data.map(function(p) {
-    var initial   = p.name ? p.name[0].toUpperCase() : '?';
+    var initial   = p.name ? escapeHtml(p.name[0].toUpperCase()) : '?';
     var initColor = p.role === 'coach' ? 'color:var(--orange)' : 'color:var(--lime)';
     var joined    = p.joined ? new Date(p.joined).toLocaleDateString('en-US',{month:'short',day:'numeric'}) : '—';
     var iqHtml    = p.status === 'pending'
       ? '<div class="cr-iq no-score">—</div>'
       : p.iqGrade
-        ? '<div class="cr-iq" style="color:' + gradeColor(p.iqGrade) + '">' + p.iqGrade + '</div>'
+        ? '<div class="cr-iq" style="color:' + gradeColor(p.iqGrade) + '">' + escapeHtml(p.iqGrade) + '</div>'
         : '<div class="cr-iq no-score">No test</div>';
     var progressHtml = p.status === 'pending'
       ? '<div class="cr-meta">Invite sent</div>'
@@ -1344,8 +1338,8 @@ function renderRoster() {
       + '<div class="cr-name-wrap">'
         + '<div class="cr-avatar" style="' + initColor + '">' + initial + '</div>'
         + '<div>'
-          + '<div class="cr-name">' + (p.name || 'Player') + ' ' + roleTag + '</div>'
-          + (p.email ? '<div class="cr-meta cr-meta--tight">' + p.email + '</div>' : '')
+          + '<div class="cr-name">' + escapeHtml(p.name || 'Player') + ' ' + roleTag + '</div>'
+          + (p.email ? '<div class="cr-meta cr-meta--tight">' + escapeHtml(p.email) + '</div>' : '')
         + '</div>'
       + '</div>'
       + iqHtml

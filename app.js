@@ -19,6 +19,40 @@ try {
 var currentUser = null;
 var currentProfile = null;
 
+// Only accept a same-site relative path for post-auth redirects — never
+// a scheme (http:, javascript:, data:) or protocol-relative "//host",
+// either of which would send a user who just authenticated for real
+// straight off-site to a look-alike page.
+function getSafeNextPage(fallback) {
+  var next = new URLSearchParams(window.location.search).get('next');
+  if (!next) return fallback;
+  if (/^[a-z][a-z0-9+.-]*:/i.test(next) || next.indexOf('//') === 0 || next.indexOf('\\') !== -1) {
+    return fallback;
+  }
+  return next;
+}
+
+function escapeHtml(str) {
+  return String(str).replace(/[&<>"']/g, function(ch) {
+    return { '&':'&amp;', '<':'&lt;', '>':'&gt;', '"':'&quot;', "'":'&#39;' }[ch];
+  });
+}
+
+// Consent tokens gate a child's staged PII (get_pending_child_signup is
+// callable by anon with just the token) — Math.random()/Date.now() are
+// not unpredictable enough for that. crypto.getRandomValues is far more
+// widely available than randomUUID, so it's a real fallback rather than
+// a second weak one.
+function generateSecureToken() {
+  if (window.crypto && crypto.randomUUID) return crypto.randomUUID();
+  if (window.crypto && crypto.getRandomValues) {
+    var bytes = new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.prototype.map.call(bytes, function(b) { return b.toString(16).padStart(2, '0'); }).join('');
+  }
+  throw new Error('Secure random number generation is not available in this browser.');
+}
+
 // ══════════════════════════════════════════
 // NAVIGATION
 // ══════════════════════════════════════════
@@ -257,7 +291,7 @@ async function doSignup() {
     // Check if email confirmation is required
     var sessionCheck = await db.auth.getSession();
     var hasSession = sessionCheck.data && sessionCheck.data.session;
-    var nextPage = new URLSearchParams(window.location.search).get('next') || 'dashboard.html';
+    var nextPage = getSafeNextPage('dashboard.html');
 
     if (hasSession) {
       showAuthMsg('success', 'Account created! Logging you in...');
@@ -286,7 +320,7 @@ async function doParentSignup() {
   showAuthMsg('loading', 'Sending consent email...');
 
   try {
-    var token = (window.crypto && crypto.randomUUID) ? crypto.randomUUID() : (Date.now().toString(36) + Math.random().toString(36).slice(2));
+    var token = generateSecureToken();
 
     var insertResult = await db.from('pending_child_signups').insert({
       token: token,
@@ -381,8 +415,7 @@ async function doLogin() {
     currentUser = result.data.user;
     await loadProfile();
     // Navigate to next page or dashboard
-    var nextPage = new URLSearchParams(window.location.search).get('next');
-    window.location.href = nextPage || 'dashboard.html';
+    window.location.href = getSafeNextPage('dashboard.html');
   } catch(err) { showAuthMsg('error', 'Something went wrong. Please try again.'); console.error(err); }
 }
 
@@ -663,10 +696,11 @@ async function loadCoachDashboard() {
       } else {
         listEl.innerHTML = players.map(function(p) {
           var joined = new Date(p.created_at).toLocaleDateString('en-US', {month:'short', day:'numeric'});
+          var initial = p.full_name ? escapeHtml(p.full_name[0].toUpperCase()) : '?';
           return '<div style="display:flex;align-items:center;justify-content:space-between;padding:12px 0;border-bottom:1px solid var(--grey-200);">' +
             '<div style="display:flex;align-items:center;gap:10px;">' +
-            '<div style="width:32px;height:32px;background:var(--navy-800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;">' + (p.full_name ? p.full_name[0].toUpperCase() : '?') + '</div>' +
-            '<span style="font-size:14px;">' + (p.full_name || 'Player') + '</span>' +
+            '<div style="width:32px;height:32px;background:var(--navy-800);border-radius:50%;display:flex;align-items:center;justify-content:center;font-weight:700;font-size:13px;color:white;">' + initial + '</div>' +
+            '<span style="font-size:14px;">' + escapeHtml(p.full_name || 'Player') + '</span>' +
             '</div><span style="font-size:12px;color:var(--grey-500);">Joined ' + joined + '</span></div>';
         }).join('');
       }

@@ -581,15 +581,13 @@ function showPage(name) {
 }
 
 function updateNavForLoggedIn() {
-  var next = new URLSearchParams(window.location.search).get('next');
-  window.location.href = next || 'dashboard.html';
+  window.location.href = getSafeNextPage('dashboard.html');
 }
 
 // If already logged in — redirect to next page or dashboard
 document.addEventListener('sessionReady', function() {
   if (currentUser) {
-    var next = new URLSearchParams(window.location.search).get('next');
-    window.location.href = next || 'dashboard.html';
+    window.location.href = getSafeNextPage('dashboard.html');
   }
 });
 
