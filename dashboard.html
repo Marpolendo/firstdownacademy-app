@@ -218,6 +218,25 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
 .pdb-next-card:hover .pdb-next-arrow{opacity:0.7;}
 .pdb-section-label{font-family:var(--font-m);font-size:9.5px;font-weight:500;letter-spacing:0.16em;text-transform:uppercase;color:var(--muted);}
 
+/* COURSE SELECT */
+.course-select-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:14px;}
+@media(max-width:760px){.course-select-grid{grid-template-columns:1fr;}}
+.course-select-card{background:var(--s1);border:1px solid var(--border);border-radius:var(--r-lg);padding:20px;display:flex;flex-direction:column;gap:10px;text-decoration:none;color:inherit;transition:border-color .2s,background .2s;}
+.course-select-card:hover{border-color:rgba(193,255,34,0.3);background:var(--s2);}
+.course-select-icon{width:38px;height:38px;border-radius:8px;display:flex;align-items:center;justify-content:center;background:var(--lime-dim);flex-shrink:0;}
+.course-select-icon svg{width:20px;height:20px;stroke:var(--lime);fill:none;stroke-width:2;stroke-linecap:round;stroke-linejoin:round;}
+.course-select-card.safety .course-select-icon{background:var(--orange-dim);}
+.course-select-card.safety .course-select-icon svg{stroke:var(--orange);}
+.course-select-title{font-family:var(--font-d);font-weight:800;font-size:17px;text-transform:uppercase;letter-spacing:.02em;color:var(--text);}
+.course-select-sub{font-size:12.5px;color:var(--muted2);line-height:1.5;}
+.course-select-badge{font-family:var(--font-m);font-size:9px;font-weight:500;letter-spacing:0.14em;text-transform:uppercase;color:var(--muted);margin-top:auto;padding-top:4px;}
+.course-select-card.locked{cursor:default;}
+.course-select-card.locked:hover{border-color:var(--border);background:var(--s1);}
+.course-select-card.locked .course-select-icon{background:var(--s2);}
+.course-select-card.locked .course-select-icon svg{stroke:var(--muted);}
+.course-select-card.locked .course-select-title{color:var(--muted2);}
+.course-select-card.locked .course-select-badge{color:var(--muted);}
+
 /* QUIZ HISTORY */
 .history-section{background:var(--surface);border:1px solid var(--border);border-radius:var(--r-lg);overflow:hidden;}
 .history-header{display:flex;align-items:center;justify-content:space-between;padding:18px 22px;border-bottom:1px solid var(--border);}
@@ -703,6 +722,30 @@ body::after{content:'';position:fixed;inset:0;z-index:900;pointer-events:none;ba
       <input type="text" id="joinCoachCode" class="joinCoachInput" placeholder="Enter your coach's referral code" onkeydown="if(event.key==='Enter') joinCoach()">
       <button class="join-coach-btn" onclick="joinCoach()">Link Coach</button>
       <span id="joinCoachMsg" class="player-coach-team"></span>
+    </div>
+
+    <div class="section-block fade-up">
+      <div class="pdb-section-label" style="margin-bottom:10px;">Courses</div>
+      <div class="course-select-grid">
+        <a class="course-select-card" href="lesson.html">
+          <div class="course-select-icon"><svg viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg></div>
+          <div class="course-select-title">Foundations</div>
+          <div class="course-select-sub">8 modules covering the rules, positions, and concepts every player needs.</div>
+          <div class="course-select-badge">Level 1 · Start / Resume →</div>
+        </a>
+        <a class="course-select-card safety" href="safety.html">
+          <div class="course-select-icon"><svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/><path d="M9 12l2 2 4-4"/></svg></div>
+          <div class="course-select-title">Player Safety</div>
+          <div class="course-select-sub">6 short lessons on hydration, injury awareness, recovery, and more.</div>
+          <div class="course-select-badge">Free With Account · Start →</div>
+        </a>
+        <div class="course-select-card locked">
+          <div class="course-select-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>
+          <div class="course-select-title">More Coming Soon</div>
+          <div class="course-select-sub">Level 2 and beyond are in the works — check back for new courses.</div>
+          <div class="course-select-badge">Coming Soon</div>
+        </div>
+      </div>
     </div>
 
     <div class="dash-grid">
