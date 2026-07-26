@@ -145,7 +145,7 @@ footer a:hover{color:var(--lime)}
     <path d="M32 4 L56 13 V32 C56 47 45 56 32 60 C19 56 8 47 8 32 V13 Z" stroke="#C1FF22" stroke-width="2.5" fill="rgba(193,255,34,.06)"/>
     <path d="M22 32 L29.5 39.5 L43 24" stroke="#C1FF22" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round" fill="none"/>
   </svg>
-  <div class="eyebrow">Always Free · Ages 8–18 · No Level Required</div>
+  <div class="eyebrow">Free With Account · Ages 8–18 · No Level Required</div>
   <h1>Player <span class="serif">Safety.</span></h1>
   <p>Six short lessons — about 25 minutes total — covering what every athlete should know: hydration, sportsmanship, injury awareness, recovery, weather and field safety, and speaking up. Finish all six to earn your Safety Star.</p>
 </header>
@@ -174,9 +174,11 @@ footer a:hover{color:var(--lime)}
 <p class="disclaimer">This module teaches general safety awareness and is not medical advice. Always follow the guidance of your coach, parents, athletic trainer, or doctor.</p>
 
 <footer>
-  <a href="index.html">First Down Academy</a> · Player Safety Module · Free Forever
+  <a href="index.html">First Down Academy</a> · Player Safety Module · Free With Account
 </footer>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<script src="app.js?v=6"></script>
 <script>
 var SAFETY = [
   {
@@ -383,6 +385,59 @@ function saveState(s){
   try { localStorage.setItem(STORE_KEY, JSON.stringify(s)); } catch(e){}
 }
 
+// ── AUTH GATE ──
+// Safety is a real, account-tied course now (same as the main
+// curriculum) — completions live in Supabase, not just localStorage,
+// so a logged-out visitor is sent to sign up/sign in first. This calls
+// db.auth.getSession() directly rather than waiting on app.js's
+// `sessionReady` event: if the Supabase CDN fails to load, app.js's
+// checkSession() throws and dispatches that event synchronously,
+// before this page's own script tag has run — same race already fixed
+// on parent-consent.html.
+(async function gateSafetyPage(){
+  var managed = null;
+  try { managed = getActiveManagedPlayer(); } catch(e) {}
+
+  if (!managed && typeof db !== 'undefined' && db) {
+    try {
+      var result = await db.auth.getSession();
+      if (result && result.data && result.data.session) {
+        currentUser = result.data.session.user;
+      }
+    } catch(e) { console.error('Session check error:', e); }
+  }
+
+  if (!currentUser && !managed) {
+    window.location.href = 'auth.html?next=safety.html';
+    return;
+  }
+
+  initSafetyPage(managed);
+})();
+
+async function loadSafetyProgress(managed){
+  var doneIds = {};
+  try {
+    var result = managed
+      ? await db.from('safety_progress').select('lesson_id').eq('managed_player_id', managed.id)
+      : await db.from('safety_progress').select('lesson_id').eq('user_id', currentUser.id);
+    (result.data || []).forEach(function(row){ doneIds[row.lesson_id] = true; });
+  } catch(e) { console.error('Safety progress load error:', e); }
+  return doneIds;
+}
+
+async function saveSafetyCompletion(lessonId, managed){
+  try {
+    var row = managed
+      ? { managed_player_id: managed.id, lesson_id: lessonId, completed_at: new Date().toISOString() }
+      : { user_id: currentUser.id, lesson_id: lessonId, completed_at: new Date().toISOString() };
+    var onConflict = managed ? 'managed_player_id,lesson_id' : 'user_id,lesson_id';
+    await db.from('safety_progress').upsert(row, { onConflict: onConflict });
+  } catch(e) { console.error('Safety progress save error:', e); }
+}
+
+function initSafetyPage(managed){
+
 var root = document.getElementById("lessons");
 
 SAFETY.forEach(function(lesson, li){
@@ -486,6 +541,7 @@ SAFETY.forEach(function(lesson, li){
     markDone(el);
     el.classList.remove("open");
     updateProgress();
+    saveSafetyCompletion(lesson.id, managed);
   });
 });
 
@@ -502,14 +558,20 @@ function updateProgress(){
   document.getElementById("completeBanner").classList.toggle("show", done === SAFETY.length);
 }
 
-/* Restore saved progress */
-(function(){
+/* Restore saved progress — Supabase is the source of truth (works
+   across devices), localStorage is just a fast local cache of it. */
+(async function(){
   var st = getState();
+  var remoteDone = await loadSafetyProgress(managed);
+  Object.keys(remoteDone).forEach(function(id){ st[id] = true; });
+  saveState(st);
   SAFETY.forEach(function(l){
     if(st[l.id]) markDone(document.getElementById("lesson-" + l.id));
   });
   updateProgress();
 })();
+
+} // end initSafetyPage
 </script>
 </body>
 </html>
