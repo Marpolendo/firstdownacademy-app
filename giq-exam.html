@@ -285,6 +285,42 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
   .rh-grade{font-size:28px}
 }
 ::selection{background:var(--accent);color:var(--accent-ink)}
+
+/* ── SAVE-SCORE MODAL (ported from giq-result.html) ── */
+.modal-backdrop{position:fixed;inset:0;background:rgba(0,0,0,.7);backdrop-filter:blur(8px);z-index:100;display:none;align-items:center;justify-content:center;padding:16px}
+.modal-backdrop.open{display:flex}
+.modal{background:var(--bg-3);border:1px solid rgba(193,255,34,.15);border-radius:20px;width:100%;max-width:420px;padding:28px 24px;position:relative;animation:modalIn .3s ease;max-height:90vh;overflow-y:auto}
+@keyframes modalIn{from{opacity:0;transform:scale(.95) translateY(16px)}to{opacity:1;transform:scale(1) translateY(0)}}
+.modal-close{position:absolute;top:16px;right:16px;width:32px;height:32px;background:rgba(255,255,255,.06);border:none;border-radius:50%;cursor:pointer;color:var(--muted);font-size:18px;line-height:1;display:flex;align-items:center;justify-content:center;transition:background .2s,color .2s}
+.modal-close:hover{background:rgba(255,255,255,.12);color:var(--ink)}
+.modal-score-preview{display:flex;align-items:center;gap:14px;background:var(--bg-4);border:1px solid var(--line);border-radius:12px;padding:14px 16px;margin-bottom:20px}
+.modal-grade-mini{font-family:var(--disp);font-size:40px;font-weight:900;color:var(--accent);line-height:1}
+.modal-score-info{flex:1}
+.modal-score-info .tier{font-family:var(--disp);font-size:14px;font-weight:800;letter-spacing:.06em;text-transform:uppercase;color:var(--accent);margin-bottom:2px}
+.modal-score-info .detail{font-size:12px;color:var(--muted)}
+.modal-headline{font-family:var(--disp);font-size:22px;font-weight:900;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin-bottom:4px}
+.modal-sub{font-size:13px;color:var(--muted);margin-bottom:20px;line-height:1.5}
+.form-field{margin-bottom:12px}
+.form-field label{display:block;font-family:var(--disp);font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:var(--muted);margin-bottom:6px}
+.form-field input,.form-field select{width:100%;background:var(--bg-4);border:1px solid var(--line);border-radius:8px;padding:11px 14px;color:var(--ink);font-family:var(--sans);font-size:15px;outline:none;transition:border-color .2s;-webkit-appearance:none}
+.form-field input::placeholder{color:var(--muted-2)}
+.form-field input:focus,.form-field select:focus{border-color:rgba(193,255,34,.4)}
+.form-field select{cursor:pointer}
+.form-field select option{background:var(--bg-3)}
+.form-row{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.modal-fine{font-size:11px;color:var(--muted);text-align:center;margin-top:10px;line-height:1.5}
+.modal-login{text-align:center;margin-top:14px;font-size:13px;color:var(--muted)}
+.modal-login a{color:var(--accent);text-decoration:none;font-weight:600}
+.modal-login a:hover{text-decoration:underline}
+.form-msg{border-radius:8px;padding:10px 14px;font-size:13px;font-weight:500;margin-bottom:12px;display:none}
+.form-msg.error{background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#f87171;display:block}
+.form-msg.loading{background:rgba(193,255,34,.08);border:1px solid rgba(193,255,34,.15);color:var(--accent);display:block}
+.form-msg.success{background:rgba(34,210,124,.1);border:1px solid rgba(34,210,124,.2);color:var(--ok);display:block}
+.modal-success{text-align:center;padding:8px 0;display:none}
+.success-check{width:64px;height:64px;background:rgba(34,210,124,.12);border-radius:50%;display:flex;align-items:center;justify-content:center;margin:0 auto 16px}
+.success-check svg{width:30px;height:30px}
+.success-title{font-family:var(--disp);font-size:22px;font-weight:800;letter-spacing:.04em;text-transform:uppercase;color:var(--ink);margin-bottom:6px}
+.success-body{font-size:14px;color:var(--muted);line-height:1.5;margin-bottom:20px}
 </style>
 </head>
 <body>
@@ -325,8 +361,14 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
         <div class="ic-sc"><div class="ic-sc-pts neg">−6</div><div class="ic-sc-lab">Hard<br>Sure ✗</div></div>
       </div>
       <div class="ic-scoring-note">Score = <b>difficulty × conviction</b>. Hard + Locked In = 9 pts. Wrong and sure costs you points too.</div>
-      <button class="ic-btn" onclick="startQuiz()"><span>Snap the Ball</span><span class="arr">▶</span></button>
-      <div class="ic-note">5–8 min · No signup required</div>
+      <div id="startAction">
+        <button class="ic-btn" onclick="startQuiz()"><span>Snap the Ball</span><span class="arr">▶</span></button>
+        <div class="ic-note">5–8 min · No signup required</div>
+      </div>
+      <div id="cooldownNotice" style="display:none;">
+        <button class="ic-btn" disabled style="opacity:.4;cursor:not-allowed;box-shadow:none;"><span>Already Taken This Week</span><span class="arr">⏳</span></button>
+        <div class="ic-note" id="cooldownNote">You can retake this exam on —</div>
+      </div>
     </div>
   </div>
 </section>
@@ -448,7 +490,7 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
           <div class="pc-list" id="pcList"></div>
         </div>
         <div class="pc-actions">
-          <a href="/program.html" class="btn-primary" style="text-decoration:none"><span>Join the Program</span><span>→</span></a>
+          <a href="/program.html" id="pcPrimaryAction" class="btn-primary" style="text-decoration:none"><span id="pcPrimaryText">Join the Program</span><span>→</span></a>
           <button class="btn-ghost" onclick="shareResult()"><span>Share Scorecard</span><span>↗</span></button>
           <button class="btn-ghost" onclick="restart()" style="opacity:.6"><span>Retake the Exam</span><span>↻</span></button>
         </div>
@@ -456,6 +498,108 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
     </div>
   </div>
 </section>
+
+<!-- SAVE-SCORE MODAL — shown to anonymous visitors at results time so their
+     score isn't lost. Logged-in players/managed players skip this entirely
+     (renderResults auto-saves for them instead). -->
+<div class="modal-backdrop" id="modalBackdrop" onclick="closeModalOutside(event)">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modalHeadline">
+    <button class="modal-close" onclick="closeModal()" aria-label="Close">✕</button>
+
+    <div id="modalForm">
+      <div class="modal-score-preview">
+        <div class="modal-grade-mini" id="modalGrade">A</div>
+        <div class="modal-score-info">
+          <div class="tier" id="modalTier">Elite IQ</div>
+          <div class="detail">Score saved instantly on signup</div>
+        </div>
+      </div>
+
+      <div class="modal-headline" id="modalHeadline">Save Your Results</div>
+      <div class="modal-sub">Free account. Your score is saved the moment you sign up — no redirects.</div>
+
+      <div class="form-msg" id="formMsg"></div>
+
+      <div class="form-field">
+        <label>Full Name *</label>
+        <input type="text" id="mName" placeholder="Your name" autocomplete="name">
+      </div>
+
+      <div class="form-row">
+        <div class="form-field">
+          <label>Age *</label>
+          <input type="number" id="mAge" placeholder="13" min="8" max="25" oninput="handleModalAgeChange()">
+        </div>
+        <div class="form-field">
+          <label>Position (optional)</label>
+          <select id="mPosition">
+            <option value="">Select...</option>
+            <option>Quarterback</option>
+            <option>Running Back</option>
+            <option>Wide Receiver</option>
+            <option>Tight End</option>
+            <option>Offensive Line</option>
+            <option>Defensive Line</option>
+            <option>Linebacker</option>
+            <option>Cornerback</option>
+            <option>Safety</option>
+            <option>Kicker / Punter</option>
+            <option>Athlete / Multi</option>
+          </select>
+        </div>
+      </div>
+      <div class="modal-fine" id="mUnder13Notice" style="display:none;margin-bottom:14px;">
+        Players under 13 don't create their own login — a parent or guardian creates and manages the account instead. Ask below.
+      </div>
+
+      <div id="mKidFields">
+        <div class="form-field">
+          <label>Email *</label>
+          <input type="email" id="mEmail" placeholder="you@email.com" autocomplete="email">
+        </div>
+        <div class="form-field">
+          <label>Password *</label>
+          <input type="password" id="mPassword" placeholder="At least 6 characters" autocomplete="new-password">
+        </div>
+      </div>
+
+      <div id="mParentFields" style="display:none;">
+        <div class="form-field">
+          <label>Parent/Guardian Full Name *</label>
+          <input type="text" id="mParentName" placeholder="Your full name" autocomplete="name">
+        </div>
+        <div class="form-field">
+          <label>Parent/Guardian Email *</label>
+          <input type="email" id="mParentEmail" placeholder="your@email.com" autocomplete="email">
+          <div class="modal-fine" style="margin-top:6px;">We'll email you a link to confirm and review exactly what data we collect — including this score — before the account is created.</div>
+        </div>
+      </div>
+
+      <button class="btn-primary" id="signupBtn" onclick="handleModalSubmit()" style="width:100%;justify-content:center;gap:8px;text-decoration:none;">
+        Create Account &amp; Save Score →
+      </button>
+
+      <div class="modal-fine">By signing up you agree to our Terms. No spam, ever.</div>
+
+      <div class="modal-login">
+        Already have an account? <a href="auth.html?tab=login">Log In</a>
+      </div>
+    </div>
+
+    <div class="modal-success" id="modalSuccess">
+      <div class="success-check">
+        <svg viewBox="0 0 24 24" fill="none" stroke="#22D27C" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round">
+          <polyline points="20 6 9 17 4 12"/>
+        </svg>
+      </div>
+      <div class="success-title">Score Saved!</div>
+      <div class="success-body" id="successBody">Your score is locked in. Taking you to your dashboard…</div>
+      <button class="btn-primary" onclick="window.location.href='dashboard.html'" style="width:100%;justify-content:center;text-decoration:none;">
+        View Full Dashboard →
+      </button>
+    </div>
+  </div>
+</div>
 
 <!-- Mobile conviction bar — only visible via body.quiz-active -->
 <div class="conv-bottom-bar" id="convBottomBar">
@@ -469,7 +613,28 @@ a.nav-brand{text-decoration:none;color:inherit;cursor:pointer;}
 
 <div class="toast" id="toast">Copied</div>
 
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 <script>
+// ── SUPABASE CONFIG — standalone client, this page doesn't load app.js ──
+const SUPABASE_URL = 'https://wzylgwvifdfnkmuleoxn.supabase.co';
+const SUPABASE_KEY = 'sb_publishable_FaPj5NQeqzsRE8kOme2lKQ_uXrHArbt';
+var db = null;
+try {
+  const { createClient } = supabase;
+  db = createClient(SUPABASE_URL, SUPABASE_KEY);
+} catch(e) {
+  console.warn('Supabase init skipped.');
+}
+var currentUser = null;
+var activeManagedPlayer = null;
+
+function getActiveManagedPlayer() {
+  try {
+    var raw = sessionStorage.getItem('fda_activeManagedPlayer');
+    return raw ? JSON.parse(raw) : null;
+  } catch(e) { return null; }
+}
+
 // ── Question Pool: 3 difficulties × 5 domains × 3 questions each ──
 const POOL={
   "Rules & Objectives":{
@@ -662,7 +827,51 @@ function announce(msg){
   if(el) el.textContent=msg;
 }
 
+var cooldownActive = false;
+var cooldownUntil = null;
+
+// Resolve session/managed-player once on load, then check whether this
+// owner is inside the 7-day retake cooldown before they can start —
+// this is a courtesy (tells them when they're next eligible before they
+// spend 8 minutes on it); the real gate is the RLS insert policy on
+// giq_scores, which can't be bypassed by this check being skipped.
+(async function initGiqSession(){
+  try { activeManagedPlayer = getActiveManagedPlayer(); } catch(e) {}
+  if (!activeManagedPlayer && db) {
+    try {
+      var result = await db.auth.getSession();
+      if (result && result.data && result.data.session) currentUser = result.data.session.user;
+    } catch(e) { console.error('Session check error:', e); }
+  }
+  if (currentUser || activeManagedPlayer) await checkCooldown();
+})();
+
+async function checkCooldown(){
+  try {
+    var query = activeManagedPlayer
+      ? db.from('giq_scores').select('taken_at').eq('managed_player_id', activeManagedPlayer.id).order('taken_at', { ascending: false }).limit(1)
+      : db.from('giq_scores').select('taken_at').eq('user_id', currentUser.id).order('taken_at', { ascending: false }).limit(1);
+    var result = await query;
+    var rows = result.data || [];
+    if (!rows.length) return;
+    var nextEligible = new Date(new Date(rows[0].taken_at).getTime() + 7 * 24 * 60 * 60 * 1000);
+    if (nextEligible > new Date()) showCooldown(nextEligible);
+  } catch(e) { console.error('Cooldown check error:', e); }
+}
+
+function showCooldown(nextEligible){
+  cooldownActive = true;
+  cooldownUntil = nextEligible;
+  var startAction = document.getElementById('startAction');
+  var notice = document.getElementById('cooldownNotice');
+  var note = document.getElementById('cooldownNote');
+  if (startAction) startAction.style.display = 'none';
+  if (notice) notice.style.display = 'block';
+  if (note) note.textContent = 'You can retake this exam on ' + nextEligible.toLocaleDateString('en-US', { weekday: 'long', month: 'short', day: 'numeric' }) + '.';
+}
+
 function startQuiz(){
+  if (cooldownActive) return;
   document.getElementById('screenIntro').classList.remove('active');
   document.getElementById('screenQuiz').classList.add('active');
   document.body.classList.add('quiz-active');
@@ -930,16 +1139,281 @@ function renderResults(){
   document.getElementById('pcSub').innerHTML=`Weakest domain: <em style="color:var(--accent);font-style:normal">${weak.d}</em>. Close that gap and your whole score climbs.`;
   const pc=document.getElementById('pcList');pc.innerHTML='';
   prescriptionFor(weak.d).forEach((s,i)=>{const el=document.createElement('div');el.className='pc-item';el.innerHTML=`<span class="pc-num">0${i+1}</span><span class="pc-text">${s}</span>`;pc.appendChild(el)});
+
+  lastResults={score:disp,MAX:MAX,grade:g.g,correct:correct,ds:ds};
+  handlePostResultsSave();
 }
 function prescriptionFor(d){
   const map={"Rules & Objectives":["Re-read the scoring, downs, and clock sections of the rulebook.","Watch five drives muted. Narrate the rule at every stoppage.","Quiz yourself on penalty yardage and automatic first-down triggers."],"Positions & Roles":["Map all 22 positions on a blank field diagram from memory.","Shadow one position per game — watch stance, first-step, leverage.","Learn strong vs. free safety, Will / Mike / Sam linebacker roles."],"Formations & Alignments":["Build flashcards for the ten most-used offensive formations.","Pause the broadcast at the snap. Name the alignment out loud.","Study motion — the cheapest way offense unmasks a defense."],"Plays & Concepts":["Pick one concept a week — Mesh, Y-Cross, Four Verts — and learn it cold.","Re-watch a full game and label every play: run, pass, or play-action.","Draw three screen variants on paper until the spacing is obvious."],"Situation & Strategy":["Memorize the 4th-down decision chart by field position.","Chart the final two minutes of three close games — every call, every stop.","Study two-point conversion math. It's simpler than it looks."]};
   return map[d]||[];
 }
 function animateNumber(el,from,to,dur){const s=performance.now();function t(n){const p=Math.min(1,(n-s)/dur),e=1-Math.pow(1-p,3);el.textContent=Math.round(from+(to-from)*e);if(p<1)requestAnimationFrame(t)}requestAnimationFrame(t)}
+
+// ══════════════════════════════════════════
+// SAVE THE SCORE
+// ══════════════════════════════════════════
+var lastResults=null;
+
+// giq-exam's own domain names don't all slug-match the fixed pillar_*
+// columns on giq_scores (which were named after curriculum.js's pillar
+// list) — "Positions & Roles" and "Situation & Strategy" need an
+// explicit override rather than the naive replace/lowercase used
+// elsewhere for the three domains that do match.
+const DOMAIN_TO_PILLAR_KEY={
+  "Rules & Objectives":"rulesobjectives",
+  "Positions & Roles":"positionsresponsibilities",
+  "Formations & Alignments":"formationsalignments",
+  "Plays & Concepts":"playsconcepts",
+  "Situation & Strategy":"situationalawareness"
+};
+
+// giq_scores.score is read elsewhere (dashboard.html, app.js's
+// getTierName/"X / 100" display) assuming a 0-100 scale. giq-exam's own
+// raw point total isn't — MAX varies with adaptive difficulty and can
+// include negative points — so it's normalized to a percentage here;
+// the letter grade is saved as-is from gradeFor(), which is giq-exam's
+// own (different, coarser) scale rather than app.js's getLetterGrade.
+async function saveGiqScoreForOwner(results){
+  const pillarData={};
+  results.ds.forEach(function(d){
+    const key='pillar_'+(DOMAIN_TO_PILLAR_KEY[d.d]||d.d.replace(/[^a-zA-Z]/g,'').toLowerCase());
+    pillarData[key]=d.c+'/'+d.t;
+  });
+  const normalizedScore=Math.round((results.score/results.MAX)*100);
+  const base=activeManagedPlayer
+    ? {managed_player_id:activeManagedPlayer.id}
+    : {user_id:currentUser.id};
+  const row=Object.assign({},base,{score:normalizedScore,grade:results.grade,correct:results.correct,taken_at:new Date().toISOString()},pillarData);
+  try {
+    const result=await db.from('giq_scores').insert(row);
+    return !result.error;
+  } catch(e) { console.error('Score save error:',e); return false; }
+}
+
+function setPrimaryAction(mode){
+  const a=document.getElementById('pcPrimaryAction');
+  const span=document.getElementById('pcPrimaryText');
+  if(!a||!span) return;
+  if(mode==='signup'){
+    a.href='#';
+    span.textContent='Save My Score & Join Free';
+    a.onclick=function(e){e.preventDefault();openModal();};
+  } else if(mode==='saved'){
+    a.href='dashboard.html';
+    span.textContent='Saved ✓ — View Dashboard';
+    a.onclick=null;
+  } else {
+    a.href='/program.html';
+    span.textContent='Join the Program';
+    a.onclick=null;
+  }
+}
+
+async function handlePostResultsSave(){
+  if((currentUser||activeManagedPlayer)&&db){
+    const ok=await saveGiqScoreForOwner(lastResults);
+    setPrimaryAction(ok?'saved':'program');
+    // A retake within the next 7 days would fail the RLS insert check
+    // anyway — set the cooldown immediately so "Retake the Exam" from
+    // this same results screen shows that up front instead of letting
+    // them redo all 15 questions only to fail at the save step.
+    if(ok){ cooldownActive=true; cooldownUntil=new Date(Date.now()+7*24*60*60*1000); }
+  } else {
+    setPrimaryAction('signup');
+    const modalGrade=document.getElementById('modalGrade');
+    const modalTier=document.getElementById('modalTier');
+    if(modalGrade) modalGrade.textContent=lastResults.grade;
+    if(modalTier) modalTier.textContent=document.getElementById('resTier').textContent;
+  }
+}
+
+// ── MODAL ──
+function openModal(){
+  document.getElementById('modalBackdrop').classList.add('open');
+  document.body.style.overflow='hidden';
+  setTimeout(function(){document.getElementById('mName').focus();},300);
+}
+function closeModal(){
+  document.getElementById('modalBackdrop').classList.remove('open');
+  document.body.style.overflow='';
+}
+function closeModalOutside(e){
+  if(e.target===document.getElementById('modalBackdrop')) closeModal();
+}
+document.addEventListener('keydown',function(e){
+  const backdrop=document.getElementById('modalBackdrop');
+  if(e.key==='Escape'&&backdrop&&backdrop.classList.contains('open')) closeModal();
+});
+function showFormMsg(type,msg){
+  const el=document.getElementById('formMsg');
+  el.className='form-msg '+type;
+  el.textContent=msg;
+}
+
+// Consent tokens gate a child's staged PII (get_pending_child_signup is
+// callable by anon with just the token) — Math.random()/Date.now() are
+// not unpredictable enough for that.
+function generateSecureToken(){
+  if(window.crypto&&crypto.randomUUID) return crypto.randomUUID();
+  if(window.crypto&&crypto.getRandomValues){
+    const bytes=new Uint8Array(16);
+    crypto.getRandomValues(bytes);
+    return Array.prototype.map.call(bytes,function(b){return b.toString(16).padStart(2,'0');}).join('');
+  }
+  throw new Error('Secure random number generation is not available in this browser.');
+}
+
+function modalIsUnder13(){
+  const age=parseInt(document.getElementById('mAge').value,10);
+  return !isNaN(age)&&age>0&&age<13;
+}
+function handleModalAgeChange(){
+  const under13=modalIsUnder13();
+  const notice=document.getElementById('mUnder13Notice');
+  const kid=document.getElementById('mKidFields');
+  const parent=document.getElementById('mParentFields');
+  const btn=document.getElementById('signupBtn');
+  if(notice) notice.style.display=under13?'block':'none';
+  if(kid) kid.style.display=under13?'none':'block';
+  if(parent) parent.style.display=under13?'block':'none';
+  if(btn) btn.textContent=under13?'Send Parent Consent Email →':'Create Account & Save Score →';
+}
+function handleModalSubmit(){
+  if(modalIsUnder13()) doModalParentSignup();
+  else doModalSignup();
+}
+
+function pillarDataFromResults(){
+  const pillarData={};
+  lastResults.ds.forEach(function(d){
+    const key='pillar_'+(DOMAIN_TO_PILLAR_KEY[d.d]||d.d.replace(/[^a-zA-Z]/g,'').toLowerCase());
+    pillarData[key]=d.c+'/'+d.t;
+  });
+  return pillarData;
+}
+
+// Under-13 path: no account is created directly here. The score and
+// signup form data are staged against a single-use token, and a
+// verified parent has to click through a magic-link email before any
+// account or managed_players row exists — same mechanism as
+// auth.html's parent signup and giq-result.html's own modal.
+async function doModalParentSignup(){
+  const childName=document.getElementById('mName').value.trim();
+  const childAge=document.getElementById('mAge').value.trim();
+  const position=document.getElementById('mPosition').value;
+  const parentName=document.getElementById('mParentName').value.trim();
+  const parentEmail=document.getElementById('mParentEmail').value.trim();
+
+  if(!childName){ showFormMsg('error',"Please enter the player's name."); return; }
+  if(!parentName||!parentEmail){ showFormMsg('error',"Please enter the parent or guardian's name and email."); return; }
+
+  const btn=document.getElementById('signupBtn');
+  btn.disabled=true;
+  btn.textContent='Sending…';
+  showFormMsg('loading','Sending consent email…');
+
+  try {
+    const normalizedScore=Math.round((lastResults.score/lastResults.MAX)*100);
+    const token=generateSecureToken();
+    const insertResult=await db.from('pending_child_signups').insert({
+      token:token,
+      child_name:childName,
+      child_age:parseInt(childAge,10)||0,
+      position:position||null,
+      parent_name:parentName,
+      parent_email:parentEmail,
+      giq_score:normalizedScore,
+      giq_grade:lastResults.grade,
+      giq_correct:lastResults.correct,
+      giq_pillars:pillarDataFromResults()
+    });
+    if(insertResult.error){
+      showFormMsg('error','Something went wrong. Please try again.');
+      console.error(insertResult.error);
+      btn.disabled=false; btn.textContent='Send Parent Consent Email →';
+      return;
+    }
+
+    const redirectTo=window.location.origin+'/parent-consent.html?token='+encodeURIComponent(token);
+    const otpResult=await db.auth.signInWithOtp({
+      email:parentEmail,
+      options:{emailRedirectTo:redirectTo,data:{full_name:parentName,role:'parent'}}
+    });
+    if(otpResult.error){
+      showFormMsg('error',otpResult.error.message);
+      btn.disabled=false; btn.textContent='Send Parent Consent Email →';
+      return;
+    }
+
+    document.getElementById('modalForm').style.display='none';
+    document.getElementById('modalSuccess').style.display='block';
+    document.getElementById('successBody').textContent=
+      "We've emailed "+parentEmail+" a link to confirm and create the account. Your score will be saved the moment they consent.";
+  } catch(err){
+    console.error(err);
+    showFormMsg('error','Something went wrong. Please try again.');
+    btn.disabled=false; btn.textContent='Send Parent Consent Email →';
+  }
+}
+
+async function doModalSignup(){
+  const name=document.getElementById('mName').value.trim();
+  const email=document.getElementById('mEmail').value.trim();
+  const age=document.getElementById('mAge').value.trim();
+  const position=document.getElementById('mPosition').value;
+  const password=document.getElementById('mPassword').value;
+
+  if(!name){ showFormMsg('error','Please enter your name.'); return; }
+  if(!email){ showFormMsg('error','Please enter your email.'); return; }
+  if(!age){ showFormMsg('error','Please enter your age.'); return; }
+  if(!password){ showFormMsg('error','Please create a password.'); return; }
+  if(password.length<6){ showFormMsg('error','Password must be at least 6 characters.'); return; }
+
+  const btn=document.getElementById('signupBtn');
+  btn.disabled=true;
+  btn.textContent='Saving your score…';
+  showFormMsg('loading','Creating your account and saving your score…');
+
+  try {
+    const signupResult=await db.auth.signUp({
+      email:email,
+      password:password,
+      options:{data:{full_name:name,role:'player',age:parseInt(age),position:position}}
+    });
+    if(signupResult.error){
+      showFormMsg('error',signupResult.error.message);
+      btn.disabled=false; btn.textContent='Create Account & Save Score →';
+      return;
+    }
+
+    const userId=signupResult.data.user.id;
+    currentUser=signupResult.data.user;
+
+    await db.from('profiles').insert({
+      id:userId, full_name:name, age:parseInt(age)||0,
+      position:position||null, created_at:new Date().toISOString()
+    });
+
+    await saveGiqScoreForOwner(lastResults);
+
+    document.getElementById('modalForm').style.display='none';
+    document.getElementById('modalSuccess').style.display='block';
+    document.getElementById('successBody').textContent=
+      'Your score and pillar breakdown are locked in. Heading to your dashboard…';
+
+    setTimeout(function(){ window.location.href='dashboard.html'; },3000);
+  } catch(err){
+    console.error(err);
+    showFormMsg('error','Something went wrong. Please try again.');
+    btn.disabled=false; btn.textContent='Create Account & Save Score →';
+  }
+}
+
 function restart(){
   document.getElementById('screenResults').classList.remove('active');
   document.getElementById('screenIntro').classList.add('active');
   state={answers:[],queue:[],idx:0,blockDiff:[],pickedIdx:null,pickedConf:null};
+  if(cooldownActive&&cooldownUntil) showCooldown(cooldownUntil);
   window.scrollTo({top:0});
 }
 function shareResult(){
