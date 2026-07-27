@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Your Gridiron IQ Result — First Down Academy</title>
+<title>Your FootballIQ Result — First Down Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:wght@400;600;700;800;900&family=Barlow:wght@400;500;600&display=swap" rel="stylesheet">
@@ -947,7 +947,7 @@ body::before {
   </header>
 
   <!-- Exam Label -->
-  <div class="exam-label">⚡ Gridiron IQ — Result</div>
+  <div class="exam-label">⚡ FootballIQ — Result</div>
 
   <!-- Grade Card -->
   <div class="grade-card">
@@ -1617,9 +1617,9 @@ async function doModalSignup() {
 // ── SHARE ──
 function shareResult() {
   var tier = getTierName(examData.score);
-  var text = 'I just scored ' + examData.score + '/100 on the Gridiron IQ Exam — ' + tier.name + ' rating! 🏈 Test your football knowledge at firstdownacademy.com';
+  var text = 'I just scored ' + examData.score + '/100 on the FootballIQ Exam — ' + tier.name + ' rating! 🏈 Test your football knowledge at firstdownacademy.com';
   if (navigator.share) {
-    navigator.share({ title: 'My Gridiron IQ Result', text: text, url: 'https://firstdownacademy.com' });
+    navigator.share({ title: 'My FootballIQ Result', text: text, url: 'https://firstdownacademy.com' });
   } else {
     navigator.clipboard.writeText(text).then(function() {
       alert('Result copied — share it with your team!');
@@ -1629,7 +1629,7 @@ function shareResult() {
 
 function copyResult() {
   var tier = getTierName(examData.score);
-  var text = 'Gridiron IQ: ' + examData.score + '/100 — ' + tier.name + ' | firstdownacademy.com';
+  var text = 'FootballIQ: ' + examData.score + '/100 — ' + tier.name + ' | firstdownacademy.com';
   navigator.clipboard.writeText(text).then(function() {
     var btn = event.currentTarget;
     var orig = btn.innerHTML;

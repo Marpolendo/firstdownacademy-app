@@ -3,15 +3,15 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Gridiron IQ Score — First Down Academy</title>
+<title>FootballIQ Score — First Down Academy</title>
 <link rel="icon" type="image/x-icon" href="favicon.ico">
 
 <!-- OG / iMessage preview tags — populated by JS once score loads -->
 <meta property="og:type"        content="website">
 <meta property="og:site_name"   content="First Down Academy">
 <meta property="og:image"       content="https://firstdownacademy.com/og-default.png" id="ogImage">
-<meta property="og:title"       content="Gridiron IQ Test — First Down Academy"       id="ogTitle">
-<meta property="og:description" content="Think you know football? Take the Gridiron IQ Test and find out." id="ogDesc">
+<meta property="og:title"       content="FootballIQ Test — First Down Academy"       id="ogTitle">
+<meta property="og:description" content="Think you know football? Take the FootballIQ Test and find out." id="ogDesc">
 <meta property="og:url"         content="https://firstdownacademy.com/giq-exam.html"   id="ogUrl">
 <meta name="twitter:card"       content="summary_large_image">
 
@@ -299,7 +299,7 @@ a{text-decoration:none;}
       <a href="index.html">
         <img src="https://firstdownacademy.com/logo.png" alt="First Down Academy" onerror="this.style.display='none'">
       </a>
-      <div class="logo-bar-badge">Gridiron IQ</div>
+      <div class="logo-bar-badge">FootballIQ</div>
     </div>
 
     <!-- Loading -->
@@ -313,7 +313,7 @@ a{text-decoration:none;}
       <div class="error-icon">🏈</div>
       <div class="error-title">Score Not Found</div>
       <div class="error-sub">This link may have expired or the score wasn't saved properly.</div>
-      <a href="giq-exam.html" class="btn-primary">Take the Gridiron IQ Test &rarr;</a>
+      <a href="giq-exam.html" class="btn-primary">Take the FootballIQ Test &rarr;</a>
     </div>
 
     <!-- Score card (populated by JS) -->
@@ -321,7 +321,7 @@ a{text-decoration:none;}
 
       <div class="score-head">
         <div class="score-head-glow"></div>
-        <div class="score-eyebrow" id="cardEyebrow">Gridiron IQ — Result</div>
+        <div class="score-eyebrow" id="cardEyebrow">FootballIQ — Result</div>
         <div class="score-display" id="cardGrade">B+</div>
         <div class="score-tier" id="cardTier">Advanced</div>
         <div class="score-tier-sub" id="cardTierSub">Strong football knowledge</div>
@@ -365,7 +365,7 @@ a{text-decoration:none;}
         <div class="cta-section">
           <div class="cta-context">
             <div class="cta-context-text">
-              <strong id="ctaPlayerRef">This player</strong> scored <strong id="ctaScore">—</strong> on the Gridiron IQ Test.
+              <strong id="ctaPlayerRef">This player</strong> scored <strong id="ctaScore">—</strong> on the FootballIQ Test.
               Think you can match it? Create your free account and find out where you stand.
             </div>
           </div>
@@ -470,8 +470,8 @@ function renderScore(data) {
   document.getElementById('ctaScore').textContent = grade + ' (' + (data.score || '—') + '/100)';
 
   // Update OG tags dynamically (helps if page is re-shared from browser)
-  document.title = 'Gridiron IQ ' + grade + ' — First Down Academy';
-  setMeta('ogTitle', 'Someone scored ' + grade + ' on the Gridiron IQ Test');
+  document.title = 'FootballIQ ' + grade + ' — First Down Academy';
+  setMeta('ogTitle', 'Someone scored ' + grade + ' on the FootballIQ Test');
   setMeta('ogDesc',  'Think you know football? Take the test and see if you can beat it.');
 
   // Pillar preview — show randomised-looking bars (real values stay hidden)
