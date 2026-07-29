@@ -394,9 +394,10 @@ function saveState(s){
 // checkSession() throws and dispatches that event synchronously,
 // before this page's own script tag has run — same race already fixed
 // on parent-consent.html.
-(async function gateSafetyPage(){
+async function runSafetyGate(){
   var managed = null;
   try { managed = getActiveManagedPlayer(); } catch(e) {}
+  currentUser = null; // never trust state left over from a bfcache restore
 
   if (!managed && typeof db !== 'undefined' && db) {
     try {
@@ -409,11 +410,34 @@ function saveState(s){
 
   if (!currentUser && !managed) {
     window.location.href = 'auth.html?next=safety.html';
-    return;
+    return { ok: false, managed: null };
   }
+  return { ok: true, managed: managed };
+}
 
-  initSafetyPage(managed);
+(async function initialGateCheck(){
+  var gate = await runSafetyGate();
+  if (gate.ok) initSafetyPage(gate.managed);
 })();
+
+// The browser can restore this page from bfcache — fully rendered,
+// lessons and all — on a plain back-button press, without re-running
+// any script on the page. A visitor who was once authorized here,
+// then signed out and hit "back", would otherwise see everything
+// exactly as it was while they were still allowed to. Blank the
+// content immediately (synchronously, before the async recheck even
+// starts) so there's no flash of it, then only rebuild if the
+// recheck actually confirms they're still authorized.
+window.addEventListener('pageshow', function(e){
+  if (!e.persisted) return;
+  document.getElementById('lessons').innerHTML = '';
+  document.getElementById('progFill').style.width = '0%';
+  document.getElementById('progLabel').textContent = '0 of 6 lessons complete';
+  document.getElementById('completeBanner').classList.remove('show');
+  runSafetyGate().then(function(gate){
+    if (gate.ok) initSafetyPage(gate.managed);
+  });
+});
 
 async function loadSafetyProgress(managed){
   var doneIds = {};
