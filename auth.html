@@ -9,129 +9,146 @@
 <title>Sign Up — First Down Academy</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Barlow:wght@300;400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Barlow+Condensed:ital,wght@0,700;0,800;0,900;1,800;1,900&family=Barlow:wght@300;400;500&family=JetBrains+Mono:wght@500;700&display=swap" rel="stylesheet">
 <style>
 /* ── RESET ── */
 *,*::before,*::after{box-sizing:border-box;margin:0;padding:0;}
 html{height:100%;}
 body{background:#020f1e;color:#d9e7fc;font-family:'Barlow',sans-serif;min-height:100vh;overflow-x:hidden;}
 a{text-decoration:none;}
+button{font-family:inherit;}
+:focus-visible{outline:2px solid #C1FF22;outline-offset:2px;}
+[role="button"]:focus{outline:2px solid #C1FF22;outline-offset:2px;box-shadow:0 0 0 4px rgba(193,255,34,.35);}
+@media (prefers-reduced-motion: reduce){
+  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
+}
 
 /* ── LAYOUT ── */
-.auth-wrap{display:grid;grid-template-columns:1fr 1fr;min-height:100vh;}
+.auth-wrap{display:grid;grid-template-columns:minmax(420px,44%) 1fr;min-height:100vh;}
 @media(max-width:860px){.auth-wrap{grid-template-columns:1fr;}}
 
 /* ── LEFT PANEL ── */
 .auth-left{
-  background:#020f1e;position:relative;
-  display:flex;flex-direction:column;justify-content:flex-end;
-  padding:48px 52px;overflow:hidden;
+  background:
+    radial-gradient(ellipse 620px 460px at 18% 100%,rgba(193,255,34,.10),transparent 65%),
+    radial-gradient(ellipse 500px 500px at 100% 0%,rgba(46,110,255,.08),transparent 60%),
+    #030f1d;
+  position:relative;
+  display:flex;flex-direction:column;justify-content:space-between;
+  padding:44px 48px 40px;overflow:hidden;
 }
 @media(max-width:860px){.auth-left{display:none;}}
-.auth-left-photo{
-  position:absolute;inset:0;margin:0;pointer-events:none;overflow:hidden;
-}
-.auth-left-photo img{
-  width:100%;height:100%;object-fit:cover;display:block;
-  filter:grayscale(1) contrast(1.15) brightness(.62);
-  mix-blend-mode:luminosity;opacity:.85;
-}
-.auth-left-photo::after{
-  content:'';position:absolute;inset:0;
-  background:linear-gradient(180deg,rgba(2,15,30,.35) 0%,rgba(2,15,30,.55) 55%,rgba(2,15,30,.92) 100%);
-}
 .auth-left-grid{
   position:absolute;inset:0;pointer-events:none;
   background-image:
-    repeating-linear-gradient(90deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 80px),
-    repeating-linear-gradient(0deg,rgba(255,255,255,.015) 0,rgba(255,255,255,.015) 1px,transparent 1px,transparent 80px);
-}
-.auth-left-glow{
-  position:absolute;bottom:-15%;left:-10%;width:500px;height:500px;
-  background:radial-gradient(ellipse,rgba(193,255,34,.07),transparent 70%);pointer-events:none;
+    repeating-linear-gradient(90deg,rgba(255,255,255,.025) 0,rgba(255,255,255,.025) 1px,transparent 1px,transparent 64px),
+    repeating-linear-gradient(0deg,rgba(255,255,255,.02) 0,rgba(255,255,255,.02) 1px,transparent 1px,transparent 64px);
+  -webkit-mask-image:linear-gradient(180deg,transparent,#000 30%,#000 75%,transparent);
+  mask-image:linear-gradient(180deg,transparent,#000 30%,#000 75%,transparent);
 }
 .auth-left-hash{
   position:absolute;inset:0;pointer-events:none;
-  background-image:repeating-linear-gradient(-55deg,transparent,transparent 28px,rgba(193,255,34,.015) 28px,rgba(193,255,34,.015) 29px);
+  background-image:repeating-linear-gradient(-55deg,transparent,transparent 28px,rgba(193,255,34,.02) 28px,rgba(193,255,34,.02) 29px);
 }
 .auth-left-wm{
-  position:absolute;bottom:-40px;right:-20px;pointer-events:none;
+  position:absolute;bottom:-.12em;right:-.05em;pointer-events:none;
   font-family:'Barlow Condensed',sans-serif;font-weight:900;font-style:italic;
-  font-size:320px;line-height:1;letter-spacing:-.02em;
-  color:transparent;-webkit-text-stroke:1px rgba(193,255,34,.05);user-select:none;
+  font-size:min(30vw,300px);line-height:1;letter-spacing:-.02em;
+  color:transparent;-webkit-text-stroke:1px rgba(193,255,34,.055);user-select:none;
 }
-.auth-brand{display:flex;align-items:center;gap:12px;margin-bottom:64px;position:relative;z-index:1;}
+.auth-brand{display:flex;align-items:center;gap:11px;position:relative;z-index:1;}
 .auth-brand-mark{
-  width:44px;height:44px;border-radius:8px;background:#C1FF22;
+  width:40px;height:40px;border-radius:9px;background:#C1FF22;
   display:flex;align-items:center;justify-content:center;
-  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;color:#0d1a00;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;color:#0d1a00;
+  transform:skewX(-6deg);
 }
 .auth-brand-name{
-  font-family:'Barlow Condensed',sans-serif;font-size:16px;font-weight:900;
-  letter-spacing:.08em;text-transform:uppercase;color:#fff;line-height:1.1;
+  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;
+  letter-spacing:.09em;text-transform:uppercase;color:#fff;line-height:1.1;
 }
 .auth-brand-name span{color:#C1FF22;}
-.auth-left-content{position:relative;z-index:1;}
+
+.auth-left-content{position:relative;z-index:1;margin:auto 0;padding:40px 0;}
 .auth-left-eyebrow{
-  font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.22em;text-transform:uppercase;color:rgba(255,255,255,.55);margin-bottom:16px;
+  font-family:'JetBrains Mono',monospace;font-size:11px;font-weight:700;
+  letter-spacing:.2em;text-transform:uppercase;color:#C1FF22;margin-bottom:18px;
 }
 .auth-left-h1{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(52px,6vw,80px);font-weight:900;
-  line-height:.86;letter-spacing:-.01em;text-transform:uppercase;
-  color:rgba(255,255,255,.75);margin-bottom:12px;
+  font-size:clamp(42px,4.6vw,60px);font-weight:900;
+  line-height:.94;letter-spacing:-.01em;text-transform:uppercase;
+  color:#fff;margin-bottom:18px;
 }
-.auth-left-h1 .lime{color:#C1FF22;font-size:clamp(62px,7.5vw,96px);display:block;}
-.auth-left-h1 .ghost{display:block;color:transparent;-webkit-text-stroke:2px rgba(255,255,255,.15);}
+.auth-left-h1 .lime{color:#C1FF22;}
+.auth-left-h1 .ghost{color:transparent;-webkit-text-stroke:1.5px rgba(255,255,255,.18);}
 .auth-left-sub{
-  font-size:15px;font-weight:300;color:rgba(255,255,255,.4);
-  line-height:1.7;max-width:380px;margin-bottom:32px;
+  font-size:15px;font-weight:300;color:rgba(217,231,252,.55);
+  line-height:1.7;max-width:400px;margin-bottom:30px;
 }
+
 #authGradePreview{
-  background:rgba(193,255,34,.06);border:1px solid rgba(193,255,34,.15);
-  border-radius:8px;padding:16px 20px;display:none;
+  background:rgba(193,255,34,.06);border:1px solid rgba(193,255,34,.16);
+  border-radius:10px;padding:18px 22px;display:none;margin-bottom:8px;
 }
 .auth-preview-label{
-  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
-  letter-spacing:.18em;text-transform:uppercase;color:rgba(193,255,34,.6);margin-bottom:6px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:rgba(193,255,34,.65);margin-bottom:7px;
 }
 .auth-preview-grade{
-  font-family:'Barlow Condensed',sans-serif;font-size:56px;font-weight:900;
-  color:#C1FF22;line-height:1;margin-bottom:2px;
+  font-family:'Barlow Condensed',sans-serif;font-size:52px;font-weight:900;
+  color:#C1FF22;line-height:1;margin-bottom:3px;
 }
 .auth-preview-tier{
   font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:700;
-  letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.4);
+  letter-spacing:.06em;text-transform:uppercase;color:rgba(255,255,255,.45);
 }
-.auth-unlock-list{margin-top:28px;display:flex;flex-direction:column;gap:8px;}
-.auth-unlock-item{display:flex;align-items:center;gap:10px;font-size:13px;color:rgba(255,255,255,.45);}
-.auth-unlock-dot{width:6px;height:6px;border-radius:50%;background:#C1FF22;box-shadow:0 0 6px rgba(193,255,34,.5);flex-shrink:0;}
+
+.auth-unlock-list{display:flex;flex-direction:column;gap:9px;}
+.auth-unlock-item{display:flex;align-items:center;gap:10px;font-size:13.5px;color:rgba(217,231,252,.5);}
+.auth-unlock-item svg{flex-shrink:0;width:15px;height:15px;color:#C1FF22;}
+
+/* Decorative pillar-breakdown mock — replaces the old broken photo panel */
+.auth-left-stat{position:relative;z-index:1;}
+.auth-left-stat-label{
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.16em;text-transform:uppercase;color:rgba(255,255,255,.3);margin-bottom:12px;
+}
+.auth-stat-bars{display:flex;flex-direction:column;gap:9px;}
+.auth-stat-row{display:grid;grid-template-columns:104px 1fr auto;align-items:center;gap:12px;}
+.auth-stat-name{font-size:11.5px;color:rgba(217,231,252,.55);}
+.auth-stat-track{height:5px;border-radius:999px;background:rgba(255,255,255,.06);overflow:hidden;}
+.auth-stat-fill{height:100%;border-radius:999px;background:linear-gradient(90deg,rgba(193,255,34,.55),#C1FF22);}
+.auth-stat-pct{font-family:'JetBrains Mono',monospace;font-size:11px;color:rgba(193,255,34,.75);width:34px;text-align:right;}
 
 /* ── RIGHT PANEL ── */
 .auth-right{
   background:#081b2c;
   display:flex;align-items:flex-start;justify-content:center;
-  padding:48px 32px 60px;
+  padding:52px 32px 60px;
   border-left:1px solid rgba(255,255,255,.06);
   min-height:100vh;
   overflow-y:auto;
 }
 @media(max-width:860px){
-  .auth-right{background:#020f1e;border-left:none;padding:24px 20px 80px;align-items:flex-start;}
+  .auth-right{background:#020f1e;border-left:none;padding:0 20px 48px;align-items:flex-start;}
 }
-.auth-right-inner{width:100%;max-width:420px;padding-top:8px;}
+.auth-right-inner{width:100%;max-width:408px;padding-top:4px;}
 
 /* Mobile brand */
-.auth-mobile-brand{display:none;align-items:center;gap:10px;margin-bottom:32px;}
+.auth-mobile-brand{
+  display:none;align-items:center;gap:10px;
+  padding:20px 0 22px;margin-bottom:8px;border-bottom:1px solid rgba(255,255,255,.06);
+}
 @media(max-width:860px){.auth-mobile-brand{display:flex;}}
 .auth-mobile-mark{
-  width:36px;height:36px;border-radius:6px;background:#C1FF22;
+  width:34px;height:34px;border-radius:7px;background:#C1FF22;
   display:flex;align-items:center;justify-content:center;
-  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:900;color:#0d1a00;
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:900;color:#0d1a00;
+  transform:skewX(-6deg);
 }
 .auth-mobile-name{
-  font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;
+  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:900;
   letter-spacing:.08em;text-transform:uppercase;color:#fff;
 }
 .auth-mobile-name span{color:#C1FF22;}
@@ -149,63 +166,77 @@ a{text-decoration:none;}
 /* Tab bar */
 .auth-tab-bar{
   display:grid;grid-template-columns:1fr 1fr;gap:2px;
-  background:#0d2134;border-radius:8px;padding:3px;margin-bottom:28px;
+  background:#0d2134;border-radius:9px;padding:3px;margin-bottom:26px;
 }
 .auth-tab-btn{
-  background:none;border:none;border-radius:6px;cursor:pointer;
+  background:none;border:none;border-radius:7px;cursor:pointer;
   font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
   letter-spacing:.1em;text-transform:uppercase;
-  color:rgba(255,255,255,.3);padding:10px;transition:all .18s;
+  color:rgba(255,255,255,.3);padding:11px;transition:all .18s;
 }
 .auth-tab-btn.active{background:#12273c;color:#fff;}
 .auth-tab-btn:hover:not(.active){color:rgba(255,255,255,.6);}
 
 /* Section header */
 .auth-mode-label{
-  font-family:'Barlow Condensed',sans-serif;font-size:10px;font-weight:700;
-  letter-spacing:.2em;text-transform:uppercase;color:#C1FF22;margin-bottom:6px;
+  font-family:'JetBrains Mono',monospace;font-size:10px;font-weight:700;
+  letter-spacing:.18em;text-transform:uppercase;color:#C1FF22;margin-bottom:7px;
 }
 .auth-right-title{
   font-family:'Barlow Condensed',sans-serif;
-  font-size:clamp(26px,3.5vw,34px);font-weight:900;
+  font-size:clamp(26px,3.5vw,32px);font-weight:900;
   letter-spacing:-.01em;text-transform:uppercase;
-  color:#fff;line-height:.95;margin-bottom:22px;
+  color:#fff;line-height:.95;margin-bottom:6px;
 }
+.auth-right-hint{font-size:13px;color:rgba(255,255,255,.4);margin-bottom:22px;line-height:1.5;}
+
+/* Step progress */
+.step-track{display:flex;gap:6px;margin-bottom:24px;}
+.step-seg{flex:1;height:3px;border-radius:999px;background:rgba(255,255,255,.08);transition:background .2s;}
+.step-seg.on{background:#C1FF22;}
 
 /* Role selector */
-.auth-role-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:20px;}
+.auth-role-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:18px;}
 .auth-role-card{
   background:#0d2134;border:1.5px solid rgba(255,255,255,.08);
-  border-radius:10px;padding:16px 12px;text-align:center;cursor:pointer;
+  border-radius:10px;padding:15px 12px;text-align:center;cursor:pointer;
   transition:all .18s;
 }
 .auth-role-card:hover{border-color:rgba(255,255,255,.2);background:#122840;}
 .auth-role-card.active{
   border-color:#C1FF22;background:rgba(193,255,34,.07);
 }
-.auth-role-icon{font-size:24px;margin-bottom:7px;line-height:1;}
-.auth-role-title{
-  font-family:'Barlow Condensed',sans-serif;font-size:14px;font-weight:800;
-  letter-spacing:.08em;text-transform:uppercase;color:#fff;margin-bottom:3px;
+.auth-role-icon{
+  width:30px;height:30px;margin:0 auto 8px;border-radius:8px;
+  display:flex;align-items:center;justify-content:center;
+  background:rgba(255,255,255,.06);color:rgba(255,255,255,.5);
+  transition:all .18s;
 }
-.auth-role-desc{font-size:11px;color:rgba(255,255,255,.55);}
+.auth-role-icon svg{width:16px;height:16px;}
+.auth-role-card.active .auth-role-icon{background:rgba(193,255,34,.16);color:#C1FF22;}
+.auth-role-title{
+  font-family:'Barlow Condensed',sans-serif;font-size:13.5px;font-weight:800;
+  letter-spacing:.07em;text-transform:uppercase;color:#fff;margin-bottom:2px;
+}
+.auth-role-desc{font-size:10.5px;color:rgba(255,255,255,.4);}
 .auth-role-card.active .auth-role-desc{color:rgba(193,255,34,.6);}
 
 /* Form fields */
 .auth-field{margin-bottom:14px;}
+.auth-field-row{display:grid;grid-template-columns:1fr 1fr;gap:10px;}
 .auth-label{
   font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.45);
+  letter-spacing:.13em;text-transform:uppercase;color:rgba(255,255,255,.4);
   margin-bottom:6px;display:flex;align-items:center;justify-content:space-between;
 }
 .auth-label-opt{
   font-family:'Barlow Condensed',sans-serif;font-size:9px;font-weight:600;
-  letter-spacing:.1em;color:rgba(255,255,255,.55);
+  letter-spacing:.1em;color:rgba(255,255,255,.3);
 }
 .auth-input-wrap{position:relative;}
 .auth-input-icon{
-  position:absolute;left:12px;top:50%;transform:translateY(-50%);
-  font-size:14px;pointer-events:none;opacity:.4;
+  position:absolute;right:12px;top:50%;transform:translateY(-50%);
+  font-size:14px;pointer-events:none;
 }
 .auth-input{
   width:100%;background:#0d2134;
@@ -216,15 +247,24 @@ a{text-decoration:none;}
   -webkit-appearance:none;appearance:none;
 }
 .auth-input:focus{border-color:rgba(193,255,34,.5);background:#102030;}
-:focus-visible{outline:2px solid #C1FF22;outline-offset:2px;}
-[role="button"]:focus{outline:2px solid #C1FF22;outline-offset:2px;box-shadow:0 0 0 4px rgba(193,255,34,.35);}
-@media (prefers-reduced-motion: reduce){
-  *,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important;}
-}
 .auth-input::placeholder{color:rgba(255,255,255,.18);}
 .auth-input option{background:#0d2134;color:#fff;}
-.auth-field-hint{font-size:11px;color:rgba(255,255,255,.55);margin-top:6px;line-height:1.5;}
+.auth-field-hint{font-size:11px;color:rgba(255,255,255,.4);margin-top:6px;line-height:1.5;}
 .auth-field-error{font-size:11px;color:#fca5a5;margin-top:5px;display:none;}
+.auth-field-error.show{display:block;}
+
+/* Optional-field disclosure (referral code) */
+.auth-disclosure summary{
+  list-style:none;cursor:pointer;display:flex;align-items:center;gap:6px;
+  font-family:'Barlow Condensed',sans-serif;font-size:12px;font-weight:700;
+  letter-spacing:.08em;text-transform:uppercase;color:rgba(255,255,255,.4);
+  margin-bottom:14px;transition:color .18s;
+}
+.auth-disclosure summary::-webkit-details-marker{display:none;}
+.auth-disclosure summary:hover{color:rgba(255,255,255,.7);}
+.auth-disclosure summary svg{width:11px;height:11px;transition:transform .18s;}
+.auth-disclosure[open] summary svg{transform:rotate(45deg);}
+.auth-disclosure[open] summary{color:#C1FF22;margin-bottom:10px;}
 
 /* Password strength */
 .pw-strength{margin-top:6px;}
@@ -240,23 +280,24 @@ a{text-decoration:none;}
 }
 
 /* Checkbox row */
-.auth-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:16px;}
+.auth-check-row{display:flex;align-items:flex-start;gap:10px;margin-bottom:18px;}
 .auth-check-row input[type=checkbox]{
   width:16px;height:16px;flex-shrink:0;margin-top:2px;
   accent-color:#C1FF22;cursor:pointer;
 }
-.auth-check-row label{font-size:12px;color:rgba(255,255,255,.55);line-height:1.5;cursor:pointer;}
-.auth-check-row a{color:rgba(193,255,34,.6);transition:color .18s;}
+.auth-check-row label{font-size:12px;color:rgba(255,255,255,.5);line-height:1.5;cursor:pointer;}
+.auth-check-row a{color:rgba(193,255,34,.65);transition:color .18s;}
 .auth-check-row a:hover{color:#C1FF22;}
 
-/* Submit */
+/* Submit / step actions */
+.step-actions{display:flex;gap:10px;}
 .auth-submit{
-  width:100%;padding:14px;
+  flex:1;padding:14px;
   background:#C1FF22;color:#0d1a00;
   font-family:'Barlow Condensed',sans-serif;font-size:15px;font-weight:900;
   letter-spacing:.1em;text-transform:uppercase;
   border:none;border-radius:8px;cursor:pointer;
-  transition:all .18s;position:relative;overflow:hidden;margin-bottom:16px;
+  transition:all .18s;position:relative;overflow:hidden;
 }
 .auth-submit::after{
   content:'';position:absolute;inset:0;
@@ -265,24 +306,26 @@ a{text-decoration:none;}
 }
 .auth-submit:hover::after{transform:translateX(100%);}
 .auth-submit:hover{background:#d0ff55;transform:translateY(-1px);box-shadow:0 6px 20px rgba(193,255,34,.3);}
+.auth-back-btn{
+  flex:none;padding:14px 16px;background:none;cursor:pointer;
+  border:1.5px solid rgba(255,255,255,.1);border-radius:8px;color:rgba(255,255,255,.5);
+  font-family:'Barlow Condensed',sans-serif;font-size:13px;font-weight:800;
+  letter-spacing:.08em;text-transform:uppercase;transition:all .18s;
+}
+.auth-back-btn:hover{border-color:rgba(255,255,255,.3);color:#fff;}
 
 /* Switch link */
-.auth-switch{text-align:center;font-size:13px;color:rgba(255,255,255,.55);margin-top:4px;}
-.auth-switch a{color:rgba(193,255,34,.7);transition:color .18s;}
+.auth-switch{text-align:center;font-size:13px;color:rgba(255,255,255,.5);margin-top:16px;}
+.auth-switch a{color:rgba(193,255,34,.75);transition:color .18s;}
 .auth-switch a:hover{color:#C1FF22;}
 
 /* Forgot password link */
 .auth-forgot{
   font-family:'Barlow Condensed',sans-serif;font-size:11px;font-weight:700;
-  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.55);transition:color .18s;
+  letter-spacing:.1em;text-transform:uppercase;color:rgba(255,255,255,.45);transition:color .18s;
 }
-.auth-forgot:hover{color:rgba(255,255,255,.8);}
+.auth-forgot:hover{color:rgba(255,255,255,.75);}
 
-/* Auth message (injected by JS) */
-.auth-msg{
-  border-radius:8px;padding:14px 16px;margin-top:12px;
-  font-size:13px;line-height:1.6;
-}
 .auth-toast-icon{font-size:14px;}
 </style>
 </head>
@@ -292,11 +335,7 @@ a{text-decoration:none;}
 
   <!-- ── LEFT PANEL ── -->
   <div class="auth-left">
-    <figure class="auth-left-photo" aria-hidden="true">
-      <img src="https://firstdownacademy.com/img/home-player.jpg" alt="" loading="lazy" onerror="this.closest('figure').style.display='none'">
-    </figure>
     <div class="auth-left-grid"></div>
-    <div class="auth-left-glow"></div>
     <div class="auth-left-hash"></div>
     <div class="auth-left-wm">IQ</div>
 
@@ -308,9 +347,7 @@ a{text-decoration:none;}
     <div class="auth-left-content">
       <div class="auth-left-eyebrow" id="authLeftEyebrow">Create Your Account</div>
       <h1 class="auth-left-h1" id="authLeftHeadline">
-        UNLOCK YOUR
-        <span class="lime">FOOTBALLIQ</span>
-        <span class="ghost">RESULTS.</span>
+        UNLOCK YOUR <span class="lime">FOOTBALLIQ</span> <span class="ghost">RESULTS.</span>
       </h1>
       <p class="auth-left-sub" id="authLeftSub">
         You completed the quiz. Create a free account to unlock your full score, pillar breakdown, and personalized improvement plan.
@@ -326,20 +363,42 @@ a{text-decoration:none;}
       <!-- Unlock bullets — shown by default -->
       <div class="auth-unlock-list" id="authUnlockList">
         <div class="auth-unlock-item">
-          <div class="auth-unlock-dot"></div>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Full pillar breakdown
         </div>
         <div class="auth-unlock-item">
-          <div class="auth-unlock-dot"></div>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Personalized improvement plan
         </div>
         <div class="auth-unlock-item">
-          <div class="auth-unlock-dot"></div>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Quiz history &amp; progress tracking
         </div>
         <div class="auth-unlock-item">
-          <div class="auth-unlock-dot"></div>
+          <svg viewBox="0 0 24 24" fill="none"><path d="M4 12.5l5 5L20 7" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"/></svg>
           Access to the full course
+        </div>
+      </div>
+    </div>
+
+    <!-- Decorative sample breakdown — self-contained, no external image -->
+    <div class="auth-left-stat">
+      <div class="auth-left-stat-label">Sample FootballIQ Breakdown</div>
+      <div class="auth-stat-bars">
+        <div class="auth-stat-row">
+          <div class="auth-stat-name">Coverage IDs</div>
+          <div class="auth-stat-track"><div class="auth-stat-fill" style="width:82%"></div></div>
+          <div class="auth-stat-pct">82%</div>
+        </div>
+        <div class="auth-stat-row">
+          <div class="auth-stat-name">Route Trees</div>
+          <div class="auth-stat-track"><div class="auth-stat-fill" style="width:64%"></div></div>
+          <div class="auth-stat-pct">64%</div>
+        </div>
+        <div class="auth-stat-row">
+          <div class="auth-stat-name">Blitz ID</div>
+          <div class="auth-stat-track"><div class="auth-stat-fill" style="width:71%"></div></div>
+          <div class="auth-stat-pct">71%</div>
         </div>
       </div>
     </div>
@@ -348,6 +407,11 @@ a{text-decoration:none;}
   <!-- ── RIGHT PANEL ── -->
 <div class="auth-right">
     <div class="auth-right-inner">
+
+      <div class="auth-mobile-brand">
+        <div class="auth-mobile-mark">FDA</div>
+        <div class="auth-mobile-name">FIRST DOWN <span>ACADEMY</span></div>
+      </div>
 
       <!-- Toast message -->
       <div class="auth-toast" id="authToast">
@@ -370,12 +434,12 @@ a{text-decoration:none;}
         <!-- Role selector -->
         <div class="auth-role-row">
           <div class="auth-role-card active" id="rolePlayer" role="button" tabindex="0" aria-pressed="true" onclick="switchRole('player')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchRole('player');}">
-            <div class="auth-role-icon">🏈</div>
+            <div class="auth-role-icon"><svg viewBox="0 0 24 24" fill="none"><circle cx="12" cy="7.5" r="3.2" stroke="currentColor" stroke-width="1.8"/><path d="M4.5 20c1-4 4-6 7.5-6s6.5 2 7.5 6" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
             <div class="auth-role-title">Player</div>
             <div class="auth-role-desc">I want to learn</div>
           </div>
           <div class="auth-role-card" id="roleCoach" role="button" tabindex="0" aria-pressed="false" onclick="switchRole('coach')" onkeydown="if(event.key==='Enter'||event.key===' '){event.preventDefault();switchRole('coach');}">
-            <div class="auth-role-icon">📋</div>
+            <div class="auth-role-icon"><svg viewBox="0 0 24 24" fill="none"><rect x="5" y="4.5" width="14" height="17" rx="2" stroke="currentColor" stroke-width="1.8"/><path d="M9 4.5V3.8A1.8 1.8 0 0 1 10.8 2h2.4A1.8 1.8 0 0 1 15 3.8v.7" stroke="currentColor" stroke-width="1.8"/><path d="M8.5 11.5h7M8.5 15.5h5" stroke="currentColor" stroke-width="1.8" stroke-linecap="round"/></svg></div>
             <div class="auth-role-title">Coach</div>
             <div class="auth-role-desc">I have a team</div>
           </div>
@@ -383,152 +447,200 @@ a{text-decoration:none;}
 
         <!-- Player fields -->
         <div id="playerFields">
-          <div class="auth-field">
-            <label class="auth-label" for="playerName">Player's Full Name</label>
-            <input class="auth-input" id="playerName" type="text" placeholder="Player's full name" autocomplete="name">
+
+          <div class="step-track" id="playerStepTrack">
+            <div class="step-seg on" data-step="1"></div>
+            <div class="step-seg" data-step="2"></div>
           </div>
-          <div class="auth-field">
-            <label class="auth-label" for="playerAge">Player's Age</label>
-            <select class="auth-input" id="playerAge" onchange="handleAgeChange()">
-              <option value="">Select age</option>
-              <option>8</option><option>9</option><option>10</option><option>11</option>
-              <option>12</option><option>13</option><option>14</option><option>15</option>
-              <option>16</option><option>17</option><option>18</option><option value="18+">18+</option>
-            </select>
+
+          <!-- Step 1: who's playing -->
+          <div id="playerStep1">
+            <div class="auth-field">
+              <label class="auth-label" for="playerName">Player's Full Name</label>
+              <input class="auth-input" id="playerName" type="text" placeholder="Player's full name" autocomplete="name">
+            </div>
+            <div class="auth-field-row">
+              <div class="auth-field">
+                <label class="auth-label" for="playerAge">Age</label>
+                <select class="auth-input" id="playerAge" onchange="handleAgeChange()">
+                  <option value="">Select</option>
+                  <option>8</option><option>9</option><option>10</option><option>11</option>
+                  <option>12</option><option>13</option><option>14</option><option>15</option>
+                  <option>16</option><option>17</option><option>18</option><option value="18+">18+</option>
+                </select>
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="playerPosition">
+                  Position
+                  <span class="auth-label-opt">Optional</span>
+                </label>
+                <select class="auth-input" id="playerPosition">
+                  <option value="">Select...</option>
+                  <option>Quarterback</option>
+                  <option>Running Back</option>
+                  <option>Wide Receiver</option>
+                  <option>Tight End</option>
+                  <option>Offensive Line</option>
+                  <option>Defensive Line</option>
+                  <option>Linebacker</option>
+                  <option>Cornerback</option>
+                  <option>Safety</option>
+                  <option>Kicker / Punter</option>
+                  <option>Athlete / Multi</option>
+                </select>
+              </div>
+            </div>
             <div class="auth-field-hint" id="under13Notice" style="display:none;">
-              Players under 13 don't create their own login — a parent or guardian creates and manages the account instead. Ask below.
+              Players under 13 don't create their own login — a parent or guardian creates and manages the account instead. Ask on the next step.
             </div>
-          </div>
-          <div class="auth-field">
-            <label class="auth-label" for="playerPosition">
-              Position
-              <span class="auth-label-opt">Optional</span>
-            </label>
-            <select class="auth-input" id="playerPosition">
-              <option value="">Select...</option>
-              <option>Quarterback</option>
-              <option>Running Back</option>
-              <option>Wide Receiver</option>
-              <option>Tight End</option>
-              <option>Offensive Line</option>
-              <option>Defensive Line</option>
-              <option>Linebacker</option>
-              <option>Cornerback</option>
-              <option>Safety</option>
-              <option>Kicker / Punter</option>
-              <option>Athlete / Multi</option>
-            </select>
+
+            <div class="step-actions">
+              <button type="button" class="auth-submit" onclick="goPlayerStep(2)">Continue &rarr;</button>
+            </div>
+            <div class="auth-switch">Already have an account? <a onclick="switchTab('login')">Log In</a></div>
           </div>
 
-          <!-- 13+ : player creates their own login -->
-          <div id="teenOnlyFields">
-            <div class="auth-field">
-              <label class="auth-label" for="playerEmail">Email</label>
-              <div class="auth-input-wrap">
-                <input class="auth-input" id="playerEmail" type="email" placeholder="your@email.com" autocomplete="email">
-              </div>
-            </div>
-            <div class="auth-field">
-              <label class="auth-label" for="playerPassword">Password</label>
-              <input class="auth-input" id="playerPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value); checkPasswordMatch()">
-              <div class="pw-strength" id="pwStrength">
-                <div class="pw-strength-bar">
-                  <div class="pw-seg" id="pwSeg1"></div>
-                  <div class="pw-seg" id="pwSeg2"></div>
-                  <div class="pw-seg" id="pwSeg3"></div>
-                  <div class="pw-seg" id="pwSeg4"></div>
+          <!-- Step 2: create the login -->
+          <div id="playerStep2" style="display:none;">
+
+            <!-- 13+ : player creates their own login -->
+            <div id="teenOnlyFields">
+              <div class="auth-field">
+                <label class="auth-label" for="playerEmail">Email</label>
+                <div class="auth-input-wrap">
+                  <input class="auth-input" id="playerEmail" type="email" placeholder="your@email.com" autocomplete="email">
                 </div>
-                <div class="pw-strength-label" id="pwLabel">Enter a password</div>
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="playerPassword">Password</label>
+                <input class="auth-input" id="playerPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkPasswordStrength(this.value); checkPasswordMatch()">
+                <div class="pw-strength" id="pwStrength">
+                  <div class="pw-strength-bar">
+                    <div class="pw-seg" id="pwSeg1"></div>
+                    <div class="pw-seg" id="pwSeg2"></div>
+                    <div class="pw-seg" id="pwSeg3"></div>
+                    <div class="pw-seg" id="pwSeg4"></div>
+                  </div>
+                  <div class="pw-strength-label" id="pwLabel">Enter a password</div>
+                </div>
+              </div>
+              <div class="auth-field">
+                <label class="auth-label" for="playerPasswordConfirm">Confirm Password</label>
+                <div class="auth-input-wrap">
+                  <input class="auth-input" id="playerPasswordConfirm" type="password" placeholder="Type it again" autocomplete="new-password" oninput="checkPasswordMatch()">
+                  <span class="auth-input-icon" id="pwMatchIcon"></span>
+                </div>
+                <div class="auth-field-error" id="pwMatchError">Passwords do not match</div>
               </div>
             </div>
-            <div class="auth-field">
-              <label class="auth-label" for="playerPasswordConfirm">Confirm Password</label>
-              <div class="auth-input-wrap">
-                <input class="auth-input" id="playerPasswordConfirm" type="password" placeholder="Type it again" autocomplete="new-password" oninput="checkPasswordMatch()">
-                <span class="auth-input-icon" id="pwMatchIcon"></span>
+
+            <!-- Under 13 : parent/guardian creates and owns the account -->
+            <div id="parentOnlyFields" style="display:none;">
+              <div class="auth-field">
+                <label class="auth-label" for="parentName">Parent/Guardian Full Name</label>
+                <input class="auth-input" id="parentName" type="text" placeholder="Your full name" autocomplete="name">
               </div>
-              <div class="auth-field-error" id="pwMatchError">Passwords do not match</div>
+              <div class="auth-field">
+                <label class="auth-label" for="parentEmail">Parent/Guardian Email</label>
+                <div class="auth-input-wrap">
+                  <input class="auth-input" id="parentEmail" type="email" placeholder="your@email.com" autocomplete="email">
+                </div>
+                <div class="auth-field-hint">We'll email you a link to confirm and review exactly what data we collect before the account is created. No password needed right now.</div>
+              </div>
+            </div>
+
+            <details class="auth-disclosure">
+              <summary>
+                <svg viewBox="0 0 24 24" fill="none"><path d="M12 5v14M5 12h14" stroke="currentColor" stroke-width="2" stroke-linecap="round"/></svg>
+                Have a coach referral code?
+              </summary>
+              <div class="auth-field">
+                <input class="auth-input" id="playerReferral" type="text" placeholder="e.g. eagles4827">
+                <div class="auth-field-hint">Links your progress to your coach's team.</div>
+              </div>
+            </details>
+
+            <div class="auth-check-row">
+              <input type="checkbox" id="playerTerms">
+              <label for="playerTerms">I agree to the <a href="https://firstdownacademy.com/legal.html">Terms of Service</a> and <a href="https://firstdownacademy.com/legal.html">Privacy Policy</a></label>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="auth-back-btn" onclick="goPlayerStep(1)">&larr; Back</button>
+              <button class="auth-submit" id="playerSubmitBtn">Create Player Account &rarr;</button>
             </div>
           </div>
 
-          <!-- Under 13 : parent/guardian creates and owns the account -->
-          <div id="parentOnlyFields" style="display:none;">
-            <div class="auth-field">
-              <label class="auth-label" for="parentName">Parent/Guardian Full Name</label>
-              <input class="auth-input" id="parentName" type="text" placeholder="Your full name" autocomplete="name">
-            </div>
-            <div class="auth-field">
-              <label class="auth-label" for="parentEmail">Parent/Guardian Email</label>
-              <div class="auth-input-wrap">
-                <input class="auth-input" id="parentEmail" type="email" placeholder="your@email.com" autocomplete="email">
-              </div>
-              <div class="auth-field-hint">We'll email you a link to confirm and review exactly what data we collect before the account is created. No password needed right now.</div>
-            </div>
-          </div>
-
-          <div class="auth-field">
-            <label class="auth-label" for="playerReferral">
-              Coach Referral Code
-              <span class="auth-label-opt">Optional</span>
-            </label>
-            <input class="auth-input" id="playerReferral" type="text" placeholder="e.g. eagles4827">
-            <div class="auth-field-hint">Ask your coach for their referral code to link your progress to their team.</div>
-          </div>
-          <div class="auth-check-row">
-            <input type="checkbox" id="playerTerms">
-            <label for="playerTerms">I agree to the <a href="https://firstdownacademy.com/legal.html">Terms of Service</a> and <a href="https://firstdownacademy.com/legal.html">Privacy Policy</a></label>
-          </div>
-          <button class="auth-submit" id="playerSubmitBtn">Create Player Account &rarr;</button>
-          <div class="auth-switch">Already have an account? <a onclick="switchTab('login')">Log In</a></div>
         </div>
 
         <!-- Coach fields -->
         <div id="coachFields" style="display:none;">
-          <div class="auth-field">
-            <label class="auth-label" for="coachName">Your Full Name</label>
-            <input class="auth-input" id="coachName" type="text" placeholder="Coach name" autocomplete="name">
-          </div>
-          <div class="auth-field">
-            <label class="auth-label" for="coachEmail">Email</label>
-            <input class="auth-input" id="coachEmail" type="email" placeholder="your@email.com" autocomplete="email">
-          </div>
-          <div class="auth-field">
-            <label class="auth-label" for="coachTeamName">Team Name</label>
-            <input class="auth-input" id="coachTeamName" type="text" placeholder="e.g. Westside Bears">
-          </div>
-          <div class="auth-field">
-            <label class="auth-label" for="coachMascot">Team Mascot</label>
-            <input class="auth-input" id="coachMascot" type="text" placeholder="e.g. Bears" autocomplete="off">
-            <div class="auth-field-hint">Used to generate your unique team code — e.g. BEARS492. You can't change this later.</div>
+
+          <div class="step-track" id="coachStepTrack">
+            <div class="step-seg on" data-step="1"></div>
+            <div class="step-seg" data-step="2"></div>
           </div>
 
-          <div class="auth-field">
-            <label class="auth-label" for="coachPassword">Password</label>
-            <input class="auth-input" id="coachPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkCoachPasswordStrength(this.value); checkCoachPasswordMatch()">
-            <div class="pw-strength" id="coachPwStrength">
-              <div class="pw-strength-bar">
-                <div class="pw-seg" id="cPwSeg1"></div>
-                <div class="pw-seg" id="cPwSeg2"></div>
-                <div class="pw-seg" id="cPwSeg3"></div>
-                <div class="pw-seg" id="cPwSeg4"></div>
+          <!-- Step 1: team info -->
+          <div id="coachStep1">
+            <div class="auth-field">
+              <label class="auth-label" for="coachName">Your Full Name</label>
+              <input class="auth-input" id="coachName" type="text" placeholder="Coach name" autocomplete="name">
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="coachEmail">Email</label>
+              <input class="auth-input" id="coachEmail" type="email" placeholder="your@email.com" autocomplete="email">
+            </div>
+            <div class="auth-field-row">
+              <div class="auth-field">
+                <label class="auth-label" for="coachTeamName">Team Name</label>
+                <input class="auth-input" id="coachTeamName" type="text" placeholder="e.g. Westside Bears">
               </div>
-              <div class="pw-strength-label" id="coachPwLabel">Enter a password</div>
+              <div class="auth-field">
+                <label class="auth-label" for="coachMascot">Mascot</label>
+                <input class="auth-input" id="coachMascot" type="text" placeholder="e.g. Bears" autocomplete="off">
+              </div>
+            </div>
+            <div class="auth-field-hint" style="margin-top:-6px;margin-bottom:16px;">Mascot is used to generate your unique team code — e.g. BEARS492. You can't change this later.</div>
+
+            <div class="step-actions">
+              <button type="button" class="auth-submit" onclick="goCoachStep(2)">Continue &rarr;</button>
+            </div>
+            <div class="auth-switch">Already have an account? <a onclick="switchTab('login')">Log In</a></div>
+          </div>
+
+          <!-- Step 2: password -->
+          <div id="coachStep2" style="display:none;">
+            <div class="auth-field">
+              <label class="auth-label" for="coachPassword">Password</label>
+              <input class="auth-input" id="coachPassword" type="password" placeholder="At least 6 characters" autocomplete="new-password" oninput="checkCoachPasswordStrength(this.value); checkCoachPasswordMatch()">
+              <div class="pw-strength" id="coachPwStrength">
+                <div class="pw-strength-bar">
+                  <div class="pw-seg" id="cPwSeg1"></div>
+                  <div class="pw-seg" id="cPwSeg2"></div>
+                  <div class="pw-seg" id="cPwSeg3"></div>
+                  <div class="pw-seg" id="cPwSeg4"></div>
+                </div>
+                <div class="pw-strength-label" id="coachPwLabel">Enter a password</div>
+              </div>
+            </div>
+            <div class="auth-field">
+              <label class="auth-label" for="coachPasswordConfirm">Confirm Password</label>
+              <div class="auth-input-wrap">
+                <input class="auth-input" id="coachPasswordConfirm" type="password" placeholder="Type it again" autocomplete="new-password" oninput="checkCoachPasswordMatch()">
+                <span class="auth-input-icon" id="coachPwMatchIcon"></span>
+              </div>
+              <div class="auth-field-error" id="coachPwMatchError">Passwords do not match</div>
+            </div>
+            <div class="auth-check-row">
+              <input type="checkbox" id="coachTerms">
+              <label for="coachTerms">I agree to the <a href="https://firstdownacademy.com/legal.html">Terms of Service</a> and <a href="https://firstdownacademy.com/legal.html">Privacy Policy</a></label>
+            </div>
+            <div class="step-actions">
+              <button type="button" class="auth-back-btn" onclick="goCoachStep(1)">&larr; Back</button>
+              <button class="auth-submit" onclick="doCoachSignup()">Create Coach Account &rarr;</button>
             </div>
           </div>
-          <div class="auth-field">
-            <label class="auth-label" for="coachPasswordConfirm">Confirm Password</label>
-            <div class="auth-input-wrap">
-              <input class="auth-input" id="coachPasswordConfirm" type="password" placeholder="Type it again" autocomplete="new-password" oninput="checkCoachPasswordMatch()">
-              <span class="auth-input-icon" id="coachPwMatchIcon"></span>
-            </div>
-            <div class="auth-field-error" id="coachPwMatchError">Passwords do not match</div>
-          </div>
-          <div class="auth-check-row">
-            <input type="checkbox" id="coachTerms">
-            <label for="coachTerms">I agree to the <a href="https://firstdownacademy.com/legal.html">Terms of Service</a> and <a href="https://firstdownacademy.com/legal.html">Privacy Policy</a></label>
-          </div>
-          <button class="auth-submit" onclick="doCoachSignup()">Create Coach Account &rarr;</button>
-          <div class="auth-switch">Already have an account? <a onclick="switchTab('login')">Log In</a></div>
+
         </div>
 
       </div>
@@ -536,7 +648,7 @@ a{text-decoration:none;}
       <!-- ── LOGIN FORM ── -->
       <div id="formLogin" style="display:none;">
         <div class="auth-mode-label">Welcome back</div>
-        <div class="auth-right-title">Log In</div>
+        <div class="auth-right-title" style="margin-bottom:22px;">Log In</div>
 
         <div class="auth-field">
           <label class="auth-label" for="loginEmail">Email</label>
@@ -545,23 +657,20 @@ a{text-decoration:none;}
         <div class="auth-field">
           <label class="auth-label" for="loginPassword">
             Password
-            <a onclick="handleForgotPassword()" style="color:#8a96b0;text-decoration:underline;text-underline-offset:3px;cursor:pointer;">Forgot password?</a>
+            <a class="auth-forgot" onclick="handleForgotPassword()" style="cursor:pointer;">Forgot password?</a>
           </label>
           <input class="auth-input" id="loginPassword" type="password" placeholder="Your password" autocomplete="current-password">
         </div>
 
-        <button class="auth-submit" onclick="doLogin()">Log In &rarr;</button>
+        <button class="auth-submit" style="width:100%;" onclick="doLogin()">Log In &rarr;</button>
 
-        <div class="auth-switch" style="margin-top:20px;">
+        <div class="auth-switch">
           Don&rsquo;t have an account? <a onclick="switchTab('signup')">Sign up free</a>
         </div>
       </div>
 
     </div>
   </div>
-
-</div>
-
 
 </div>
 
@@ -624,6 +733,10 @@ var _ref = _params.get('ref');
 if (_ref) {
   var _refInput = document.getElementById('playerReferral');
   if (_refInput) _refInput.value = _ref;
+  document.addEventListener('DOMContentLoaded', function() {
+    var d = document.querySelector('.auth-disclosure');
+    if (d) d.open = true;
+  });
 }
 
 // Handle ?next=giq-exam.html — show quiz result context on left panel
@@ -638,10 +751,9 @@ if (_ref) {
   if (!isFromQuiz) {
     // Generic signup — update messaging
     var headline = document.getElementById('authLeftHeadline');
-    if (headline) headline.innerHTML = 'BUILD YOUR <span class="acc">FOOTBALL IQ</span> <span class="ghost">TODAY.</span>';
+    if (headline) headline.innerHTML = 'BUILD YOUR <span class="lime">FOOTBALL IQ</span> <span class="ghost">TODAY.</span>';
     var sub = document.getElementById('authLeftSub');
     if (sub) sub.textContent = 'Join First Down Academy free. Take the FootballIQ quiz, build your football knowledge, and track your improvement over time.';
-    var unlockList = document.getElementById('authUnlockList');
     // Keep the unlock list — it's relevant for all signups
   }
 
@@ -649,9 +761,9 @@ if (_ref) {
     // Show the grade preview card
     var preview = document.getElementById('authGradePreview');
     if (preview) preview.style.display = 'block';
-    var gradeEl = document.getElementById('authGradeDisplay');
+    var gradeEl = document.getElementById('authPreviewGrade');
     if (gradeEl) gradeEl.textContent = storedGrade;
-    var tierEl = document.getElementById('authTierDisplay');
+    var tierEl = document.getElementById('authPreviewTier');
     if (tierEl) tierEl.textContent = storedTier || '';
   }
 })();
@@ -681,6 +793,49 @@ function switchRole(role) {
   if (cf) cf.style.display = role === 'coach' ? 'block' : 'none';
   if (rp) { rp.classList.toggle('active', role === 'player'); rp.setAttribute('aria-pressed', role === 'player'); }
   if (rc) { rc.classList.toggle('active', role === 'coach'); rc.setAttribute('aria-pressed', role === 'coach'); }
+  // Reset both wizards to step 1 whenever the role changes
+  goPlayerStep(1);
+  goCoachStep(1);
+  clearToast();
+}
+
+// ── Step wizard (player) ──
+function goPlayerStep(n) {
+  var s1 = document.getElementById('playerStep1');
+  var s2 = document.getElementById('playerStep2');
+  if (n === 2) {
+    var name = document.getElementById('playerName');
+    var age  = document.getElementById('playerAge');
+    if (!name || !name.value.trim()) { showToast('error', "Please enter the player's name."); return; }
+    if (!age || !age.value) { showToast('error', "Please select the player's age."); return; }
+  }
+  if (s1) s1.style.display = n === 1 ? 'block' : 'none';
+  if (s2) s2.style.display = n === 2 ? 'block' : 'none';
+  document.querySelectorAll('#playerStepTrack .step-seg').forEach(function(seg) {
+    seg.classList.toggle('on', parseInt(seg.dataset.step, 10) <= n);
+  });
+  clearToast();
+}
+
+// ── Step wizard (coach) ──
+function goCoachStep(n) {
+  var s1 = document.getElementById('coachStep1');
+  var s2 = document.getElementById('coachStep2');
+  if (n === 2) {
+    var name  = document.getElementById('coachName');
+    var email = document.getElementById('coachEmail');
+    var team  = document.getElementById('coachTeamName');
+    var mascot = document.getElementById('coachMascot');
+    if (!name || !name.value.trim()) { showToast('error', 'Please enter your name.'); return; }
+    if (!email || !email.value.trim()) { showToast('error', 'Please enter your email.'); return; }
+    if (!team || !team.value.trim()) { showToast('error', 'Please enter your team name.'); return; }
+    if (!mascot || !mascot.value.trim()) { showToast('error', 'Please enter your team mascot.'); return; }
+  }
+  if (s1) s1.style.display = n === 1 ? 'block' : 'none';
+  if (s2) s2.style.display = n === 2 ? 'block' : 'none';
+  document.querySelectorAll('#coachStepTrack .step-seg').forEach(function(seg) {
+    seg.classList.toggle('on', parseInt(seg.dataset.step, 10) <= n);
+  });
   clearToast();
 }
 
@@ -756,8 +911,6 @@ function checkCoachPasswordMatch() {
   if (err)  err.classList.toggle('show', !match);
 }
 
-// Coach preview removed — referral code generated on account creation
-
 // ── Age-gated signup: under 13 requires a parent-managed account ──
 function isUnder13() {
   var ageEl = document.getElementById('playerAge');
@@ -783,7 +936,7 @@ function handleAgeChange() {
 var _origDoSignup = null;
 document.addEventListener('DOMContentLoaded', function() {
   // Validate password match before calling doSignup from app.js
-  var submitBtn = document.querySelector('#playerFields .auth-submit');
+  var submitBtn = document.querySelector('#playerFields .auth-submit#playerSubmitBtn') || document.getElementById('playerSubmitBtn');
   if (submitBtn) {
     submitBtn.onclick = function() {
       var terms = document.getElementById('playerTerms');
@@ -815,7 +968,7 @@ document.addEventListener('DOMContentLoaded', function() {
       doSignup();
     };
   }
-  var coachBtn = document.querySelector('#coachFields .auth-submit');
+  var coachBtn = document.querySelector('#coachStep2 .auth-submit');
   if (coachBtn) {
     coachBtn.onclick = function() {
       var pw   = document.getElementById('coachPassword');
@@ -827,7 +980,7 @@ document.addEventListener('DOMContentLoaded', function() {
         return;
       }
       if (!terms || !terms.checked) {
-        showToas('error', 'Please agree to the Terms of Service and Privacy Policy.');
+        showToast('error', 'Please agree to the Terms of Service and Privacy Policy.');
         return;
       }
       doCoachSignup();
